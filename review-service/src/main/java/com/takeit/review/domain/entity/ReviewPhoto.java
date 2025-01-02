@@ -29,7 +29,7 @@ public class ReviewPhoto extends BaseEntity {
     private Review review;
 
     @Column(name = "file_name")
-    private String fileName;
+    private UUID fileName;
 
     @Column(name = "uri")
     private String uri;
