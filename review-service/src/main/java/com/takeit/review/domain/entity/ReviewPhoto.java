@@ -28,6 +28,9 @@ public class ReviewPhoto extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Review review;
 
+    @Column(name = "origin_file_name")
+    private String originFileName;
+
     @Column(name = "uri")
     private String uri;
 
