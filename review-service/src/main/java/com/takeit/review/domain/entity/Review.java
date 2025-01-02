@@ -27,7 +27,7 @@ public class Review extends BaseEntity {
     @Column(name = "stars", nullable = false)
     private Integer stars;
 
-    @Column(name = "comment")
+    @Column(name = "comment", length = 255)
     private String comment;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "id")

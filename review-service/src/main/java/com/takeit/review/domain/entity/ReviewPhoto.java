@@ -31,7 +31,7 @@ public class ReviewPhoto extends BaseEntity {
     @Column(name = "file_name")
     private UUID fileName;
 
-    @Column(name = "uri")
+    @Column(name = "uri", length = 255)
     private String uri;
 
     @Column(name = "is_s3_deleted")
