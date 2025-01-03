@@ -1,6 +1,17 @@
 spring:
   application:
     name: order-service
+  datasource:
+    url: jdbc:postgresql://localhost:15432/takeit_order
+    username: takeit_order
+    password: takeit_order
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 
 server:
   port: 19093
