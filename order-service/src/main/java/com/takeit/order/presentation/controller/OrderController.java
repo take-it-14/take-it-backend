@@ -72,4 +72,10 @@ public class OrderController {
 		return CommonResponse.ofSuccess("주문 상태 변경", orderService.updateOrderStatus(orderId, request.toServiceDto()));
 	}
 
+	@PatchMapping("/{orderId}/cancel")
+	public CommonResponse<OrderStatusUpdateResponse> cancelOrder(
+		@PathVariable UUID orderId
+	){
+		return CommonResponse.ofSuccess("주문 취소", orderService.cancelOrder(orderId));
+	}
 }

@@ -82,7 +82,7 @@ public class OrderService {
 		// TODO: product-service에서 order.productId로 해당 상품 재고가 몇개 있는지 확인 + id->UUID 변환 필요
 		UUID productId = findProductUuidByProductId(1L);
 
-		if(order.getStatus()==OrderStatus.CANCELLED || order.getStatus()==OrderStatus.DELIVERED) throw new CustomException(ErrorCode.ORDER_CANNOT_BE_CANCELLED);
+		if(order.getStatus()==OrderStatus.CANCELLED || order.getStatus()==OrderStatus.DELIVERED) throw new CustomException(ErrorCode.ORDER_CANNOT_BE_MODIFIED);
 
 		order.update(request.quantity(), request.amount());
 
@@ -100,6 +100,18 @@ public class OrderService {
 		return OrderStatusUpdateResponse.from(order);
 	}
 
+	@Transactional
+	public OrderStatusUpdateResponse cancelOrder(UUID orderId){
+		Order order = findOrderByUuid(orderId);
+
+		// TODO: 요청 유저의 정보인지 검증 필요
+
+		if(order.getStatus()==OrderStatus.CANCELLED || order.getStatus()==OrderStatus.DELIVERED) throw new CustomException(ErrorCode.ORDER_CANNOT_BE_MODIFIED);
+
+		order.cancel();
+
+		return OrderStatusUpdateResponse.from(order);
+	}
 
 
 	private Order findOrderByUuid(UUID uuid){
