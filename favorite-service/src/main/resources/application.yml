@@ -1,6 +1,18 @@
 spring:
   application:
     name: favorite-service
+  datasource:
+    url: jdbc:postgresql://localhost:15432/takeit_favorite
+    username: takeit_favorite
+    password: takeit_favorite
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 
 server:
   port: 19098
