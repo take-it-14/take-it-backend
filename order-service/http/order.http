@@ -1,0 +1,17 @@
+### 주문 생성
+POST localhost:19093/api/v1/orders
+Content-Type: application/json
+
+{
+  "productId": "8c7c72b3-1234-4e56-89ab-0c1234d56789",
+  "quantity": 2,
+  "amount": 10000
+}
+
+### 주문 상세 조회
+GET localhost:19093/api/v1/orders/bc4bc686-d0aa-4a08-91fd-81dfb5ef887a
+Content-Type: application/json
+
+### 주문 목록 조회
+GET localhost:19093/api/v1/orders
+Content-Type: application/json
