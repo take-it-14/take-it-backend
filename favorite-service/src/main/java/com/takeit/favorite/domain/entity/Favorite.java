@@ -28,4 +28,10 @@ public class Favorite extends BaseEntity {
     @Column(name = "productId", nullable = false)
     private Long productId;
 
+    public static Favorite create(Long userId, Long productId) {
+        return Favorite.builder()
+                .userId(userId)
+                .productId(productId)
+                .build();
+    }
 }
