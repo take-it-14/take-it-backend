@@ -5,8 +5,11 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.takeit.common.exception.CustomException;
+import com.takeit.common.exception.ErrorCode;
 import com.takeit.order.application.dto.OrderCreateDto;
 import com.takeit.order.application.dto.OrderCreateResponse;
+import com.takeit.order.application.dto.OrderDetailResponse;
 import com.takeit.order.domain.entity.Order;
 import com.takeit.order.domain.repository.OrderRepository;
 
@@ -33,5 +36,21 @@ public class OrderService {
 			request.amount()
 		);
 		return OrderCreateResponse.from(orderRepository.save(order), request.productId());
+	}
+
+	public OrderDetailResponse getOrderDetail(UUID orderId){
+		Order order = findOrderByUuid(orderId);
+
+		// TODO: 요청 유저의 정보인지 검증 필요
+
+		// TODO: product-service에서 id->UUID 변환 필요
+		UUID productId = UUID.randomUUID();
+
+		return OrderDetailResponse.from(order, productId);
+	}
+
+
+	private Order findOrderByUuid(UUID uuid){
+		return orderRepository.findByUuid(uuid).orElseThrow(()-> new CustomException(ErrorCode.ORDER_NOT_FOUND));
 	}
 }
