@@ -25,7 +25,7 @@ public class Favorite extends BaseEntity {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @Column(name = "productId", nullable = false)
+    @Column(name = "product_id", nullable = false)
     private Long productId;
 
     public static Favorite create(Long userId, Long productId) {
@@ -36,7 +36,7 @@ public class Favorite extends BaseEntity {
     }
 
     public void restore() {
-        this.isDeleted = true;
+        this.isDeleted = false;
         this.deletedBy = null;
         this.deletedAt = null;
     }
