@@ -2,6 +2,8 @@ package com.takeit.order.application.service;
 
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,6 +13,7 @@ import com.takeit.order.application.dto.OrderCreateDto;
 import com.takeit.order.application.dto.OrderCreateResponse;
 import com.takeit.order.application.dto.OrderDetailResponse;
 import com.takeit.order.domain.entity.Order;
+import com.takeit.order.domain.enums.OrderStatus;
 import com.takeit.order.domain.repository.OrderRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -49,8 +52,31 @@ public class OrderService {
 		return OrderDetailResponse.from(order, productId);
 	}
 
+	public Page<OrderDetailResponse> getOrders(Pageable pageable, String status, String username){
+		Page<Order> orderPage;
+
+		// TODO: username->userId 가져오는 로직 필요
+		Long userId = 1L;
+
+		OrderStatus stat = OrderStatus.of(status);
+		if(stat==null) orderPage = orderRepository.findByCustomerId(userId, pageable);
+		else orderPage = orderRepository.findByCustomerIdAndStatus(userId, stat, pageable);
+
+		return orderPage.map(
+			order -> {
+				UUID productUuid = findProductUuidByProductId(order.getProductId());
+				return OrderDetailResponse.from(order, productUuid);
+			}
+		);
+	}
+
 
 	private Order findOrderByUuid(UUID uuid){
 		return orderRepository.findByUuid(uuid).orElseThrow(()-> new CustomException(ErrorCode.ORDER_NOT_FOUND));
+	}
+
+	private UUID findProductUuidByProductId(Long productId){
+		// TODO: product-service 요청 필요
+		return UUID.randomUUID();
 	}
 }
