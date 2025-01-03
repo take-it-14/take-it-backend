@@ -49,4 +49,14 @@ public class Order extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	private OrderStatus status;
 
+	public static Order create(Long customerId, Long productId, Long quantity, Long amount) {
+		return Order.builder()
+			.uuid(UUID.randomUUID())
+			.customerId(customerId)
+			.productId(productId)
+			.quantity(quantity)
+			.amount(amount)
+			.status(OrderStatus.PENDING)
+			.build();
+	}
 }
