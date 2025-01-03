@@ -10,8 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.takeit.common.exception.CustomException;
 import com.takeit.common.exception.ErrorCode;
 import com.takeit.order.application.dto.OrderCreateDto;
-import com.takeit.order.application.dto.OrderCreateResponse;
+import com.takeit.order.application.dto.OrderResponse;
 import com.takeit.order.application.dto.OrderDetailResponse;
+import com.takeit.order.application.dto.OrderUpdateDto;
 import com.takeit.order.domain.entity.Order;
 import com.takeit.order.domain.enums.OrderStatus;
 import com.takeit.order.domain.repository.OrderRepository;
@@ -26,7 +27,7 @@ public class OrderService {
 	private final OrderRepository orderRepository;
 
 	@Transactional
-	public OrderCreateResponse createOrder(OrderCreateDto request){
+	public OrderResponse createOrder(OrderCreateDto request){
 
 		// TODO: product-service에서 productId 유효성 검사 + id 받아오는 로직 구현 필요
 		Long productId = 1L;
@@ -38,7 +39,7 @@ public class OrderService {
 			request.quantity(),
 			request.amount()
 		);
-		return OrderCreateResponse.from(orderRepository.save(order), request.productId());
+		return OrderResponse.from(orderRepository.save(order), request.productId());
 	}
 
 	public OrderDetailResponse getOrderDetail(UUID orderId){
@@ -68,6 +69,22 @@ public class OrderService {
 				return OrderDetailResponse.from(order, productUuid);
 			}
 		);
+	}
+
+	@Transactional
+	public OrderResponse updateOrder(UUID orderId, OrderUpdateDto request){
+		Order order = findOrderByUuid(orderId);
+
+		// TODO: 요청 유저의 정보인지 검증 필요
+
+		// TODO: product-service에서 order.productId로 해당 상품 재고가 몇개 있는지 확인 + id->UUID 변환 필요
+		UUID productId = findProductUuidByProductId(1L);
+
+		if(order.getStatus()==OrderStatus.CANCELLED || order.getStatus()==OrderStatus.DELIVERED) throw new CustomException(ErrorCode.ORDER_CANNOT_BE_CANCELLED);
+
+		order.update(request.quantity(), request.amount());
+
+		return OrderResponse.from(order, productId);
 	}
 
 

@@ -13,6 +13,8 @@ public enum ErrorCode {
 
     // order
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 주문 정보입니다."),
+    ORDER_CANNOT_BE_CANCELLED(HttpStatus.BAD_REQUEST, "현재 상태의 주문은 취소할 수 없습니다."),
+
 
 
 
