@@ -15,9 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.takeit.common.presentation.dto.CommonResponse;
 import com.takeit.order.application.dto.OrderResponse;
 import com.takeit.order.application.dto.OrderDetailResponse;
+import com.takeit.order.application.dto.OrderStatusUpdateResponse;
 import com.takeit.order.application.dto.PageResponse;
 import com.takeit.order.application.service.OrderService;
 import com.takeit.order.presentation.request.OrderCreateRequest;
+import com.takeit.order.presentation.request.OrderStatusUpdateRequest;
 import com.takeit.order.presentation.request.OrderUpdateRequest;
 
 import jakarta.validation.Valid;
@@ -61,4 +63,13 @@ public class OrderController {
 	){
 		return CommonResponse.ofSuccess("주문 정보 수정", orderService.updateOrder(orderId, request.toServiceDto()));
 	}
+
+	@PatchMapping("/{orderId}/status")
+	public CommonResponse<OrderStatusUpdateResponse> updateOrderStatus(
+		@PathVariable UUID orderId,
+		@RequestBody @Valid OrderStatusUpdateRequest request
+	){
+		return CommonResponse.ofSuccess("주문 상태 변경", orderService.updateOrderStatus(orderId, request.toServiceDto()));
+	}
+
 }

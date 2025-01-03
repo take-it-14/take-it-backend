@@ -24,3 +24,11 @@ Content-Type: application/json
   "quantity": 5,
   "amount": 20000
 }
+
+### 주문 상태 수정
+PATCH localhost:19093/api/v1/orders/b999ecfa-8fd3-420f-9439-e64c03f938d6/status
+Content-Type: application/json
+
+{
+  "status": "COMPLETED"
+}
