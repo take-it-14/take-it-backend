@@ -34,4 +34,10 @@ public class Favorite extends BaseEntity {
                 .productId(productId)
                 .build();
     }
+
+    public void restore() {
+        this.isDeleted = true;
+        this.deletedBy = null;
+        this.deletedAt = null;
+    }
 }

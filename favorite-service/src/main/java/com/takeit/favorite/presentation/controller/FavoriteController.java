@@ -18,7 +18,7 @@ public class FavoriteController {
     public CommonResponse<CreateFavoriteResponse> createFavorite(@Valid @RequestBody CreateFavoriteRequest request,
                                                                  @RequestHeader(value = "X-Username") String username) {
 
-        return CommonResponse.ofSuccess("찜 하기", favoriteService.createFavorite(request.toDto(), username));
+        return CommonResponse.ofSuccess("찜 하기", favoriteService.addFavorite(request.toDto(), username));
     }
 
 }
