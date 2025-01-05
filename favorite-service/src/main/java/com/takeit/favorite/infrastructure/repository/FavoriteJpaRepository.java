@@ -17,16 +17,8 @@ public interface FavoriteJpaRepository extends JpaRepository<Favorite, UUID>,
         QuerydslBinderCustomizer<QFavorite> {
     @Override
     default void customize(QuerydslBindings querydslBindings, @NotNull QFavorite qFavorite) {
-        querydslBindings.bind(String.class).all((StringPath path, Collection<? extends String> values) -> {
-            List<String> valueList = new ArrayList<>(values.stream().map(String::trim).toList());
-            if (valueList.isEmpty()) {
-                return Optional.empty();
-            }
-            BooleanBuilder booleanBuilder = new BooleanBuilder();
-            for (String s : valueList) {
-                booleanBuilder.or(path.containsIgnoreCase(s));
-            }
-            return Optional.of(booleanBuilder);
-        });
+
     }
+
+    Optional<Favorite> findByProductIdAndUserId(Long productId, Long userId);
 }
