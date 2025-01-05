@@ -12,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -77,5 +78,12 @@ public class User extends BaseEntity {
         if (email != null) this.email = email;
         if (password != null) this.password = password;
         if (role != null) this.role = role;
+    }
+
+    // 유저 삭제 메서드
+    public void delete(String deletedBy) {
+        this.deletedAt = LocalDateTime.now();
+        this.deletedBy = deletedBy;
+        this.isDeleted = true;
     }
 }
