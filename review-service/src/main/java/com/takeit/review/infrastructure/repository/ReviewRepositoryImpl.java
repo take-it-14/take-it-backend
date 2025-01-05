@@ -22,4 +22,9 @@ public class ReviewRepositoryImpl implements ReviewRepository {
     public Optional<Review> findByUuid(UUID reviewId) {
         return jpaReviewRepository.findByUuidAndIsDeletedIsFalse(reviewId);
     }
+
+    @Override
+    public Optional<Review> findReviewAndReviewPhotosByUuid(UUID reviewId) {
+        return jpaReviewRepository.findReviewAndReviewPhotosByUuid(reviewId);
+    }
 }

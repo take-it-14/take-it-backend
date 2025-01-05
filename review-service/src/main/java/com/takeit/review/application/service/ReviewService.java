@@ -2,6 +2,7 @@ package com.takeit.review.application.service;
 
 import com.takeit.common.exception.CustomException;
 import com.takeit.review.application.dto.CreateReviewResponse;
+import com.takeit.review.application.dto.ReviewResponse;
 import com.takeit.review.application.dto.UpdateReviewResponse;
 import com.takeit.review.application.repository.ReviewPhotoRepository;
 import com.takeit.review.application.repository.ReviewRepository;
@@ -94,5 +95,8 @@ public class ReviewService {
         return UpdateReviewResponse.of(review, request.orderId());
     }
 
-
+    public ReviewResponse getReview(String username, UUID reviewId) {
+        Review review = reviewRepository.findReviewAndReviewPhotosByUuid(reviewId).orElseThrow(() -> new CustomException(REVIEW_NOT_FOUND));
+        return ReviewResponse.from(review);
+    }
 }

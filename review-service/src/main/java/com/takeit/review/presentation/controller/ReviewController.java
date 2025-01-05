@@ -2,6 +2,7 @@ package com.takeit.review.presentation.controller;
 
 import com.takeit.common.presentation.dto.CommonResponse;
 import com.takeit.review.application.dto.CreateReviewResponse;
+import com.takeit.review.application.dto.ReviewResponse;
 import com.takeit.review.application.dto.UpdateReviewResponse;
 import com.takeit.review.application.service.ReviewService;
 import com.takeit.review.presentation.request.CreateReviewRequest;
@@ -35,5 +36,13 @@ public class ReviewController {
             @Valid UpdateReviewRequest request,
             @PathVariable UUID reviewId) {
         return CommonResponse.ofSuccess("리뷰 수정에 성공했습니다.", reviewService.updateReview(request, reviewId, username));
+    }
+
+    @GetMapping("/{reviewId}")
+    public CommonResponse<ReviewResponse> getReview(
+            @RequestHeader(name = "X-Username", required = false) String username,
+            @PathVariable UUID reviewId
+    ) {
+        return CommonResponse.ofSuccess("리뷰 상세 조회에 성공했습니다.", reviewService.getReview(username, reviewId));
     }
 }

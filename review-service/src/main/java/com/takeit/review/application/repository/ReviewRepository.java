@@ -9,4 +9,6 @@ public interface ReviewRepository {
     Review save(Review review);
 
     Optional<Review> findByUuid(UUID reviewId);
+
+    Optional<Review> findReviewAndReviewPhotosByUuid(UUID reviewId);
 }
