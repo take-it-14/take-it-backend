@@ -4,6 +4,7 @@ import com.takeit.common.domain.model.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 
@@ -33,6 +34,12 @@ public class Favorite extends BaseEntity {
                 .userId(userId)
                 .productId(productId)
                 .build();
+    }
+
+    public void cancel(String username) {
+        this.isDeleted = true;
+        this.deletedAt = LocalDateTime.now();
+        this.deletedBy = username;
     }
 
     public void restore() {
