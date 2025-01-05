@@ -2,15 +2,16 @@ package com.takeit.review.presentation.controller;
 
 import com.takeit.common.presentation.dto.CommonResponse;
 import com.takeit.review.application.dto.CreateReviewResponse;
+import com.takeit.review.application.dto.UpdateReviewResponse;
 import com.takeit.review.application.service.ReviewService;
 import com.takeit.review.presentation.request.CreateReviewRequest;
+import com.takeit.review.presentation.request.UpdateReviewRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -26,5 +27,13 @@ public class ReviewController {
 
         return CommonResponse.ofSuccess("리뷰 생성에 성공했습니다.", reviewService.createReview(request, username));
 
+    }
+
+    @PutMapping("/{reviewId}")
+    public CommonResponse<UpdateReviewResponse> updateReview(
+            @RequestHeader(name = "X-Username") String username,
+            @Valid UpdateReviewRequest request,
+            @PathVariable UUID reviewId) {
+        return CommonResponse.ofSuccess("리뷰 수정에 성공했습니다.", reviewService.updateReview(request, reviewId, username));
     }
 }
