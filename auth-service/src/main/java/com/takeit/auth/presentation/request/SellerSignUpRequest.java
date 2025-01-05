@@ -1,13 +1,13 @@
 package com.takeit.auth.presentation.request;
 
-import com.takeit.auth.application.dto.CreateUserDto;
+import com.takeit.auth.application.dto.CreateSellerDto;
 import com.takeit.auth.domain.entity.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-public record CustomerSignUpRequest(
+public record SellerSignUpRequest(
         @NotNull
         @Pattern(regexp = "^[a-z0-9]{4,10}$", message = "username은 소문자와 숫자로 구성된 4자 이상, 10자 이하여야 합니다.")
         String username,
@@ -28,16 +28,31 @@ public record CustomerSignUpRequest(
         )
         String password,
 
-        UserRole role
+        UserRole role,
+
+        @NotNull
+        @Size(max = 10, message = "businessNumber는 10자리여야 합니다.")
+        String businessNumber,
+
+        @NotNull
+        @Size(max = 100, message = "businessName은 100자 이하여야 합니다.")
+        String businessName,
+
+        @NotNull
+        @Size(max = 20, message = "phoneNumber는 20자 이하여야 합니다.")
+        String phoneNumber,
+
+        @NotNull
+        String address
 ) {
-    public CustomerSignUpRequest {
+    public SellerSignUpRequest {
         // role 기본값 설정
         if (role == null) {
-            role = UserRole.CUSTOMER;
+            role = UserRole.SELLER;
         }
     }
 
-    public CreateUserDto toDto() {
-        return new CreateUserDto(username, nickname, email, password, role);
+    public CreateSellerDto toDto() {
+        return new CreateSellerDto(username, nickname, email, password, role, businessNumber, businessName, phoneNumber, address);
     }
 }

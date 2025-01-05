@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,13 +35,13 @@ public class SellerInfo extends BaseEntity {
     private User user;
 
     @Column(nullable = false, length = 10)
-    private String business_number;
+    private String businessNumber;
 
     @Column(nullable = false, length = 100)
-    private String business_name;
+    private String businessName;
 
-    @Column(nullable = false, length = 10)
-    private String phone_number;
+    @Column(nullable = false, length = 20)
+    private String phoneNumber;
 
     @Column(nullable = false)
     private String address;
@@ -51,16 +52,18 @@ public class SellerInfo extends BaseEntity {
 
     // 판매자정보 생성 메서드
     public static SellerInfo create(
-            String business_number,
-            String business_name,
-            String phone_number,
+            User user,
+            String businessNumber,
+            String businessName,
+            String phoneNumber,
             String address,
             SellerInfoStatus status
     ) {
         return SellerInfo.builder()
-                .business_number(business_number)
-                .business_name(business_name)
-                .phone_number(phone_number)
+                .user(user)
+                .businessNumber(businessNumber)
+                .businessName(businessName)
+                .phoneNumber(phoneNumber)
                 .address(address)
                 .status(status)
                 .build();
@@ -68,16 +71,23 @@ public class SellerInfo extends BaseEntity {
 
     // 판매자정보 수정 메서드
     public void update(
-            String business_number,
-            String business_name,
-            String phone_number,
+            String businessNumber,
+            String businessName,
+            String phoneNumber,
             String address,
             SellerInfoStatus status
     ) {
-        if (business_number != null) this.business_number = business_number;
-        if (business_name != null) this.business_name = business_name;
-        if (phone_number != null) this.phone_number = phone_number;
+        if (businessNumber != null) this.businessNumber = businessNumber;
+        if (businessName != null) this.businessName = businessName;
+        if (phoneNumber != null) this.phoneNumber = phoneNumber;
         if (address != null) this.address = address;
         if (status != null) this.status = status;
+    }
+
+    // 판매자정보 삭제 메서드
+    public void delete(String deletedBy) {
+        this.deletedAt = LocalDateTime.now();
+        this.deletedBy = deletedBy;
+        this.isDeleted = true;
     }
 }
