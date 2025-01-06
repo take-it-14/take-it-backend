@@ -10,11 +10,10 @@ import java.util.List;
 import java.util.UUID;
 
 public interface JpaReviewPhotoRepository extends JpaRepository<ReviewPhoto, Long> {
-    @Modifying
-    @Query("update ReviewPhoto set isDeleted = true, deletedAt = CURRENT_TIMESTAMP, deletedBy = :username, updatedAt = CURRENT_TIMESTAMP, updatedBy = :username where uuid in :uuids")
-    int deleteAllByUuidIn(List<UUID> uuids, String username);
 
     List<ReviewPhoto> findByReviewAndIsDeletedIsFalse(Review review);
 
     List<ReviewPhoto> findAllByReviewAndIsDeletedIsFalse(Review review);
+
+    List<ReviewPhoto> findByUuidInAndIsDeletedIsFalse(List<UUID> uuids);
 }
