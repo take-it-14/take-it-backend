@@ -1,0 +1,71 @@
+package com.takeit.product.domain.entity;
+
+import com.takeit.common.domain.model.BaseEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import java.time.LocalDateTime;
+import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Table(name = "p_product")
+@Getter
+@Builder(access = AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor
+public class Product extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, updatable = false, unique = true)
+    private UUID uuid = UUID.randomUUID();
+
+    @Column(nullable = false)
+    private Long sellerId;
+
+    @Column(nullable = false)
+    private Long categoryId;
+
+    @Column(nullable = false)
+    private String productName;
+
+    private String description;
+
+    private String imageUrl;
+
+    @Column(nullable = false)
+    private Long price;
+
+    @Column(nullable = false)
+    private Integer stock; // 상품 재고 수량
+
+    @Column(nullable = false)
+    private Integer limitPerUser; // 1인당 구매 제한 수량
+
+    @Column(nullable = false)
+    private LocalDateTime openTime; // 상품 판매 시작 시간
+
+    private LocalDateTime closeTime; // 상품 판매 종료 시간
+
+    @Column(nullable = false)
+    private Boolean isActive; // 상품 전시 여부
+
+    private Integer stars; // 평점
+
+    // 상품 삭제 메서드
+    public void delete(String deletedBy) {
+        this.deletedAt = LocalDateTime.now();
+        this.deletedBy = deletedBy;
+        this.isDeleted = true;
+    }
+}
