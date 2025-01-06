@@ -25,10 +25,17 @@ public class Payment extends BaseEntity {
     @Column(name = "order_id", nullable = false)
     private Long orderId;
 
-    @Column(name = "payment_key", length = 200, nullable = false)
-    private String paymentKey;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
+
+    @Column(name="status")
+    @Enumerated(value=EnumType.STRING)
+    private PaymentStatus status;
 
     @Column(name = "amount", nullable = false)
     private Integer amount;
+
+    @Column(name = "receipt", nullable = false, length = 500)
+    private String receipt;
 }
 
