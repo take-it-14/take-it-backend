@@ -1,9 +1,12 @@
 package com.takeit.auth.presentation.controller;
 
+import com.takeit.auth.application.dto.AuthResponse;
 import com.takeit.auth.application.dto.UserResponse;
+import com.takeit.auth.application.service.AuthService;
 import com.takeit.auth.application.service.UserService;
 import com.takeit.auth.presentation.request.CustomerSignUpRequest;
 import com.takeit.auth.presentation.request.SellerSignUpRequest;
+import com.takeit.auth.presentation.request.SignInRequest;
 import com.takeit.common.presentation.dto.CommonResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +22,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final UserService userService;
+    private final AuthService authService;
+
+    // 로그인
+    @PostMapping("/signin")
+    public ResponseEntity<CommonResponse<AuthResponse>> signIn(@RequestBody @Valid SignInRequest request) {
+        return ResponseEntity.ok().body(CommonResponse.ofSuccess("로그인 성공", authService.login(request)));
+    }
 
     // 일반 회원 가입
     @PostMapping("/signup/customer")
