@@ -28,7 +28,7 @@ public class ReviewService {
     private final FileUpload fileUpload;
 
     @Transactional
-    public CreateReviewResponse createReview(@Valid CreateReviewRequest request, String username) {
+    public CreateReviewResponse createReview(CreateReviewRequest request, String username) {
         // todo : username 으로 user 권한 체크 및 order uuid로 productId와 userid 가 일치하는지 체크
         Long userId = 1L;
         Long productId = 1L;
