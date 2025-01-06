@@ -1,9 +1,11 @@
 spring:
   application:
     name: review-service
+  profiles:
+    default: local
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
     properties:
       hibernate:
@@ -11,11 +13,6 @@ spring:
         highlight_sql: true
         default_batch_fetch_size: 10
     open-in-view: false
-  datasource:
-    driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME}
-    username: ${SPRING_DATASOURCE_LOCAL_USERNAME}
-    password: ${SPRING_DATASOURCE_LOCAL_PASSWORD}
-    url: ${SPRING_DATASOURCE_LOCAL_URL}
 
 server:
   port: 19096
