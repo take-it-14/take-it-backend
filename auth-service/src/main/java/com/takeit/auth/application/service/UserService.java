@@ -3,7 +3,6 @@ package com.takeit.auth.application.service;
 import com.querydsl.core.types.Predicate;
 import com.takeit.auth.application.dto.CreateSellerDto;
 import com.takeit.auth.application.dto.CreateUserDto;
-import com.takeit.auth.application.dto.SellerPageResponse;
 import com.takeit.auth.application.dto.SellerResponse;
 import com.takeit.auth.application.dto.UserPageResponse;
 import com.takeit.auth.application.dto.UserResponse;
@@ -116,18 +115,6 @@ public class UserService {
         }
 
         return UserPageResponse.from(userPage);
-    }
-
-    // 승인 요청된 판매자 목록 조회
-    @Transactional(readOnly = true)
-    public SellerPageResponse getSellers(Pageable pageable) {
-        Page<SellerInfo> sellerPage = sellerInfoRepository.findByStatusAndIsDeletedFalseOrderByIdAsc(SellerInfoStatus.PENDING, pageable);
-
-        if (sellerPage.isEmpty()) {
-            throw new CustomException(ErrorCode.USER_NOT_FOUND);
-        }
-
-        return SellerPageResponse.from(sellerPage);
     }
 
     // Username 존재 여부 확인

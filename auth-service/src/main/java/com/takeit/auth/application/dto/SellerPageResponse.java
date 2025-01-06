@@ -1,6 +1,7 @@
 package com.takeit.auth.application.dto;
 
 import com.takeit.auth.domain.entity.SellerInfo;
+import com.takeit.auth.domain.entity.SellerInfoStatus;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -26,10 +27,12 @@ public record SellerPageResponse(
         }
 
         public static record SellerInfo(
+                Long id,
                 String businessNumber,
                 String businessName,
                 String phoneNumber,
                 String address,
+                SellerInfoStatus status,
                 String username,
                 String nickname,
                 String email
@@ -42,10 +45,12 @@ public record SellerPageResponse(
 
             public static SellerInfo from(com.takeit.auth.domain.entity.SellerInfo sellerInfo) {
                 return new SellerInfo(
+                        sellerInfo.getId(),
                         sellerInfo.getBusinessNumber(),
                         sellerInfo.getBusinessName(),
                         sellerInfo.getPhoneNumber(),
                         sellerInfo.getAddress(),
+                        sellerInfo.getStatus(),
                         sellerInfo.getUser().getUsername(),
                         sellerInfo.getUser().getNickname(),
                         sellerInfo.getUser().getEmail()
