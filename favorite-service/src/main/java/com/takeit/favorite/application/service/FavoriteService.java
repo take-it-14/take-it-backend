@@ -32,6 +32,6 @@ public class FavoriteService {
             ));
         }
 
-        return CreateFavoriteResponse.of(favorite.get().getUuid(), username,  request.getProductId());
+        return CreateFavoriteResponse.of(favorite.get().getUuid(), username,  request.productId());
     }
 }

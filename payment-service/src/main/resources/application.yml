@@ -1,6 +1,14 @@
 spring:
   application:
     name: payment-service
+  profiles:
+    default: local
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 
 server:
   port: 19095
