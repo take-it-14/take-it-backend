@@ -1,0 +1,18 @@
+spring:
+    datasource:
+      driver-class-name: org.postgresql.Driver
+      username: takeit_review
+      password: takeit_review
+      url: jdbc:postgresql://localhost:15432/takeit_review
+cloud:
+  aws:
+    s3:
+      bucket: ${S3_BUCKET}
+    credentials:
+      access-key: ${S3_ACCESS_KEY}
+      secret-key: ${S3_SECRET_KEY}
+    region:
+      static: ap-northeast-2
+      auto: false
+    stack:
+      auto: false
