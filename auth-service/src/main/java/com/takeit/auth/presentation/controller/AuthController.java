@@ -1,6 +1,7 @@
 package com.takeit.auth.presentation.controller;
 
 import com.takeit.auth.application.dto.AuthResponse;
+import com.takeit.auth.application.dto.SellerResponse;
 import com.takeit.auth.application.dto.UserResponse;
 import com.takeit.auth.application.dto.UserRoleResponse;
 import com.takeit.auth.application.service.AuthService;
@@ -41,7 +42,7 @@ public class AuthController {
 
     // 판매자 회원 가입
     @PostMapping("/signup/seller")
-    public ResponseEntity<CommonResponse<UserResponse>> signUpSeller(@RequestBody @Valid SellerSignUpRequest request) {
+    public ResponseEntity<CommonResponse<SellerResponse>> signUpSeller(@RequestBody @Valid SellerSignUpRequest request) {
         return ResponseEntity.ok().body(CommonResponse.ofSuccess("회원 가입 성공", userService.createSeller(request.toDto())));
     }
 

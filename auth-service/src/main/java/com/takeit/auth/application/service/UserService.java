@@ -3,6 +3,8 @@ package com.takeit.auth.application.service;
 import com.querydsl.core.types.Predicate;
 import com.takeit.auth.application.dto.CreateSellerDto;
 import com.takeit.auth.application.dto.CreateUserDto;
+import com.takeit.auth.application.dto.SellerPageResponse;
+import com.takeit.auth.application.dto.SellerResponse;
 import com.takeit.auth.application.dto.UserPageResponse;
 import com.takeit.auth.application.dto.UserResponse;
 import com.takeit.auth.domain.entity.SellerInfo;
@@ -56,7 +58,7 @@ public class UserService {
 
     // 판매자 등록
     @Transactional
-    public UserResponse createSeller(CreateSellerDto request) {
+    public SellerResponse createSeller(CreateSellerDto request) {
         // validation
         if (isUsernameExists(request.username())) { // username 중복 확인
             throw new CustomException(ErrorCode.USERNAME_ALEADY_EXISTS);
@@ -88,10 +90,9 @@ public class UserService {
                 SellerInfoStatus.PENDING
         );
 
-        System.out.println("businessNumber = " + request.businessNumber());
         sellerInfoRepository.save(sellerInfo);
 
-        return UserResponse.from(user);
+        return SellerResponse.from(sellerInfo);
     }
 
     // 사용자 단건 조회
@@ -115,6 +116,18 @@ public class UserService {
         }
 
         return UserPageResponse.from(userPage);
+    }
+
+    // 승인 요청된 판매자 목록 조회
+    @Transactional(readOnly = true)
+    public SellerPageResponse getSellers(Pageable pageable) {
+        Page<SellerInfo> sellerPage = sellerInfoRepository.findByStatusAndIsDeletedFalseOrderByIdAsc(SellerInfoStatus.PENDING, pageable);
+
+        if (sellerPage.isEmpty()) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        return SellerPageResponse.from(sellerPage);
     }
 
     // Username 존재 여부 확인
