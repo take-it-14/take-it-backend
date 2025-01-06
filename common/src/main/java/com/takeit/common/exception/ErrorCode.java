@@ -9,7 +9,10 @@ public enum ErrorCode {
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다. (%s)"),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "권한이 없습니다."),
-    FORBIDDEN(HttpStatus.FORBIDDEN, "해당 작업에 대한 권한이 없습니다.");
+    FORBIDDEN(HttpStatus.FORBIDDEN, "해당 작업에 대한 권한이 없습니다."),
+
+    // Payment
+    WRONG_PAYMENT_INFO(HttpStatus.BAD_REQUEST, "결제 정보가 잘못되었습니다.");
 
     private final HttpStatus status;
     private final String description;

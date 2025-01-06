@@ -37,5 +37,15 @@ public class Payment extends BaseEntity {
 
     @Column(name = "receipt", nullable = false, length = 500)
     private String receipt;
+
+    public static Payment create(Long orderId, Long userId, Integer amount, String receipt) {
+        return Payment.builder()
+                .orderId(orderId)
+                .userId(userId)
+                .status(PaymentStatus.COMPLETED)
+                .amount(amount)
+                .receipt(receipt)
+                .build();
+    }
 }
 
