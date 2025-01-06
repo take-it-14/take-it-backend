@@ -47,7 +47,7 @@ public class UserService {
 
         userRepository.save(user);
 
-        return UserResponse.of(user);
+        return UserResponse.from(user);
     }
 
     // 판매자 등록
@@ -87,7 +87,7 @@ public class UserService {
         System.out.println("businessNumber = " + request.businessNumber());
         sellerInfoRepository.save(sellerInfo);
 
-        return UserResponse.of(user);
+        return UserResponse.from(user);
     }
 
     // Username 존재 여부 확인
@@ -116,7 +116,7 @@ public class UserService {
             throw new CustomException(ErrorCode.FORBIDDEN);
         }
 
-        return UserResponse.of(user);
+        return UserResponse.from(user);
     }
 
 }

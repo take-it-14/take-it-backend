@@ -9,7 +9,7 @@ public record UserResponse (
     String email,
     UserRole role
 ) {
-    public static UserResponse of(User user) {
+    public static UserResponse from(User user) {
         return new UserResponse(user.getUsername(), user.getNickname(), user.getEmail(), user.getRole());
     }
 }
