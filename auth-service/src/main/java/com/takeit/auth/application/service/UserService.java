@@ -1,8 +1,5 @@
 package com.takeit.auth.application.service;
 
-import static com.takeit.auth.domain.entity.QUser.user;
-
-import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import com.takeit.auth.application.dto.CreateSellerDto;
 import com.takeit.auth.application.dto.CreateUserDto;
@@ -98,6 +95,7 @@ public class UserService {
     }
 
     // 사용자 단건 조회
+    @Transactional(readOnly = true)
     public UserResponse getUserByUsername(String username) {
         // 사용자 확인
         User user = userRepository.findByUsernameAndIsDeletedFalse(username).orElseThrow(
@@ -110,11 +108,7 @@ public class UserService {
     // 사용자 목록 조회
     @Transactional(readOnly = true)
     public UserPageResponse getUsers(Predicate predicate, Pageable pageable) {
-
-        BooleanBuilder bb = new BooleanBuilder(predicate);
-        bb.and(user.isDeleted.eq(false));
-
-        Page<User> userPage = userRepository.findAll(bb, pageable);
+        Page<User> userPage = userRepository.findAll(predicate, pageable);
 
         if (userPage.isEmpty()) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
