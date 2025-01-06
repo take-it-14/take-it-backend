@@ -1,4 +1,4 @@
-package com.takeit.payment.application.dto;
+package com.takeit.payment.application.dto.payment;
 
 public record VerifyTossPaymentDto(
         Long orderId,

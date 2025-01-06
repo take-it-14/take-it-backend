@@ -1,6 +1,6 @@
 package com.takeit.payment.presentation.request;
 
-import com.takeit.payment.application.dto.VerifyTossPaymentDto;
+import com.takeit.payment.application.dto.payment.VerifyTossPaymentDto;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
