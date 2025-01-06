@@ -99,6 +99,7 @@ public class ReviewService {
     }
 
     public ReviewDetailResponse getReview(String username, UUID reviewId) {
+        // todo : product 정보 같이 반환
         Review review = reviewRepository.findReviewAndReviewPhotosByUuid(reviewId).orElseThrow(() -> new CustomException(REVIEW_NOT_FOUND));
         return ReviewDetailResponse.from(review);
     }
