@@ -1,6 +1,7 @@
 package com.takeit.auth.application.service;
 
 import com.takeit.auth.application.dto.AuthResponse;
+import com.takeit.auth.application.dto.UserRoleResponse;
 import com.takeit.auth.domain.entity.User;
 import com.takeit.auth.domain.repository.UserRepository;
 import com.takeit.auth.jwt.JwtUtil;
@@ -35,6 +36,16 @@ public class AuthService {
         String token = jwtUtil.createAccessToken(user.getUsername(), user.getRole());
 
         return new AuthResponse(token);
+    }
+
+    // 사용자 권한 조회
+    public UserRoleResponse getUserRoleByUsername(String username) {
+        // 사용자 확인
+        User user = userRepository.findByUsernameAndIsDeletedFalse(username).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+
+        return new UserRoleResponse(user.getUsername(), user.getRole());
     }
 
 }

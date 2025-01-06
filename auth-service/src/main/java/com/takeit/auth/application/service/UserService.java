@@ -6,6 +6,7 @@ import com.takeit.auth.application.dto.UserResponse;
 import com.takeit.auth.domain.entity.SellerInfo;
 import com.takeit.auth.domain.entity.SellerInfoStatus;
 import com.takeit.auth.domain.entity.User;
+import com.takeit.auth.domain.entity.UserRole;
 import com.takeit.auth.domain.repository.SellerInfoRepository;
 import com.takeit.auth.domain.repository.UserRepository;
 import com.takeit.common.exception.CustomException;
@@ -99,6 +100,23 @@ public class UserService {
     public Boolean isEmailExists(String email) {
         // email 로 User 를 조회 후 isPresent() 로 존재유무를 리턴함
         return userRepository.findByEmailAndIsDeletedFalse(email).isPresent();
+    }
+
+    // 사용자 단건 조회
+    public UserResponse getUserByUsername(String username, String requesterRole, String requesterUsername) {
+        UserRole userRole = UserRole.from(requesterRole);
+
+        // 사용자 확인
+        User user = userRepository.findByUsernameAndIsDeletedFalse(username).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+
+        // 역할 확인 및 요청 제한
+        if (userRole.isRestrictedRole() && !username.equals(requesterUsername)) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
+
+        return UserResponse.of(user);
     }
 
 }
