@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -45,5 +46,11 @@ public class ReviewPhoto extends BaseEntity {
                 .fileName(file.filename())
                 .uri(file.uri())
                 .build();
+    }
+
+    public void deleted(String username) {
+        this.isDeleted = true;
+        this.deletedAt = LocalDateTime.now();
+        this.deletedBy = username;
     }
 }

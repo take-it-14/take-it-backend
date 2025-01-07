@@ -72,4 +72,13 @@ public class ReviewController {
                 username)
         );
     }
+
+    @DeleteMapping("/{reviewId}")
+    public CommonResponse<?> deleteReview(
+            @RequestHeader(name = "X-Username") String username,
+            @PathVariable UUID reviewId
+    ) {
+        reviewService.deleteReview(reviewId, username);
+        return CommonResponse.ofSuccess("리뷰 삭제에 성공했습니다.", null);
+    }
 }

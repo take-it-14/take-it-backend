@@ -3,6 +3,7 @@ package com.takeit.review.infrastructure.repository;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.takeit.review.application.dto.QReviewPageResponse_ReviewPage_Review;
@@ -47,7 +48,7 @@ public class ReviewRepositoryImpl implements ReviewRepository {
     @Override
     public ReviewPageResponse findAll(Predicate predicate, Pageable pageable) {
         BooleanBuilder builder = new BooleanBuilder();
-
+        // todo : review uuid 로 목록 조회
         builder.and(review.isDeleted.eq(false));
 
         JPAQuery<ReviewPageResponse.ReviewPage.Review> query =
