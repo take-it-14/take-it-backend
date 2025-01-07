@@ -39,4 +39,12 @@ public class UserCoupon extends BaseEntity {
     @Builder.Default
     private Boolean isUsed = false;
 
+    public static UserCoupon create(Coupon coupon, Long userId) {
+        return UserCoupon.builder()
+                .coupon(coupon)
+                .userId(userId)
+                .startDate(coupon.getStartDate().isBefore(LocalDateTime.now()) ? LocalDateTime.now() : coupon.getStartDate())
+                .endDate(coupon.getStartDate().isBefore(LocalDateTime.now()) ? LocalDateTime.now().plusDays(coupon.getExpirationDate()) : coupon.getStartDate().plusDays(coupon.getExpirationDate()))
+                .build();
+    }
 }

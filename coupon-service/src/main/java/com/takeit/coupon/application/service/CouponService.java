@@ -89,7 +89,7 @@ public class CouponService {
             throw new CustomException(COUPON_START_DATE_IN_PAST);
         }
 
-        if(endDate.isBefore(startDate) || endDate.isEqual(startDate)) {
+        if(endDate.isBefore(LocalDateTime.now()) || endDate.isBefore(startDate) || endDate.isEqual(startDate)) {
             throw new CustomException(COUPON_END_DATE_MUST_BE_AFTER_START_DATE);
         }
     }
