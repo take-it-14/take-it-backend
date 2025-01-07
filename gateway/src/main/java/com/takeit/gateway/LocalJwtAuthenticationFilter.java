@@ -10,6 +10,7 @@ import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
@@ -21,12 +22,14 @@ public class LocalJwtAuthenticationFilter implements GlobalFilter {
 
     @Value("${service.jwt.secret-key}")
     private String secretKey;
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         String path = exchange.getRequest().getURI().getPath();
 
-        if (path.equals("/auth/signIn") || path.equals("/auth/signUp")) {
+        // 검증 예외 처리
+        if (pathMatcher.match("/api/*/auths/**", path)) {
             return chain.filter(exchange);
         }
 
