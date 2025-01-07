@@ -1,4 +1,5 @@
 rootProject.name = 'takeit'
+include 's3-service'
 include 'eureka-server'
 include 'gateway'
 include 'auth-service'
