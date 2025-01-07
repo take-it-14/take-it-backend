@@ -33,7 +33,7 @@ public class UserCouponRepositoryImpl implements UserCouponRepository {
     }
 
     @Override
-    public Optional<UserCoupon> findByUuidAndUserIdAndJoinCouponAndIsDeletedIsFalse(UUID userCouponId, Long userId) {
+    public Optional<UserCoupon> findByUuidAndUserIdAndFetchJoinCouponAndIsDeletedIsFalse(UUID userCouponId, Long userId) {
         BooleanBuilder builder = new BooleanBuilder();
 
         builder.and(userCoupon.isDeleted.eq(false))

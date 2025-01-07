@@ -41,8 +41,9 @@ public enum ErrorCode {
     COUPON_EXPIRED(HttpStatus.BAD_REQUEST, "등록 종료일이 지난 쿠폰입니다."),
     USER_COUPON_NOT_FOUND(HttpStatus.BAD_REQUEST, "사용자 쿠폰을 찾을 수 없습니다."),
     USER_COUPON_INVALID_DATE_RANGE(HttpStatus.BAD_REQUEST, "사용 기한에 맞지 않는 쿠폰입니다."),
-    USER_COUPON_ALREADY_USED(HttpStatus.BAD_REQUEST, "이미 사용한 쿠폰입니다.")
-
+    USER_COUPON_ALREADY_USED(HttpStatus.BAD_REQUEST, "이미 사용한 쿠폰입니다."),
+    USER_COUPON_NOT_USED(HttpStatus.BAD_REQUEST, "아직 사용하지 않은 쿠폰입니다."),
+    USER_COUPON_EXPIRED(HttpStatus.BAD_REQUEST, "사용 기한이 지난 쿠폰입니다."),
 
     ;
 

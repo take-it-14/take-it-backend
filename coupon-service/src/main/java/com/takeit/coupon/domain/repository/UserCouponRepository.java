@@ -10,5 +10,5 @@ public interface UserCouponRepository {
 
     Optional<UserCoupon> findByUuidAndUserIdAndIsDeletedIsFalse(UUID userCouponId, Long userId);
 
-    Optional<UserCoupon> findByUuidAndUserIdAndJoinCouponAndIsDeletedIsFalse(UUID userCouponId, Long userId);
+    Optional<UserCoupon> findByUuidAndUserIdAndFetchJoinCouponAndIsDeletedIsFalse(UUID userCouponId, Long userId);
 }

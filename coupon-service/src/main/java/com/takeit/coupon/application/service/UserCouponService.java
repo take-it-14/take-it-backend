@@ -52,7 +52,7 @@ public class UserCouponService {
         // todo : user 권한 체크
         Long userId = 1L;
 
-        UserCoupon coupon = userCouponRepository.findByUuidAndUserIdAndJoinCouponAndIsDeletedIsFalse(userCouponId, userId).orElseThrow(() -> new CustomException(USER_COUPON_NOT_FOUND));
+        UserCoupon coupon = userCouponRepository.findByUuidAndUserIdAndFetchJoinCouponAndIsDeletedIsFalse(userCouponId, userId).orElseThrow(() -> new CustomException(USER_COUPON_NOT_FOUND));
 
         if(LocalDateTime.now().isBefore(coupon.getStartDate()) || coupon.getEndDate().isBefore(LocalDateTime.now())) {
             throw new CustomException(USER_COUPON_INVALID_DATE_RANGE);
@@ -64,6 +64,27 @@ public class UserCouponService {
 
         String couponName = coupon.getCoupon().getName();
         coupon.used();
+
+        return UpdateUserCouponResponse.of(userCouponRepository.save(coupon), couponName);
+    }
+
+    @Transactional
+    public UpdateUserCouponResponse cancel(UUID userCouponId, String username) {
+        // todo : user 권한 체크
+        Long userId = 1L;
+
+        UserCoupon coupon = userCouponRepository.findByUuidAndUserIdAndFetchJoinCouponAndIsDeletedIsFalse(userCouponId, userId).orElseThrow(() -> new CustomException(USER_COUPON_NOT_FOUND));
+
+        if(coupon.getEndDate().isBefore(LocalDateTime.now())) {
+            throw new CustomException(USER_COUPON_EXPIRED);
+        }
+
+        if(!coupon.getIsUsed()) {
+            throw new CustomException(USER_COUPON_NOT_USED);
+        }
+
+        String couponName = coupon.getCoupon().getName();
+        coupon.cancel();
 
         return UpdateUserCouponResponse.of(userCouponRepository.save(coupon), couponName);
     }

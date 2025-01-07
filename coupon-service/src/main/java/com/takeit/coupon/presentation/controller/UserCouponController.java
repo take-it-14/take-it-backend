@@ -41,4 +41,11 @@ public class UserCouponController {
         return CommonResponse.ofSuccess("사용자 쿠폰을 사용하였습니다.", userCouponService.used(userCouponId, username));
     }
 
+    @PatchMapping("/{userCouponId}/cancel")
+    public CommonResponse<UpdateUserCouponResponse> userCouponCancel(
+            @RequestHeader(name = "X-Username") String username,
+            @PathVariable UUID userCouponId) {
+        return CommonResponse.ofSuccess("사용자 쿠폰 사용을 취소하였습니다.", userCouponService.cancel(userCouponId, username));
+    }
+
 }
