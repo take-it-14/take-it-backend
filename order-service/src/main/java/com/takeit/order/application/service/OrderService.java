@@ -72,6 +72,21 @@ public class OrderService {
 		);
 	}
 
+	@Transactional
+	public OrderResponse updateOrder(UUID orderId, OrderUpdateDto request){
+		Order order = findOrderByUuid(orderId);
+
+		// TODO: 요청 유저의 정보인지 검증 필요
+
+		// TODO: product-service에서 order.productId로 해당 상품 재고가 몇개 있는지 확인 + id->UUID 변환 필요
+		UUID productId = findProductUuidByProductId(1L);
+
+		if(order.getStatus()==OrderStatus.CANCELLED || order.getStatus()==OrderStatus.DELIVERED) throw new CustomException(ErrorCode.ORDER_CANNOT_BE_CANCELLED);
+
+		order.update(request.quantity(), request.amount());
+
+		return OrderResponse.of(order, productId);
+	}
 
 	private Order findOrderByUuid(UUID uuid){
 		return orderRepository.findByUuid(uuid).orElseThrow(()-> new CustomException(ErrorCode.ORDER_NOT_FOUND));
