@@ -5,16 +5,15 @@ import com.takeit.review.domain.entity.Review;
 import java.util.List;
 import java.util.UUID;
 
-public record CreateReviewResponse(
-        UUID id,
-        UUID orderId,
-        int stars,
-        String comment,
-        List<ReviewPhotoDto> photos
+public record UpdateReviewResponse(UUID id,
+                                   UUID orderId,
+                                   int stars,
+                                   String comment,
+                                   List<ReviewPhotoDto> photos
 ) {
 
-    public static CreateReviewResponse of(Review review, UUID orderId) {
-        return new CreateReviewResponse(
+    public static UpdateReviewResponse of(Review review, UUID orderId) {
+        return new UpdateReviewResponse(
                 review.getUuid(),
                 orderId,
                 review.getStars(),

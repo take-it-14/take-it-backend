@@ -2,6 +2,7 @@ package com.takeit.review.domain.entity;
 
 import com.takeit.common.domain.model.BaseEntity;
 import com.takeit.review.presentation.request.CreateReviewRequest;
+import com.takeit.review.presentation.request.UpdateReviewRequest;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import lombok.*;
@@ -33,11 +34,11 @@ public class Review extends BaseEntity {
     @Column(name = "comment", length = 255)
     private String comment;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "id")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "review")
     @Builder.Default
     private List<ReviewPhoto> photoList = new ArrayList<>();
 
-    public static Review of(CreateReviewRequest request, Long userId, Long productId) {
+    public static Review of(CreateReviewRequest request, String username, Long productId) {
         return Review.builder()
                .uuid(UUID.randomUUID())
                .productId(productId)
@@ -47,6 +48,11 @@ public class Review extends BaseEntity {
     }
 
     public void addPhotos(List<ReviewPhoto> reviewPhotos) {
-        photoList.addAll(reviewPhotos);
+        photoList = new ArrayList<>(reviewPhotos);
+    }
+
+    public void updateReview(UpdateReviewRequest request) {
+        this.stars = request.stars();
+        this.comment = request.comment();
     }
 }

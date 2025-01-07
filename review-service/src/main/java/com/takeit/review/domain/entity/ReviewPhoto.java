@@ -38,7 +38,7 @@ public class ReviewPhoto extends BaseEntity {
     @Column(name = "is_s3_deleted")
     private boolean isS3Deleted;
 
-    public static ReviewPhoto of(S3UploadFile file, Review review, Long userId) {
+    public static ReviewPhoto of(S3UploadFile file, Review review, String username) {
         return ReviewPhoto.builder()
                 .uuid(UUID.randomUUID())
                 .review(review)
