@@ -12,7 +12,7 @@ public record OrderDetailResponse(
 	Long amount,
 	OrderStatus status
 ) {
-	public static OrderDetailResponse from(Order order, UUID productId) {
+	public static OrderDetailResponse of(Order order, UUID productId) {
 		return new OrderDetailResponse(
 			order.getUuid(),
 			productId,

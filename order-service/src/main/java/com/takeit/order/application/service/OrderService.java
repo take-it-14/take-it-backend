@@ -15,6 +15,7 @@ import com.takeit.order.application.dto.OrderDetailResponse;
 import com.takeit.order.application.dto.OrderStatusUpdateDto;
 import com.takeit.order.application.dto.OrderStatusUpdateResponse;
 import com.takeit.order.application.dto.OrderUpdateDto;
+import com.takeit.order.application.dto.OrderListResponse;
 import com.takeit.order.domain.entity.Order;
 import com.takeit.order.domain.enums.OrderStatus;
 import com.takeit.order.domain.repository.OrderRepository;
@@ -41,7 +42,7 @@ public class OrderService {
 			request.quantity(),
 			request.amount()
 		);
-		return OrderResponse.from(orderRepository.save(order), request.productId());
+		return OrderResponse.of(orderRepository.save(order), request.productId());
 	}
 
 	public OrderDetailResponse getOrderDetail(UUID orderId){
@@ -52,10 +53,10 @@ public class OrderService {
 		// TODO: product-service에서 id->UUID 변환 필요
 		UUID productId = UUID.randomUUID();
 
-		return OrderDetailResponse.from(order, productId);
+		return OrderDetailResponse.of(order, productId);
 	}
 
-	public Page<OrderDetailResponse> getOrders(Pageable pageable, String status, String username){
+	public Page<OrderListResponse> getOrders(Pageable pageable, String status, String username){
 		Page<Order> orderPage;
 
 		// TODO: username->userId 가져오는 로직 필요
@@ -68,7 +69,7 @@ public class OrderService {
 		return orderPage.map(
 			order -> {
 				UUID productUuid = findProductUuidByProductId(order.getProductId());
-				return OrderDetailResponse.from(order, productUuid);
+				return OrderListResponse.of(order, productUuid);
 			}
 		);
 	}
@@ -82,11 +83,11 @@ public class OrderService {
 		// TODO: product-service에서 order.productId로 해당 상품 재고가 몇개 있는지 확인 + id->UUID 변환 필요
 		UUID productId = findProductUuidByProductId(1L);
 
-		if(order.getStatus()==OrderStatus.CANCELLED || order.getStatus()==OrderStatus.DELIVERED) throw new CustomException(ErrorCode.ORDER_CANNOT_BE_MODIFIED);
+		checkStatus(order.getStatus());
 
 		order.update(request.quantity(), request.amount());
 
-		return OrderResponse.from(order, productId);
+		return OrderResponse.of(order, productId);
 	}
 
 	@Transactional
@@ -121,5 +122,9 @@ public class OrderService {
 	private UUID findProductUuidByProductId(Long productId){
 		// TODO: product-service 요청 필요
 		return UUID.randomUUID();
+	}
+
+	private void checkStatus(OrderStatus status){
+		if(status == OrderStatus.CANCELLED || status == OrderStatus.DELIVERED) throw new CustomException(ErrorCode.ORDER_CANNOT_BE_CANCELLED);
 	}
 }
