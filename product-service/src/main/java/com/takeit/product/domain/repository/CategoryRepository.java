@@ -9,5 +9,5 @@ public interface CategoryRepository {
     Category save(Category category);
 
     Optional<Category> findByName(String name);
-    Optional<Category> findByUuid(UUID categoryId);
+    Optional<Category> findByIdAndIsDeleteFalse(Long categoryId);
 }

@@ -6,12 +6,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
-import java.util.UUID;
+
+import static com.takeit.product.domain.entity.QCategory.category;
 
 @Repository
 @RequiredArgsConstructor
 public class CategoryRepositoryImpl implements CategoryRepository {
     private final CategoryJpaRepository jpaRepository;
+    private final JPAQueryFactory queryFactory;
 
     @Override
     public Category save(Category category) {
@@ -24,7 +26,11 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     }
 
     @Override
-    public Optional<Category> findByUuid(UUID categoryId) {
-        return jpaRepository.findByUuid(categoryId);
+    public Optional<Category> findByIdAndIsDeleteFalse(Long categoryId) {
+        JPAQuery<Category> query = queryFactory
+                .selectFrom(category)
+                .where(category.id.eq(categoryId).and(category.isDeleted.eq(false)));
+
+        return Optional.ofNullable(query.fetchOne());
     }
 }

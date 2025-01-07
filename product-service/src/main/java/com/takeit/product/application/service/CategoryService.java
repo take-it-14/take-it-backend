@@ -40,7 +40,7 @@ public class CategoryService {
     public CategoryEntityResponse updateCategory(UpdateCategoryDto request, UUID categoryId, String username) {
         // TODO: username으로 권한체크
 
-        return categoryRepository.findByUuid(categoryId).map(category -> {
+        return categoryRepository.findByIdAndIsDeleteFalse(categoryId).map(category -> {
             category.update(request.name());
             return CategoryEntityResponse.from(category);
         }).orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND));
