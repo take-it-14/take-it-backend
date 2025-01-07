@@ -25,6 +25,12 @@ public enum ErrorCode {
 
     FILE_DELETE_ERROR(HttpStatus.BAD_REQUEST, "파일 삭제에 실패했습니다."),
 
+
+    // coupon
+    INVALID_DISCOUNT_PERCENTAGE_VALUE(HttpStatus.BAD_REQUEST, "할인 퍼센트 값이 유효하지 않습니다."),
+    COUPON_START_DATE_IN_PAST(HttpStatus.BAD_REQUEST, "쿠폰 시작 날짜는 과거가 될 수 없습니다."),
+    COUPON_END_DATE_MUST_BE_AFTER_START_DATE(HttpStatus.BAD_REQUEST, "쿠폰 종료 날짜는 시작 날짜 이후여야 합니다."),
+
     ;
     private final HttpStatus status;
     private final String description;
