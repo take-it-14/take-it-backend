@@ -1,6 +1,6 @@
 package com.takeit.product.application.service;
 
-import com.takeit.product.application.dto.category.CategoryResponse;
+import com.takeit.product.application.dto.category.CategoryEntityResponse;
 import com.takeit.product.application.dto.category.CreateCategoryDto;
 import com.takeit.product.domain.entity.Category;
 import com.takeit.product.domain.repository.CategoryRepository;
@@ -15,8 +15,8 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
 
     @Transactional
-    public CategoryResponse createCategory(CreateCategoryDto request, String username) {
+    public CategoryEntityResponse createCategory(CreateCategoryDto request, String username) {
         // TODO: username으로 권한체크
-        return CategoryResponse.from(categoryRepository.createCategory(Category.create(request.name())));
+        return CategoryEntityResponse.from(categoryRepository.createCategory(Category.create(request.name())));
     }
 }
