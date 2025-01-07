@@ -40,7 +40,7 @@ public class CouponService {
             throw new CustomException(COUPON_END_DATE_MUST_BE_AFTER_START_DATE);
         }
 
-        return CreateCouponResponse.of(couponRepository.save(Coupon.of(request, categoryId)), categoryName);
+        return CreateCouponResponse.of(couponRepository.save(Coupon.create(request, categoryId)), categoryName);
 
     }
 }
