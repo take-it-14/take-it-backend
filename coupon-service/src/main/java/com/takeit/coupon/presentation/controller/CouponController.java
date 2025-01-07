@@ -36,4 +36,14 @@ public class CouponController {
     ) {
         return CommonResponse.ofSuccess("쿠폰 수정에 성공했습니다.", couponService.updateCoupon(couponId, request, username));
     }
+
+    @DeleteMapping("/{couponId}")
+    public CommonResponse<?> deleteCoupon(
+            @RequestHeader(name = "X-Username") String username,
+            @PathVariable UUID couponId
+    ) {
+        couponService.deleteCoupon(couponId, username);
+
+        return CommonResponse.ofSuccess("쿠폰 삭제에 성공했습니다.", null);
+    }
 }

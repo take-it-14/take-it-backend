@@ -9,6 +9,7 @@ import com.takeit.coupon.domain.repository.UserCouponRepository;
 import com.takeit.coupon.domain.type.CouponType;
 import com.takeit.coupon.presentation.request.CreateCouponRequest;
 import com.takeit.coupon.presentation.request.UpdateCouponRequest;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ public class CouponService {
     private final CouponRepository couponRepository;
     private final UserCouponRepository userCouponRepository;
 
+    @Transactional
     public CreateCouponResponse createCoupon(CreateCouponRequest request, String username) {
         // todo : user 권한 체크 (master, manager), 카테고리 객체 가져오기
         Long categoryId = 1L;
@@ -42,6 +44,7 @@ public class CouponService {
 
     }
 
+    @Transactional
     public UpdateCouponResponse updateCoupon(UUID couponId, UpdateCouponRequest request, String username) {
         // todo : user 권한 체크 (master, manager), 카테고리 객체 가져오기
         Long categoryId = 1L;
@@ -62,6 +65,16 @@ public class CouponService {
 
         return UpdateCouponResponse.of(couponRepository.save(coupon), categoryName);
 
+    }
+
+    @Transactional
+    public void deleteCoupon(UUID couponId, String username) {
+        // todo : user 권한 체크 (master, manager)
+        Coupon coupon = couponRepository.findByUuid(couponId).orElseThrow(() -> new CustomException(COUPON_NOT_FOUND));
+
+        coupon.delete(username);
+
+        couponRepository.save(coupon);
     }
 
     private void validationPercentageValue(int value) {
