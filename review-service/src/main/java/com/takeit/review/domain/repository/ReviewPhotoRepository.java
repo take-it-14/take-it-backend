@@ -9,9 +9,9 @@ import java.util.UUID;
 public interface ReviewPhotoRepository {
     List<ReviewPhoto> saveAll(List<ReviewPhoto> reviewPhotos);
 
-    int deletedAll(List<UUID> uuids, String username);
-
     List<ReviewPhoto> findByReviewAndDeletedIsFalse(Review review);
 
     List<ReviewPhoto> findAllByReview(Review review);
+
+    List<ReviewPhoto> findByUuidInAndIsDeletedIsFalse(List<UUID> uuids);
 }

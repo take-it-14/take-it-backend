@@ -20,11 +20,6 @@ public class ReviewPhotoRepositoryImpl implements ReviewPhotoRepository {
     }
 
     @Override
-    public int deletedAll(List<UUID> uuids, String username) {
-        return jpaReviewPhotoRepository.deleteAllByUuidIn(uuids, username);
-    }
-
-    @Override
     public List<ReviewPhoto> findByReviewAndDeletedIsFalse(Review review) {
         return jpaReviewPhotoRepository.findByReviewAndIsDeletedIsFalse(review);
     }
@@ -32,5 +27,10 @@ public class ReviewPhotoRepositoryImpl implements ReviewPhotoRepository {
     @Override
     public List<ReviewPhoto> findAllByReview(Review review) {
         return jpaReviewPhotoRepository.findAllByReviewAndIsDeletedIsFalse(review);
+    }
+
+    @Override
+    public List<ReviewPhoto> findByUuidInAndIsDeletedIsFalse(List<UUID> uuids) {
+        return jpaReviewPhotoRepository.findByUuidInAndIsDeletedIsFalse(uuids);
     }
 }

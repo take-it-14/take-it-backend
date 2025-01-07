@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 import static com.takeit.common.exception.ErrorCode.*;
@@ -63,14 +64,19 @@ public class ReviewService {
         // todo : username 으로 user 권한 체크 및 order uuid로 productId가 일치하는지 체크
         Long productId = 1L;
 
-        Review review = reviewRepository.findByUuid(reviewId).orElseThrow(() -> new CustomException(REVIEW_NOT_FOUND));
+        Review review = findByUuid(reviewId);
 
         review.updateReview(request);
         review = reviewRepository.save(review);
 
         int deleteFileSize = 0;
         if(request.deleteFileNames() != null && !request.deleteFileNames().isEmpty()) {
-            deleteFileSize = reviewPhotoRepository.deletedAll(request.deleteFileNames(), username);
+            List<ReviewPhoto> deletePhotos = reviewPhotoRepository.findByUuidInAndIsDeletedIsFalse(request.deleteFileNames());
+
+            deletePhotos.forEach(reviewPhoto -> reviewPhoto.deleted(username));
+
+            deleteFileSize = deletePhotos.size();
+            reviewPhotoRepository.saveAll(deletePhotos);
         }
 
         if(request.files() != null && !request.files().isEmpty()) {
@@ -107,4 +113,28 @@ public class ReviewService {
     public ReviewPageResponse getReviews(Pageable pageable, Predicate predicate, String username) {
         return reviewRepository.findAll(predicate, pageable);
     }
+
+    @Transactional
+    public void deleteReview(UUID reviewId, String username) {
+        // todo : username 으로 user 권한 체크
+
+        Review review = findByUuid(reviewId);
+        review.deleted(username);
+
+        review = reviewRepository.save(review);
+
+        List<ReviewPhoto> reviewPhotos = reviewPhotoRepository.findByReviewAndDeletedIsFalse(review);
+
+        reviewPhotos.forEach(reviewPhoto -> {
+            reviewPhoto.deleted(username);
+        });
+
+        reviewPhotoRepository.saveAll(reviewPhotos);
+
+    }
+
+    private Review findByUuid(UUID reviewId) {
+        return reviewRepository.findByUuid(reviewId).orElseThrow(() -> new CustomException(REVIEW_NOT_FOUND));
+    }
+
 }
