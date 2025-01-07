@@ -107,7 +107,7 @@ public class OrderService {
 
 		// TODO: 요청 유저의 정보인지 검증 필요
 
-		if(order.getStatus()==OrderStatus.CANCELLED || order.getStatus()==OrderStatus.DELIVERED) throw new CustomException(ErrorCode.ORDER_CANNOT_BE_MODIFIED);
+		checkStatus(order.getStatus());
 
 		order.cancel();
 
@@ -125,6 +125,6 @@ public class OrderService {
 	}
 
 	private void checkStatus(OrderStatus status){
-		if(status == OrderStatus.CANCELLED || status == OrderStatus.DELIVERED) throw new CustomException(ErrorCode.ORDER_CANNOT_BE_CANCELLED);
+		if(status == OrderStatus.CANCELLED || status == OrderStatus.DELIVERED) throw new CustomException(ErrorCode.ORDER_CANNOT_BE_MODIFIED);
 	}
 }
