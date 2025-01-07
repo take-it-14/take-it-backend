@@ -101,6 +101,18 @@ public class OrderService {
 		return OrderStatusUpdateResponse.from(order);
 	}
 
+	@Transactional
+	public OrderStatusUpdateResponse cancelOrder(UUID orderId){
+		Order order = findOrderByUuid(orderId);
+
+		// TODO: 요청 유저의 정보인지 검증 필요
+
+		checkStatus(order.getStatus());
+
+		order.cancel();
+
+		return OrderStatusUpdateResponse.from(order);
+	}
 
 
 	private Order findOrderByUuid(UUID uuid){
@@ -113,6 +125,6 @@ public class OrderService {
 	}
 
 	private void checkStatus(OrderStatus status){
-		if(status == OrderStatus.CANCELLED || status == OrderStatus.DELIVERED) throw new CustomException(ErrorCode.ORDER_CANNOT_BE_CANCELLED);
+		if(status == OrderStatus.CANCELLED || status == OrderStatus.DELIVERED) throw new CustomException(ErrorCode.ORDER_CANNOT_BE_MODIFIED);
 	}
 }

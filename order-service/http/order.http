@@ -32,3 +32,7 @@ Content-Type: application/json
 {
   "status": "COMPLETED"
 }
+
+### 주문 취소
+PATCH localhost:19093/api/v1/orders/b999ecfa-8fd3-420f-9439-e64c03f938d6/cancel
+Content-Type: application/json
