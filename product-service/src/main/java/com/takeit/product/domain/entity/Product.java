@@ -62,6 +62,63 @@ public class Product extends BaseEntity {
 
     private Integer stars; // 평점
 
+    // 상품 생성 메서드
+    public static Product create(
+            Long sellerId,
+            Long categoryId,
+            String productName,
+            String description,
+            String imageUrl,
+            Long price,
+            Integer stock,
+            Integer limitPerUser,
+            LocalDateTime openTime,
+            LocalDateTime closeTime,
+            Boolean isActive
+    ) {
+        return Product.builder()
+                .uuid(UUID.randomUUID())
+                .sellerId(sellerId)
+                .categoryId(categoryId)
+                .productName(productName)
+                .description(description)
+                .imageUrl(imageUrl)
+                .price(price)
+                .stock(stock)
+                .limitPerUser(limitPerUser)
+                .openTime(openTime)
+                .closeTime(closeTime)
+                .isActive(isActive)
+                .build();
+    }
+
+    // 상품 수정 메서드
+    public void update(
+            Long sellerId,
+            Long categoryId,
+            String productName,
+            String description,
+            String imageUrl,
+            Long price,
+            Integer stock,
+            Integer limitPerUser,
+            LocalDateTime openTime,
+            LocalDateTime closeTime,
+            Boolean isActive
+    ) {
+        if (sellerId != null) this.sellerId = sellerId;
+        if (categoryId != null) this.categoryId = categoryId;
+        if (productName != null) this.productName = productName;
+        if (description != null) this.description = description;
+        if (imageUrl != null) this.imageUrl = imageUrl;
+        if (price != null) this.price = price;
+        if (stock != null) this.stock = stock;
+        if (limitPerUser != null) this.limitPerUser = limitPerUser;
+        if (openTime != null) this.openTime = openTime;
+        if (closeTime != null) this.closeTime = closeTime;
+        this.isActive = isActive;
+    }
+
     // 상품 삭제 메서드
     public void delete(String deletedBy) {
         this.deletedAt = LocalDateTime.now();
