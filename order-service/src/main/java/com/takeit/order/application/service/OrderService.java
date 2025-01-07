@@ -12,6 +12,8 @@ import com.takeit.common.exception.ErrorCode;
 import com.takeit.order.application.dto.OrderCreateDto;
 import com.takeit.order.application.dto.OrderResponse;
 import com.takeit.order.application.dto.OrderDetailResponse;
+import com.takeit.order.application.dto.OrderStatusUpdateDto;
+import com.takeit.order.application.dto.OrderStatusUpdateResponse;
 import com.takeit.order.application.dto.OrderUpdateDto;
 import com.takeit.order.application.dto.OrderListResponse;
 import com.takeit.order.domain.entity.Order;
@@ -87,6 +89,19 @@ public class OrderService {
 
 		return OrderResponse.of(order, productId);
 	}
+
+	@Transactional
+	public OrderStatusUpdateResponse updateOrderStatus(UUID orderId, OrderStatusUpdateDto request){
+		Order order = findOrderByUuid(orderId);
+
+		// TODO: 요청 유저의 정보인지 검증 필요
+		OrderStatus status = OrderStatus.of(request.status());
+		order.updateStatus(status);
+
+		return OrderStatusUpdateResponse.from(order);
+	}
+
+
 
 	private Order findOrderByUuid(UUID uuid){
 		return orderRepository.findByUuid(uuid).orElseThrow(()-> new CustomException(ErrorCode.ORDER_NOT_FOUND));
