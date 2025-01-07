@@ -1,7 +1,10 @@
 package com.takeit.product.application.service;
 
+import com.takeit.common.exception.CustomException;
+import com.takeit.common.exception.ErrorCode;
 import com.takeit.product.application.dto.category.CategoryEntityResponse;
 import com.takeit.product.application.dto.category.CreateCategoryDto;
+import com.takeit.product.application.dto.category.UpdateCategoryDto;
 import com.takeit.product.domain.entity.Category;
 import com.takeit.product.domain.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -30,5 +34,16 @@ public class CategoryService {
         }
 
         return CategoryEntityResponse.from(category.get());
+    }
+
+    @Transactional
+    public CategoryEntityResponse updateCategory(UpdateCategoryDto request, UUID categoryId, String username) {
+        // TODO: username으로 권한체크
+
+        return categoryRepository.findByUuid(categoryId).map(category -> {
+            category.update(request.name());
+            return CategoryEntityResponse.from(category);
+        }).orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND));
+
     }
 }
