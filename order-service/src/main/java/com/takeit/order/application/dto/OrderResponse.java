@@ -4,14 +4,14 @@ import java.util.UUID;
 
 import com.takeit.order.domain.entity.Order;
 
-public record OrderCreateResponse(
+public record OrderResponse(
 	UUID orderId,
 	UUID productId,
 	Long quantity,
 	Long amount
 ) {
-	public static OrderCreateResponse of(Order order, UUID productId) {
-		return new OrderCreateResponse(
+	public static OrderResponse of(Order order, UUID productId) {
+		return new OrderResponse(
 			order.getUuid(),
 			productId,
 			order.getQuantity(),

@@ -59,4 +59,9 @@ public class Order extends BaseEntity {
 			.status(OrderStatus.PENDING)
 			.build();
 	}
+
+	public void update(Long quantity, Long amount) {
+		this.quantity = quantity;
+		this.amount = amount;
+	}
 }
