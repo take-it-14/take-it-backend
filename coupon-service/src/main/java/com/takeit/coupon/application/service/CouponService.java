@@ -38,7 +38,7 @@ public class CouponService {
 
         validationDateRange(request.startDate(), request.endDate());
 
-        return CreateCouponResponse.of(couponRepository.save(Coupon.of(request, categoryId)), categoryName);
+        return CreateCouponResponse.of(couponRepository.save(Coupon.create(request, categoryId)), categoryName);
 
     }
 

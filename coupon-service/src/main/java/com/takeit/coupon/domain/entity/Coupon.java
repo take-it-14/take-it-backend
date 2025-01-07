@@ -51,7 +51,7 @@ public class Coupon extends BaseEntity {
     @Column(name = "expiration_date")
     private int expirationDate;
 
-    public static Coupon of(CreateCouponRequest request, Long categoryId) {
+    public static Coupon create(CreateCouponRequest request, Long categoryId) {
         return Coupon.builder()
                 .name(request.name())
                 .type(request.type())
