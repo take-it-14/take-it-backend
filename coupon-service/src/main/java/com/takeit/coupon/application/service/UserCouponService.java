@@ -1,8 +1,10 @@
 package com.takeit.coupon.application.service;
 
+import com.querydsl.core.types.Predicate;
 import com.takeit.common.exception.CustomException;
 import com.takeit.coupon.application.dto.CreateUserCouponResponse;
 import com.takeit.coupon.application.dto.UpdateUserCouponResponse;
+import com.takeit.coupon.application.dto.UserCouponPageResponse;
 import com.takeit.coupon.application.dto.UserCouponResponse;
 import com.takeit.coupon.domain.entity.Coupon;
 import com.takeit.coupon.domain.entity.UserCoupon;
@@ -11,6 +13,7 @@ import com.takeit.coupon.domain.repository.UserCouponRepository;
 import com.takeit.coupon.presentation.request.CreateUserCouponRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -111,5 +114,12 @@ public class UserCouponService {
         if(!userCoupon.getUserId().equals(userId)) {
             throw new CustomException(UNAUTHORIZED);
         }
+    }
+
+    public UserCouponPageResponse getUserCoupons(Predicate predicate, Pageable pageable, String username) {
+        // todo : user 권한 체크 (master, manager)
+        Long userId = 1L;
+
+        return userCouponRepository.findAll(predicate, pageable, userId);
     }
 }
