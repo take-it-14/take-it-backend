@@ -37,7 +37,7 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryEntityResponse updateCategory(UpdateCategoryDto request, UUID categoryId, String username) {
+    public CategoryEntityResponse updateCategory(UpdateCategoryDto request, Long categoryId, String username) {
         // TODO: username으로 권한체크
 
         return categoryRepository.findByIdAndIsDeleteFalse(categoryId).map(category -> {
@@ -45,5 +45,13 @@ public class CategoryService {
             return CategoryEntityResponse.from(category);
         }).orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND));
 
+    }
+
+    public void deleteCategory(Long categoryId, String username) {
+        // TODO: username으로 권한체크
+
+        categoryRepository.findByIdAndIsDeleteFalse(categoryId)
+                .orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND))
+                .delete(username);
     }
 }
