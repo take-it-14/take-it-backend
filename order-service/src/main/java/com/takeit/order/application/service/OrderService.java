@@ -38,7 +38,7 @@ public class OrderService {
 			request.quantity(),
 			request.amount()
 		);
-		return OrderCreateResponse.from(orderRepository.save(order), request.productId());
+		return OrderCreateResponse.of(orderRepository.save(order), request.productId());
 	}
 
 	public OrderDetailResponse getOrderDetail(UUID orderId){
