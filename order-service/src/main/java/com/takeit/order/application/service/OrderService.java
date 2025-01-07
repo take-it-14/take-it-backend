@@ -81,7 +81,7 @@ public class OrderService {
 		// TODO: product-service에서 order.productId로 해당 상품 재고가 몇개 있는지 확인 + id->UUID 변환 필요
 		UUID productId = findProductUuidByProductId(1L);
 
-		if(order.getStatus()==OrderStatus.CANCELLED || order.getStatus()==OrderStatus.DELIVERED) throw new CustomException(ErrorCode.ORDER_CANNOT_BE_CANCELLED);
+		checkStatus(order.getStatus());
 
 		order.update(request.quantity(), request.amount());
 
@@ -95,5 +95,9 @@ public class OrderService {
 	private UUID findProductUuidByProductId(Long productId){
 		// TODO: product-service 요청 필요
 		return UUID.randomUUID();
+	}
+
+	private void checkStatus(OrderStatus status){
+		if(status == OrderStatus.CANCELLED || status == OrderStatus.DELIVERED) throw new CustomException(ErrorCode.ORDER_CANNOT_BE_CANCELLED);
 	}
 }
