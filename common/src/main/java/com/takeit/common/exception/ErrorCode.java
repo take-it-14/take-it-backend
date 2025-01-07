@@ -11,6 +11,9 @@ public enum ErrorCode {
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "권한이 없습니다."),
     FORBIDDEN(HttpStatus.FORBIDDEN, "해당 작업에 대한 권한이 없습니다."),
 
+    // favorite
+    FAVORITE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 찜 정보입니다.");
+
       // auth
     USERNAME_ALEADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 존재하는 username 입니다."),
     EMAIL_ALEADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 존재하는 email 입니다."),

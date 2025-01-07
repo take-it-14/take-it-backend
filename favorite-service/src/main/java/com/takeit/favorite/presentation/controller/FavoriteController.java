@@ -8,6 +8,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/v1/favorites")
 @RequiredArgsConstructor
@@ -21,4 +23,12 @@ public class FavoriteController {
         return CommonResponse.ofSuccess("찜 하기", favoriteService.addFavorite(request.toDto(), username));
     }
 
+    @DeleteMapping("/{favoriteId}")
+    public CommonResponse<?> cancelFavorite(@PathVariable UUID favoriteId,
+                                            @RequestHeader(value = "X-Username") String username) {
+
+        favoriteService.cancelFavorite(favoriteId, username);
+
+        return CommonResponse.ofSuccess("찜 제거", null);
+    }
 }
