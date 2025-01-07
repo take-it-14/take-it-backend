@@ -28,7 +28,19 @@ public enum ErrorCode {
 
     FILE_DELETE_ERROR(HttpStatus.BAD_REQUEST, "파일 삭제에 실패했습니다."),
 
+    // order
+    ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 주문 정보입니다."),
+
+
+
+
+
+
+
+
     ;
+
+
     private final HttpStatus status;
     private final String description;
 

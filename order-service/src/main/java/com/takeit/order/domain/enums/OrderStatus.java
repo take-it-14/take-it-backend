@@ -12,6 +12,7 @@ public enum OrderStatus {
 	CANCELLED;
 
 	public static OrderStatus of(String request){
+		if(request==null) return null;
 		return switch (request){
 			case "PENDING" -> PENDING;
 			case "COMPLETED" -> COMPLETED;
