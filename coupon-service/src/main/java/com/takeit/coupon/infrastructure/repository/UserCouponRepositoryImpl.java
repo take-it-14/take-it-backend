@@ -33,11 +33,10 @@ public class UserCouponRepositoryImpl implements UserCouponRepository {
     }
 
     @Override
-    public Optional<UserCoupon> findByUuidAndUserIdAndFetchJoinCouponAndIsDeletedIsFalse(UUID userCouponId, Long userId) {
+    public Optional<UserCoupon> findByUuidAndUserIdAndFetchJoinCouponAndIsDeletedIsFalse(UUID userCouponId) {
         BooleanBuilder builder = new BooleanBuilder();
 
         builder.and(userCoupon.isDeleted.eq(false))
-                .and(userCoupon.userId.eq(userId))
                 .and(userCoupon.uuid.eq(userCouponId));
 
         JPAQuery<UserCoupon> jpaQuery =

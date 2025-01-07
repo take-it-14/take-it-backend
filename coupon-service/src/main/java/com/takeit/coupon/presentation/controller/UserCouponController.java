@@ -3,6 +3,7 @@ package com.takeit.coupon.presentation.controller;
 import com.takeit.common.presentation.dto.CommonResponse;
 import com.takeit.coupon.application.dto.CreateUserCouponResponse;
 import com.takeit.coupon.application.dto.UpdateUserCouponResponse;
+import com.takeit.coupon.application.dto.UserCouponResponse;
 import com.takeit.coupon.application.service.UserCouponService;
 import com.takeit.coupon.presentation.request.CreateUserCouponRequest;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +47,14 @@ public class UserCouponController {
             @RequestHeader(name = "X-Username") String username,
             @PathVariable UUID userCouponId) {
         return CommonResponse.ofSuccess("사용자 쿠폰 사용을 취소하였습니다.", userCouponService.cancel(userCouponId, username));
+    }
+
+    @GetMapping("/{userCouponId}")
+    public CommonResponse<UserCouponResponse> getUserCoupon(
+            @RequestHeader(name = "X-Username") String username,
+            @PathVariable UUID userCouponId
+    ) {
+        return CommonResponse.ofSuccess("사용자 쿠폰 상세 조회에 성공했습니다.", userCouponService.getUserCoupon(userCouponId, username));
     }
 
 }

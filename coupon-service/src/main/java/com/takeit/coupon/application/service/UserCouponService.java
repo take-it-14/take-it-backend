@@ -3,6 +3,7 @@ package com.takeit.coupon.application.service;
 import com.takeit.common.exception.CustomException;
 import com.takeit.coupon.application.dto.CreateUserCouponResponse;
 import com.takeit.coupon.application.dto.UpdateUserCouponResponse;
+import com.takeit.coupon.application.dto.UserCouponResponse;
 import com.takeit.coupon.domain.entity.Coupon;
 import com.takeit.coupon.domain.entity.UserCoupon;
 import com.takeit.coupon.domain.repository.CouponRepository;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 import static com.takeit.common.exception.ErrorCode.*;
@@ -52,7 +54,10 @@ public class UserCouponService {
         // todo : user 권한 체크
         Long userId = 1L;
 
-        UserCoupon coupon = userCouponRepository.findByUuidAndUserIdAndFetchJoinCouponAndIsDeletedIsFalse(userCouponId, userId).orElseThrow(() -> new CustomException(USER_COUPON_NOT_FOUND));
+        UserCoupon coupon = userCouponRepository.findByUuidAndUserIdAndFetchJoinCouponAndIsDeletedIsFalse(userCouponId).orElseThrow(() -> new CustomException(USER_COUPON_NOT_FOUND));
+
+        // todo : user 권한이 master, manager 인 경우 validation x
+        validationUserId(coupon, userId);
 
         if(LocalDateTime.now().isBefore(coupon.getStartDate()) || coupon.getEndDate().isBefore(LocalDateTime.now())) {
             throw new CustomException(USER_COUPON_INVALID_DATE_RANGE);
@@ -73,7 +78,7 @@ public class UserCouponService {
         // todo : user 권한 체크
         Long userId = 1L;
 
-        UserCoupon coupon = userCouponRepository.findByUuidAndUserIdAndFetchJoinCouponAndIsDeletedIsFalse(userCouponId, userId).orElseThrow(() -> new CustomException(USER_COUPON_NOT_FOUND));
+        UserCoupon coupon = userCouponRepository.findByUuidAndUserIdAndFetchJoinCouponAndIsDeletedIsFalse(userCouponId).orElseThrow(() -> new CustomException(USER_COUPON_NOT_FOUND));
 
         if(coupon.getEndDate().isBefore(LocalDateTime.now())) {
             throw new CustomException(USER_COUPON_EXPIRED);
@@ -87,5 +92,24 @@ public class UserCouponService {
         coupon.cancel();
 
         return UpdateUserCouponResponse.of(userCouponRepository.save(coupon), couponName);
+    }
+
+    @Transactional(readOnly = true)
+    public UserCouponResponse getUserCoupon(UUID userCouponId, String username) {
+        // todo : user 권한 체크
+        Long userId = 1L;
+        UserCoupon userCoupon = userCouponRepository.findByUuidAndUserIdAndFetchJoinCouponAndIsDeletedIsFalse(userCouponId).orElseThrow(() -> new CustomException(USER_COUPON_NOT_FOUND));
+
+        // todo : user 권한이 master, manager 인 경우 validation x
+        validationUserId(userCoupon, userId);
+
+        return UserCouponResponse.from(userCoupon);
+
+    }
+
+    private void validationUserId(UserCoupon userCoupon, Long userId) {
+        if(!userCoupon.getUserId().equals(userId)) {
+            throw new CustomException(UNAUTHORIZED);
+        }
     }
 }
