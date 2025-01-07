@@ -1,15 +1,23 @@
 package com.takeit.coupon.presentation.controller;
 
+import com.querydsl.core.types.Predicate;
 import com.takeit.common.presentation.dto.CommonResponse;
+import com.takeit.coupon.application.dto.CouponPageResponse;
 import com.takeit.coupon.application.dto.CouponResponse;
 import com.takeit.coupon.application.dto.CreateCouponResponse;
 import com.takeit.coupon.application.dto.UpdateCouponResponse;
 import com.takeit.coupon.application.service.CouponService;
+import com.takeit.coupon.domain.entity.Coupon;
 import com.takeit.coupon.presentation.request.CreateCouponRequest;
 import com.takeit.coupon.presentation.request.UpdateCouponRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.querydsl.binding.QuerydslPredicate;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -54,5 +62,14 @@ public class CouponController {
             @PathVariable UUID couponId
     ) {
         return CommonResponse.ofSuccess("쿠폰 상세 조회에 성공했습니다.", couponService.getCoupon(username, couponId));
+    }
+
+    @GetMapping
+    public CommonResponse<CouponPageResponse> getCoupons(
+            @RequestHeader(name = "X-Username") String username,
+            @QuerydslPredicate(root = Coupon.class) Predicate predicate,
+            @PageableDefault(sort = "id", direction = Sort.Direction.DESC, size = 10) Pageable pageable
+    ) {
+        return CommonResponse.ofSuccess("쿠폰 상세 조회에 성공했습니다.", couponService.getCoupons(username, predicate, pageable));
     }
 }

@@ -1,6 +1,8 @@
 package com.takeit.coupon.application.service;
 
+import com.querydsl.core.types.Predicate;
 import com.takeit.common.exception.CustomException;
+import com.takeit.coupon.application.dto.CouponPageResponse;
 import com.takeit.coupon.application.dto.CouponResponse;
 import com.takeit.coupon.application.dto.CreateCouponResponse;
 import com.takeit.coupon.application.dto.UpdateCouponResponse;
@@ -10,10 +12,11 @@ import com.takeit.coupon.domain.repository.UserCouponRepository;
 import com.takeit.coupon.domain.type.CouponType;
 import com.takeit.coupon.presentation.request.CreateCouponRequest;
 import com.takeit.coupon.presentation.request.UpdateCouponRequest;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -91,9 +94,17 @@ public class CouponService {
         }
     }
 
+    @Transactional(readOnly = true)
     public CouponResponse getCoupon(String username, UUID couponId) {
         // todo : user 권한 체크 (master, manager), category name 받아오기
         String category = "의류";
         return CouponResponse.of(couponRepository.findByUuidAndIsDeletedIsFalse(couponId).orElseThrow(() -> new CustomException(COUPON_NOT_FOUND)), category);
+    }
+
+    @Transactional(readOnly = true)
+    public CouponPageResponse getCoupons(String username, Predicate predicate, Pageable pageable) {
+        // todo : user 권한 체크 (master, manager)
+
+        return couponRepository.findAll(predicate, pageable);
     }
 }
