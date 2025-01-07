@@ -5,6 +5,9 @@ import com.takeit.coupon.domain.repository.CouponRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+import java.util.UUID;
+
 @Repository
 @RequiredArgsConstructor
 public class CouponRepositoryImpl implements CouponRepository {
@@ -13,5 +16,10 @@ public class CouponRepositoryImpl implements CouponRepository {
     @Override
     public Coupon save(Coupon coupon) {
         return jpaCouponRepository.save(coupon);
+    }
+
+    @Override
+    public Optional<Coupon> findByUuid(UUID couponId) {
+        return jpaCouponRepository.findByUuid(couponId);
     }
 }

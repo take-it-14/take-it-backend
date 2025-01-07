@@ -3,7 +3,9 @@ package com.takeit.coupon.domain.entity;
 import com.takeit.common.domain.model.BaseEntity;
 import com.takeit.coupon.domain.type.CouponType;
 import com.takeit.coupon.presentation.request.CreateCouponRequest;
+import com.takeit.coupon.presentation.request.UpdateCouponRequest;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -60,5 +62,16 @@ public class Coupon extends BaseEntity {
                 .endDate(request.endDate())
                 .expirationDate(request.expirationDate() == null ? 3650 : request.expirationDate())
                 .build();
+    }
+
+    public void update(UpdateCouponRequest request, Long categoryId) {
+        this.name = request.name() != null ? request.name() : this.name;
+        this.type = request.type() != null ? request.type() : this.type;
+        this.categoryId = categoryId != null ? categoryId : this.categoryId;
+        this.discountValue = request.discountValue() != null ? request.discountValue() : this.discountValue;
+        this.minAmount = request.minAmount() != null ? request.minAmount() : this.minAmount;
+        this.startDate = request.startDate() != null ? request.startDate() : this.startDate;
+        this.endDate = request.endDate() != null ? request.endDate() : this.endDate;
+        this.expirationDate = request.expirationDate() != null ? request.expirationDate() : this.expirationDate;
     }
 }
