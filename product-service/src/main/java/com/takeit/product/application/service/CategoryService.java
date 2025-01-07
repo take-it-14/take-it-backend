@@ -54,4 +54,12 @@ public class CategoryService {
                 .orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND))
                 .delete(username);
     }
+
+    public CategoryEntityResponse getCategory(Long categoryId, String username) {
+        // TODO: username으로 권한체크
+
+        return categoryRepository.findByIdAndIsDeleteFalse(categoryId)
+                .map(CategoryEntityResponse::from)
+                .orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND));
+    }
 }
