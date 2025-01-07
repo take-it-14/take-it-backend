@@ -1,6 +1,6 @@
 package com.takeit.review.infrastructure.repository;
 
-import com.takeit.review.application.repository.ReviewPhotoRepository;
+import com.takeit.review.domain.repository.ReviewPhotoRepository;
 import com.takeit.review.domain.entity.Review;
 import com.takeit.review.domain.entity.ReviewPhoto;
 import lombok.RequiredArgsConstructor;

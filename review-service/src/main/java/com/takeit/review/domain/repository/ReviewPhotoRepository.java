@@ -1,9 +1,8 @@
-package com.takeit.review.application.repository;
+package com.takeit.review.domain.repository;
 
 import com.takeit.review.domain.entity.Review;
 import com.takeit.review.domain.entity.ReviewPhoto;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
