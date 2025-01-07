@@ -10,7 +10,7 @@ public record OrderResponse(
 	Long quantity,
 	Long amount
 ) {
-	public static OrderResponse from(Order order, UUID productId) {
+	public static OrderResponse of(Order order, UUID productId) {
 		return new OrderResponse(
 			order.getUuid(),
 			productId,

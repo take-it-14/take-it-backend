@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.takeit.common.presentation.dto.CommonResponse;
 import com.takeit.order.application.dto.OrderResponse;
 import com.takeit.order.application.dto.OrderDetailResponse;
+import com.takeit.order.application.dto.OrderListResponse;
 import com.takeit.order.application.dto.PageResponse;
 import com.takeit.order.application.service.OrderService;
 import com.takeit.order.presentation.request.OrderCreateRequest;
@@ -45,7 +46,7 @@ public class OrderController {
 	}
 
 	@GetMapping
-	public CommonResponse<PageResponse<OrderDetailResponse>> getOrders(
+	public CommonResponse<PageResponse<OrderListResponse>> getOrders(
 		Pageable pageable,
 		@RequestParam(required = false) String status
 		//@RequestHeader(value = "X-Username") String username
