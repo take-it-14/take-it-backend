@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -47,6 +46,7 @@ public class CategoryService {
 
     }
 
+    @Transactional
     public void deleteCategory(Long categoryId, String username) {
         // TODO: username으로 권한체크
 
