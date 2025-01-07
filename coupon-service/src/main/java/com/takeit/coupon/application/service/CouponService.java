@@ -1,6 +1,7 @@
 package com.takeit.coupon.application.service;
 
 import com.takeit.common.exception.CustomException;
+import com.takeit.coupon.application.dto.CouponResponse;
 import com.takeit.coupon.application.dto.CreateCouponResponse;
 import com.takeit.coupon.application.dto.UpdateCouponResponse;
 import com.takeit.coupon.domain.entity.Coupon;
@@ -10,7 +11,6 @@ import com.takeit.coupon.domain.type.CouponType;
 import com.takeit.coupon.presentation.request.CreateCouponRequest;
 import com.takeit.coupon.presentation.request.UpdateCouponRequest;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -50,7 +50,7 @@ public class CouponService {
         Long categoryId = 1L;
         String categoryName = "가방";
 
-        Coupon coupon = couponRepository.findByUuid(couponId).orElseThrow(() -> new CustomException(COUPON_NOT_FOUND));
+        Coupon coupon = couponRepository.findByUuidAndIsDeletedIsFalse(couponId).orElseThrow(() -> new CustomException(COUPON_NOT_FOUND));
 
         if(request.type().equals(CouponType.PERCENTAGE)) {
             validationPercentageValue(request.discountValue());
@@ -70,7 +70,7 @@ public class CouponService {
     @Transactional
     public void deleteCoupon(UUID couponId, String username) {
         // todo : user 권한 체크 (master, manager)
-        Coupon coupon = couponRepository.findByUuid(couponId).orElseThrow(() -> new CustomException(COUPON_NOT_FOUND));
+        Coupon coupon = couponRepository.findByUuidAndIsDeletedIsFalse(couponId).orElseThrow(() -> new CustomException(COUPON_NOT_FOUND));
 
         coupon.delete(username);
 
@@ -89,5 +89,11 @@ public class CouponService {
         if(endDate.isBefore(startDate) || endDate.isEqual(startDate)) {
             throw new CustomException(COUPON_END_DATE_MUST_BE_AFTER_START_DATE);
         }
+    }
+
+    public CouponResponse getCoupon(String username, UUID couponId) {
+        // todo : user 권한 체크 (master, manager), category name 받아오기
+        String category = "의류";
+        return CouponResponse.of(couponRepository.findByUuidAndIsDeletedIsFalse(couponId).orElseThrow(() -> new CustomException(COUPON_NOT_FOUND)), category);
     }
 }

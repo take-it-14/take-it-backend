@@ -1,6 +1,7 @@
 package com.takeit.coupon.presentation.controller;
 
 import com.takeit.common.presentation.dto.CommonResponse;
+import com.takeit.coupon.application.dto.CouponResponse;
 import com.takeit.coupon.application.dto.CreateCouponResponse;
 import com.takeit.coupon.application.dto.UpdateCouponResponse;
 import com.takeit.coupon.application.service.CouponService;
@@ -45,5 +46,13 @@ public class CouponController {
         couponService.deleteCoupon(couponId, username);
 
         return CommonResponse.ofSuccess("쿠폰 삭제에 성공했습니다.", null);
+    }
+
+    @GetMapping("/{couponId}")
+    public CommonResponse<CouponResponse> getCoupon(
+            @RequestHeader(name = "X-Username") String username,
+            @PathVariable UUID couponId
+    ) {
+        return CommonResponse.ofSuccess("쿠폰 상세 조회에 성공했습니다.", couponService.getCoupon(username, couponId));
     }
 }
