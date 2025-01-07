@@ -1,7 +1,10 @@
 package com.takeit.review.application.service;
 
+import com.querydsl.core.types.Predicate;
 import com.takeit.common.exception.CustomException;
 import com.takeit.review.application.dto.CreateReviewResponse;
+import com.takeit.review.application.dto.ReviewDetailResponse;
+import com.takeit.review.application.dto.ReviewPageResponse;
 import com.takeit.review.application.dto.UpdateReviewResponse;
 import com.takeit.review.application.repository.ReviewPhotoRepository;
 import com.takeit.review.application.repository.ReviewRepository;
@@ -13,6 +16,7 @@ import com.takeit.s3.infrastructure.util.FileUpload;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -94,5 +98,13 @@ public class ReviewService {
         return UpdateReviewResponse.of(review, request.orderId());
     }
 
+    public ReviewDetailResponse getReview(String username, UUID reviewId) {
+        // todo : product 정보 같이 반환
+        Review review = reviewRepository.findReviewAndReviewPhotosByUuid(reviewId).orElseThrow(() -> new CustomException(REVIEW_NOT_FOUND));
+        return ReviewDetailResponse.from(review);
+    }
 
+    public ReviewPageResponse getReviews(Pageable pageable, Predicate predicate, String username) {
+        return reviewRepository.findAll(predicate, pageable);
+    }
 }

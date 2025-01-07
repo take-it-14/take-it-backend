@@ -10,3 +10,6 @@ cloud:
       auto: false
     stack:
       auto: false
+spring:
+  application:
+    name: s3-service
