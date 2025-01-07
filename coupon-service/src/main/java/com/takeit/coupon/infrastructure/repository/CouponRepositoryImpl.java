@@ -19,7 +19,7 @@ public class CouponRepositoryImpl implements CouponRepository {
     }
 
     @Override
-    public Optional<Coupon> findByUuid(UUID couponId) {
-        return jpaCouponRepository.findByUuid(couponId);
+    public Optional<Coupon> findByUuidAndIsDeletedIsFalse(UUID couponId) {
+        return jpaCouponRepository.findByUuidAndIsDeletedIsFalse(couponId);
     }
 }
