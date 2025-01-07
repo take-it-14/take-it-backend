@@ -9,4 +9,6 @@ public interface UserCouponRepository {
     UserCoupon save(UserCoupon userCoupon);
 
     Optional<UserCoupon> findByUuidAndUserIdAndIsDeletedIsFalse(UUID userCouponId, Long userId);
+
+    Optional<UserCoupon> findByUuidAndUserIdAndJoinCouponAndIsDeletedIsFalse(UUID userCouponId, Long userId);
 }

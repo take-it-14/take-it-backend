@@ -53,4 +53,9 @@ public class UserCoupon extends BaseEntity {
         this.deletedBy = username;
         this.isDeleted = true;
     }
+
+    public void used() {
+        this.isUsed = true;
+    }
+
 }

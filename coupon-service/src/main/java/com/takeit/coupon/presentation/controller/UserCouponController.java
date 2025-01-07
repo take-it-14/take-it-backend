@@ -2,6 +2,7 @@ package com.takeit.coupon.presentation.controller;
 
 import com.takeit.common.presentation.dto.CommonResponse;
 import com.takeit.coupon.application.dto.CreateUserCouponResponse;
+import com.takeit.coupon.application.dto.UpdateUserCouponResponse;
 import com.takeit.coupon.application.service.UserCouponService;
 import com.takeit.coupon.presentation.request.CreateUserCouponRequest;
 import lombok.RequiredArgsConstructor;
@@ -32,4 +33,12 @@ public class UserCouponController {
         userCouponService.delete(userCouponId, username);
         return CommonResponse.ofSuccess("사용자 쿠폰 삭제에 성공했습니다.", null);
     }
+
+    @PatchMapping("/{userCouponId}/used")
+    public CommonResponse<UpdateUserCouponResponse> userCouponUsed(
+            @RequestHeader(name = "X-Username") String username,
+            @PathVariable UUID userCouponId) {
+        return CommonResponse.ofSuccess("사용자 쿠폰을 사용하였습니다.", userCouponService.used(userCouponId, username));
+    }
+
 }
