@@ -2,12 +2,17 @@ package com.takeit.product.application.service;
 
 import com.takeit.common.exception.CustomException;
 import com.takeit.common.exception.ErrorCode;
+import com.takeit.product.application.dto.CategoryResponse;
 import com.takeit.product.application.dto.category.CategoryEntityResponse;
 import com.takeit.product.application.dto.category.CreateCategoryDto;
 import com.takeit.product.application.dto.category.UpdateCategoryDto;
 import com.takeit.product.domain.entity.Category;
 import com.takeit.product.domain.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedModel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,5 +66,18 @@ public class CategoryService {
         return categoryRepository.findByIdAndIsDeleteFalse(categoryId)
                 .map(CategoryEntityResponse::from)
                 .orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND));
+    }
+
+    public PagedModel<CategoryResponse> getAllCategories(Pageable pageable) {
+        Page<Category> categoryPage = categoryRepository.getAllCategories(pageable);
+        return new PagedModel<>(
+                new PageImpl<>(
+                        categoryPage.getContent().stream()
+                                .map(category -> CategoryResponse.of(category.getUuid(), category.getName()))
+                                .toList(),
+                        categoryPage.getPageable(),
+                        categoryPage.getTotalElements()
+                )
+        );
     }
 }
