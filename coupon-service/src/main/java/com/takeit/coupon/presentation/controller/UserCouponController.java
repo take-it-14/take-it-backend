@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -21,5 +23,13 @@ public class UserCouponController {
             @RequestBody CreateUserCouponRequest request
     ) {
         return CommonResponse.ofSuccess("사용자 쿠폰 발급에 성공했습니다.", userCouponService.create(request, username));
+    }
+
+    @DeleteMapping("/{userCouponId}")
+    public CommonResponse<?> deleteUserCoupon(
+            @RequestHeader(name = "X-Username") String username,
+            @PathVariable UUID userCouponId) {
+        userCouponService.delete(userCouponId, username);
+        return CommonResponse.ofSuccess("사용자 쿠폰 삭제에 성공했습니다.", null);
     }
 }

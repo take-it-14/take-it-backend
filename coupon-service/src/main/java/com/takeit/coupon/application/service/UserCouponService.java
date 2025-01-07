@@ -10,11 +10,12 @@ import com.takeit.coupon.presentation.request.CreateUserCouponRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
-import static com.takeit.common.exception.ErrorCode.COUPON_EXPIRED;
-import static com.takeit.common.exception.ErrorCode.COUPON_NOT_FOUND;
+import static com.takeit.common.exception.ErrorCode.*;
 
 @Slf4j
 @Service
@@ -23,6 +24,7 @@ public class UserCouponService {
     private final UserCouponRepository userCouponRepository;
     private final CouponRepository couponRepository;
 
+    @Transactional
     public CreateUserCouponResponse create(CreateUserCouponRequest request, String username) {
         // todo : user 권한 체크
         Long userId = 1L;
@@ -33,5 +35,14 @@ public class UserCouponService {
         }
 
         return CreateUserCouponResponse.of(userCouponRepository.save(UserCoupon.create(coupon, userId)), coupon.getName());
+    }
+
+    @Transactional
+    public void delete(UUID userCouponId, String username) {
+        // todo : user 권한 체크
+        Long userId = 1L;
+
+        UserCoupon coupon = userCouponRepository.findByUuidAndUserIdAndIsDeletedIsFalse(userCouponId, userId).orElseThrow(() -> new CustomException(USER_COUPON_NOT_FOUND));
+        coupon.delete(username);
     }
 }
