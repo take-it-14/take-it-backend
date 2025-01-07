@@ -7,7 +7,7 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.takeit.review.application.dto.QReviewPageResponse_ReviewPage_Review;
 import com.takeit.review.application.dto.ReviewPageResponse;
-import com.takeit.review.application.repository.ReviewRepository;
+import com.takeit.review.domain.repository.ReviewRepository;
 import com.takeit.review.domain.entity.Review;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -46,7 +46,7 @@ public class ReviewRepositoryImpl implements ReviewRepository {
 
     @Override
     public ReviewPageResponse findAll(Predicate predicate, Pageable pageable) {
-        BooleanBuilder builder = new BooleanBuilder();
+        BooleanBuilder builder = new BooleanBuilder(predicate);
 
         builder.and(review.isDeleted.eq(false));
 
