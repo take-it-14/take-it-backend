@@ -5,13 +5,20 @@ import com.takeit.product.domain.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 @RequiredArgsConstructor
 public class CategoryRepositoryImpl implements CategoryRepository {
     private final CategoryJpaRepository jpaRepository;
 
     @Override
-    public Category createCategory(Category category) {
+    public Category save(Category category) {
         return jpaRepository.save(category);
+    }
+
+    @Override
+    public Optional<Category> findByName(String name) {
+        return jpaRepository.findByName(name);
     }
 }

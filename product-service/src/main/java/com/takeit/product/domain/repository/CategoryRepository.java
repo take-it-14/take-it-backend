@@ -2,6 +2,10 @@ package com.takeit.product.domain.repository;
 
 import com.takeit.product.domain.entity.Category;
 
+import java.util.Optional;
+
 public interface CategoryRepository {
-    Category createCategory(Category category);
+    Category save(Category category);
+
+    Optional<Category> findByName(String name);
 }

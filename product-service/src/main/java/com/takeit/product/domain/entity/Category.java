@@ -4,6 +4,7 @@ import com.takeit.common.domain.model.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -29,5 +30,11 @@ public class Category extends BaseEntity {
         return Category.builder()
                 .name(name)
                 .build();
+    }
+
+    public void restore() {
+        this.isDeleted = false;
+        this.deletedAt = LocalDateTime.now();
+        this.deletedBy = null;
     }
 }

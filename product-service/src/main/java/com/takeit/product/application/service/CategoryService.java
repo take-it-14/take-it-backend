@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -17,6 +19,16 @@ public class CategoryService {
     @Transactional
     public CategoryEntityResponse createCategory(CreateCategoryDto request, String username) {
         // TODO: username으로 권한체크
-        return CategoryEntityResponse.from(categoryRepository.createCategory(Category.create(request.name())));
+
+        Optional<Category> category = categoryRepository.findByName(request.name());
+        if (category.isPresent()) {
+            category.get().restore();
+        } else {
+            category = Optional.of(categoryRepository.save(
+                    Category.create(request.name())
+            ));
+        }
+
+        return CategoryEntityResponse.from(category.get());
     }
 }
