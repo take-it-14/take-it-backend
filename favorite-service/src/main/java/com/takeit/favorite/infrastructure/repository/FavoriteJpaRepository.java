@@ -7,8 +7,6 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface FavoriteJpaRepository extends JpaRepository<Favorite, UUID>,
-        QuerydslPredicateExecutor<Favorite> {
-
+public interface FavoriteJpaRepository extends JpaRepository<Favorite, Long> {
     Optional<Favorite> findByProductIdAndUserId(Long productId, Long userId);
 }

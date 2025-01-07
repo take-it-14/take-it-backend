@@ -61,10 +61,9 @@ public class FavoriteRepositoryImpl implements FavoriteRepository {
 
         long total = query.fetch().size();
 
-        // 데이터 조회
         List<Favorite> results = query.fetch();
 
-        // Page 객체 반환
         return new PageImpl<>(results, pageable, total);
     }
+
 }

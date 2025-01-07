@@ -15,4 +15,5 @@ public interface FavoriteRepository {
     Optional<Favorite> findByUuidIsDeleteFalse(UUID uuid);
 
     Page<Favorite> getUserFavorites(Long userId, Pageable pageable);
+
 }
