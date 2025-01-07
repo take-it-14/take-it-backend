@@ -4,12 +4,18 @@ import com.takeit.common.exception.CustomException;
 import com.takeit.common.exception.ErrorCode;
 import com.takeit.favorite.application.dto.favorite.CreateFavoriteDto;
 import com.takeit.favorite.application.dto.favorite.CreateFavoriteResponse;
+import com.takeit.favorite.application.dto.favorite.FavoriteResponse;
 import com.takeit.favorite.domain.entity.Favorite;
 import com.takeit.favorite.domain.repository.FavoriteRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedModel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -45,6 +51,27 @@ public class FavoriteService {
                 .orElseThrow(() -> new CustomException(ErrorCode.FAVORITE_NOT_FOUND));
 
         favorite.cancel(username);
+
+    }
+
+    public PagedModel<FavoriteResponse> getUserFavorites(String username, Pageable pageable) {
+        // TODO: username으로 User 정보 받아오는 메소드 추가 + 권한체크(customer: 본인 것만 가능, manager,master: 아무나 가능)
+        Long userId = 1L;
+
+        Page<Favorite> favoritePage = favoriteRepository.getUserFavorites(userId, pageable);
+        List<Long> productIds = favoritePage.getContent().stream().map(Favorite::getProductId).toList();
+
+        // TODO: prouductIds 를 통해 product 가져오기
+        UUID productId = UUID.randomUUID();
+
+        return new PagedModel<>(
+                new PageImpl<>(
+                        favoritePage.getContent().stream()
+                                .map(favorite -> new FavoriteResponse(favorite.getUuid(), productId))
+                                .toList(),
+                        favoritePage.getPageable(),
+                        favoritePage.getTotalElements())
+        );
 
     }
 }
