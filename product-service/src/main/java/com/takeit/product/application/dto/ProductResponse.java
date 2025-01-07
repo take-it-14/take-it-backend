@@ -1,11 +1,12 @@
 package com.takeit.product.application.dto;
 
 import com.takeit.product.domain.entity.Product;
+import java.util.UUID;
 
 public record ProductResponse(
-        String ProductId
+        UUID ProductId
 ) {
     public static ProductResponse from(Product product) {
-        return new ProductResponse(product.getUuid().toString());
+        return new ProductResponse(product.getUuid());
     }
 }
