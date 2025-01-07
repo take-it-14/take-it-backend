@@ -12,6 +12,7 @@ import com.takeit.common.exception.ErrorCode;
 import com.takeit.order.application.dto.OrderCreateDto;
 import com.takeit.order.application.dto.OrderCreateResponse;
 import com.takeit.order.application.dto.OrderDetailResponse;
+import com.takeit.order.application.dto.OrderListResponse;
 import com.takeit.order.domain.entity.Order;
 import com.takeit.order.domain.enums.OrderStatus;
 import com.takeit.order.domain.repository.OrderRepository;
@@ -49,10 +50,10 @@ public class OrderService {
 		// TODO: product-service에서 id->UUID 변환 필요
 		UUID productId = UUID.randomUUID();
 
-		return OrderDetailResponse.from(order, productId);
+		return OrderDetailResponse.of(order, productId);
 	}
 
-	public Page<OrderDetailResponse> getOrders(Pageable pageable, String status, String username){
+	public Page<OrderListResponse> getOrders(Pageable pageable, String status, String username){
 		Page<Order> orderPage;
 
 		// TODO: username->userId 가져오는 로직 필요
@@ -65,7 +66,7 @@ public class OrderService {
 		return orderPage.map(
 			order -> {
 				UUID productUuid = findProductUuidByProductId(order.getProductId());
-				return OrderDetailResponse.from(order, productUuid);
+				return OrderListResponse.of(order, productUuid);
 			}
 		);
 	}
