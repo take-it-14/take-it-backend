@@ -1,0 +1,9 @@
+### 주문 생성
+POST localhost:19093/api/v1/orders
+Content-Type: application/json
+
+{
+  "productId": "8c7c72b3-1234-4e56-89ab-0c1234d56789",
+  "quantity": 2,
+  "amount": 10000
+}
