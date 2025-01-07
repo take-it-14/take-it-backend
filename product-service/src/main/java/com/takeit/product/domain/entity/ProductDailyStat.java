@@ -34,11 +34,11 @@ public class ProductDailyStat {
 	@Column(nullable = false)
 	private Date baseDate;
 
-	private Integer soldStock;
+	private Long soldStock;
 
-	private Integer stock;
+	private Long stock;
 
-	private Integer people;
+	private Long people;
 
 	@Column(nullable = false, updatable = false)
 	private LocalDateTime createdAt;
