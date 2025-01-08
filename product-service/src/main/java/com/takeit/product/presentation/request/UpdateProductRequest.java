@@ -24,7 +24,7 @@ public record UpdateProductRequest(
         @NotNull
         Boolean isActive,
         List<UUID> deletePhotos,
-        List<MultipartFile> photos
+        List<MultipartFile> files
 ) {
     public UpdateProductDto toDto() {
         return new UpdateProductDto(
@@ -37,7 +37,7 @@ public record UpdateProductRequest(
                 closeTime,
                 isActive,
                 deletePhotos,
-                photos
+                files
         );
     }
 }
