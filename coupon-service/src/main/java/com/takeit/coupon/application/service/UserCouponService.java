@@ -51,7 +51,8 @@ public class UserCouponService {
         // todo : user 권한 체크
         Long userId = 1L;
 
-        UserCoupon coupon = userCouponRepository.getUserCoupon(userCouponId, userId).orElseThrow(() -> new CustomException(USER_COUPON_NOT_FOUND));
+        // todo : user 권한이 master, manager 가 아닌 경우 validation 추가
+        UserCoupon coupon = userCouponRepository.findByUuidAndIsDeletedIsFalse(userCouponId).orElseThrow(() -> new CustomException(USER_COUPON_NOT_FOUND));
 
         if(LocalDateTime.now().isBefore(coupon.getStartDate()) || coupon.getEndDate().isBefore(LocalDateTime.now())) {
             throw new CustomException(USER_COUPON_INVALID_DATE_RANGE);
@@ -72,7 +73,8 @@ public class UserCouponService {
         // todo : user 권한 체크
         Long userId = 1L;
 
-        UserCoupon coupon = userCouponRepository.getUserCoupon(userCouponId, userId).orElseThrow(() -> new CustomException(USER_COUPON_NOT_FOUND));
+        // todo : user 권한이 master, manager 가 아닌 경우 validation 추가
+        UserCoupon coupon = userCouponRepository.findByUuidAndIsDeletedIsFalse(userCouponId).orElseThrow(() -> new CustomException(USER_COUPON_NOT_FOUND));
 
         if(!coupon.getIsUsed()) {
             throw new CustomException(USER_COUPON_NOT_USED);

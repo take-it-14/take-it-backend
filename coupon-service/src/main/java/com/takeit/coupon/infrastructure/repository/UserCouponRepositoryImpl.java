@@ -37,23 +37,4 @@ public class UserCouponRepositoryImpl implements UserCouponRepository {
     public boolean existsByCouponAndIsDeletedIsFalse(Coupon coupon) {
         return jpaUserCouponRepository.existsByCouponAndIsDeletedIsFalse(coupon);
     }
-
-    @Override
-    public Optional<UserCoupon> getUserCoupon(UUID userCouponId, Long userId) {
-        BooleanBuilder builder = new BooleanBuilder();
-
-        builder.and(userCoupon.isDeleted.eq(false))
-                .and(userCoupon.userId.eq(userId))
-                .and(userCoupon.uuid.eq(userCouponId));
-
-        JPAQuery<UserCoupon> jpaQuery =
-                queryFactory.select(userCoupon)
-                        .from(userCoupon)
-                        .join(userCoupon.coupon, coupon).fetchJoin()
-                        .where(builder);
-
-        UserCoupon userCoupon = jpaQuery.fetchOne();
-
-        return Optional.ofNullable(userCoupon);
-    }
 }

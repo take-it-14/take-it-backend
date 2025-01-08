@@ -10,8 +10,6 @@ import com.takeit.coupon.domain.entity.Coupon;
 public interface UserCouponRepository {
     UserCoupon save(UserCoupon userCoupon);
 
-    Optional<UserCoupon> getUserCoupon(UUID userCouponId, Long userId);
-
     Optional<UserCoupon> findByUuidAndIsDeletedIsFalse(UUID userCouponId);
 
     boolean existsByCouponAndIsDeletedIsFalse(Coupon coupon);
