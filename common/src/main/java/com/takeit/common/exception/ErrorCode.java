@@ -38,6 +38,11 @@ public enum ErrorCode {
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 주문 정보입니다."),
     ORDER_CANNOT_BE_MODIFIED(HttpStatus.BAD_REQUEST, "현재 상태의 주문은 수정할 수 없습니다."),
 
+
+    // coupon
+    INVALID_DISCOUNT_PERCENTAGE_VALUE(HttpStatus.BAD_REQUEST, "할인 퍼센트 값이 유효하지 않습니다."),
+    COUPON_START_DATE_IN_PAST(HttpStatus.BAD_REQUEST, "쿠폰 시작 날짜는 과거가 될 수 없습니다."),
+    COUPON_END_DATE_MUST_BE_AFTER_START_DATE(HttpStatus.BAD_REQUEST, "쿠폰 종료 날짜는 시작 날짜 이후여야 합니다."),
     // product
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 상품을 찾을 수 없습니다."),
 
