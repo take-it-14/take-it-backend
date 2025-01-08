@@ -37,4 +37,9 @@ public class UserCouponRepositoryImpl implements UserCouponRepository {
     public boolean existsByCouponAndIsDeletedIsFalse(Coupon coupon) {
         return jpaUserCouponRepository.existsByCouponAndIsDeletedIsFalse(coupon);
     }
+
+    @Override
+    public Optional<UserCoupon> findByIdAndIsDeletedIsFalse(Long userCouponId) {
+        return jpaUserCouponRepository.findByIdAndIsDeletedIsFalse(userCouponId);
+    }
 }
