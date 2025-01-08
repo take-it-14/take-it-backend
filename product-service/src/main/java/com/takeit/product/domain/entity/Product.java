@@ -94,8 +94,6 @@ public class Product extends BaseEntity {
 
     // 상품 수정 메서드
     public void update(
-            Long sellerId,
-            Long categoryId,
             String productName,
             String description,
             String imageUrl,
@@ -106,8 +104,6 @@ public class Product extends BaseEntity {
             LocalDateTime closeTime,
             Boolean isActive
     ) {
-        if (sellerId != null) this.sellerId = sellerId;
-        if (categoryId != null) this.categoryId = categoryId;
         if (productName != null) this.productName = productName;
         if (description != null) this.description = description;
         if (imageUrl != null) this.imageUrl = imageUrl;
