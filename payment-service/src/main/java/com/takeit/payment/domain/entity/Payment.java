@@ -47,5 +47,9 @@ public class Payment extends BaseEntity {
                 .receipt(receipt)
                 .build();
     }
+
+    public void cancel() {
+        this.status = PaymentStatus.CANCELED;
+    }
 }
 

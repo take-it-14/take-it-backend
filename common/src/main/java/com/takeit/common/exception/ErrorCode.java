@@ -12,7 +12,9 @@ public enum ErrorCode {
     FORBIDDEN(HttpStatus.FORBIDDEN, "해당 작업에 대한 권한이 없습니다."),
 
     // Payment
-    WRONG_PAYMENT_INFO(HttpStatus.BAD_REQUEST, "결제 정보가 잘못되었습니다.");
+    WRONG_PAYMENT(HttpStatus.BAD_REQUEST, "결제 정보가 잘못되었습니다."),
+    PAYMENT_CANCEL_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "결제 취소에 실패하였습니다."),
+    PAYMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "결제 정보가 없습니다.");
 
     private final HttpStatus status;
     private final String description;
