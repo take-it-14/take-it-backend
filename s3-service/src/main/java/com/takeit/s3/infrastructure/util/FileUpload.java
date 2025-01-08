@@ -3,6 +3,7 @@ package com.takeit.s3.infrastructure.util;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.takeit.common.exception.CustomException;
 import com.takeit.s3.infrastructure.util.dto.S3UploadFile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import static com.takeit.common.exception.ErrorCode.FILE_DELETE_ERROR;
 
 @Slf4j
 @Component
@@ -117,7 +120,7 @@ public class FileUpload {
             amazonS3.deleteObject(new DeleteObjectRequest(file.uri(), file.filename()));
         } else {
             log.error("s3 connected error");
-            throw new IllegalStateException("S3 client is not initialized");
+            throw new CustomException(FILE_DELETE_ERROR);
         }
     }
 
@@ -129,7 +132,7 @@ public class FileUpload {
             }
         } else {
             log.error("s3 connected error");
-            throw new IllegalStateException("S3 client is not initialized");
+            throw new CustomException(FILE_DELETE_ERROR);
         }
     }
 
