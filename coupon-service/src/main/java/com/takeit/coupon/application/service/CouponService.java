@@ -76,6 +76,10 @@ public class CouponService {
         // todo : user 권한 체크 (master, manager)
         Coupon coupon = couponRepository.findByUuid(couponId).orElseThrow(() -> new CustomException(COUPON_NOT_FOUND));
 
+        if(userCouponRepository.existsByCouponAndIsDeletedIsFalse(coupon)) {
+            throw new CustomException(COUPON_UPDATED_FAIL_CAUSE_EXIST_USER_COUPON);
+        }
+
         coupon.delete(username);
 
         couponRepository.save(coupon);
