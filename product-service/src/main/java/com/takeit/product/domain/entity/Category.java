@@ -34,14 +34,14 @@ public class Category extends BaseEntity {
 
     public void restore() {
         this.isDeleted = false;
-        this.deletedAt = LocalDateTime.now();
+        this.deletedAt = null;
         this.deletedBy = null;
     }
 
     public void update(String name) {
         this.name = name;
     }
-
+  
     public void delete(String username) {
         this.isDeleted = true;
         this.deletedAt = LocalDateTime.now();
