@@ -33,9 +33,9 @@ public class UserService {
     public UserResponse createUser(CreateUserDto request) {
         // validation
         if (isUsernameExists(request.username())) { // username 중복 확인
-            throw new CustomException(ErrorCode.USERNAME_ALEADY_EXISTS);
+            throw new CustomException(ErrorCode.USERNAME_ALREADY_EXISTS);
         } else if (isEmailExists(request.email())) { // email 중복 확인
-            throw new CustomException(ErrorCode.EMAIL_ALEADY_EXISTS);
+            throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
 
         // 비밀번호 암호화
@@ -59,9 +59,9 @@ public class UserService {
     public UserResponse createSeller(CreateSellerDto request) {
         // validation
         if (isUsernameExists(request.username())) { // username 중복 확인
-            throw new CustomException(ErrorCode.USERNAME_ALEADY_EXISTS);
+            throw new CustomException(ErrorCode.USERNAME_ALREADY_EXISTS);
         } else if (isEmailExists(request.email())) { // email 중복 확인
-            throw new CustomException(ErrorCode.EMAIL_ALEADY_EXISTS);
+            throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
         // TODO 사업자등록번호 검사
 
