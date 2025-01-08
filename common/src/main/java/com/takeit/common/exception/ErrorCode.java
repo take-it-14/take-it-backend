@@ -11,6 +11,11 @@ public enum ErrorCode {
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "권한이 없습니다."),
     FORBIDDEN(HttpStatus.FORBIDDEN, "해당 작업에 대한 권한이 없습니다."),
 
+    // Payment
+    WRONG_PAYMENT(HttpStatus.BAD_REQUEST, "결제 정보가 잘못되었습니다."),
+    PAYMENT_CANCEL_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "결제 취소에 실패하였습니다."),
+    PAYMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "결제 정보가 없습니다."),
+
     // favorite
     FAVORITE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 찜 정보입니다."),
 
@@ -33,18 +38,11 @@ public enum ErrorCode {
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 주문 정보입니다."),
     ORDER_CANNOT_BE_MODIFIED(HttpStatus.BAD_REQUEST, "현재 상태의 주문은 수정할 수 없습니다."),
 
-
-
-
-
-
-
-
     // product
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 상품을 찾을 수 없습니다."),
 
     // product daily stat
-    INVALID_DATE_FORMAT(HttpStatus.BAD_REQUEST, "유효하지 않은 날짜 입력 형식입니다."),
+    INVALID_DATE_FORMAT(HttpStatus.BAD_REQUEST, "유효하지 않은 날짜 입력 형식입니다.")
 
     ;
 
