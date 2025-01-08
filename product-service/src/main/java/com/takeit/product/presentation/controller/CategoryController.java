@@ -8,7 +8,6 @@ import com.takeit.product.presentation.request.UpdateCategoryRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.UUID;
 
 @RestController
@@ -37,5 +36,11 @@ public class CategoryController {
         categoryService.deleteCategory(categoryId, username);
 
         return CommonResponse.ofSuccess("카테고리 삭제",null);
+    }
+
+    @GetMapping("/{categoryId}")
+    public CommonResponse<CategoryEntityResponse> getCategory(@PathVariable Long categoryId,
+                                                        @RequestHeader(value = "X-Username") String username) {
+        return CommonResponse.ofSuccess("카테고리 조회", categoryService.getCategory(categoryId, username));
     }
 }
