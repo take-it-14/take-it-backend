@@ -42,9 +42,12 @@ public enum ErrorCode {
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 카테고리가 없습니다."),
 
     // coupon
+    COUPON_NOT_FOUND(HttpStatus.BAD_REQUEST, "쿠폰을 찾을 수 없습니다."),
     INVALID_DISCOUNT_PERCENTAGE_VALUE(HttpStatus.BAD_REQUEST, "할인 퍼센트 값이 유효하지 않습니다."),
     COUPON_START_DATE_IN_PAST(HttpStatus.BAD_REQUEST, "쿠폰 시작 날짜는 과거가 될 수 없습니다."),
     COUPON_END_DATE_MUST_BE_AFTER_START_DATE(HttpStatus.BAD_REQUEST, "쿠폰 종료 날짜는 시작 날짜 이후여야 합니다."),
+    COUPON_UPDATED_FAIL_CAUSE_EXIST_USER_COUPON(HttpStatus.BAD_REQUEST, "유저가 등록한 해당 쿠폰이 존재하여 쿠폰 수정이 불가합니다."),
+
     // product
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 상품을 찾을 수 없습니다."),
 
