@@ -101,12 +101,12 @@ public class ProductService {
 
         if(dto.files() != null && !dto.files().isEmpty()) {
             // todo : 파일 개수 제한 로직
-            int count = productPhotoRepository.findAllByProductAndIsDeletedIsFalse(product).size();
-
-            // 총 보여질 사진 개수 (현재 저장되어 있는 사진 개수 - 지울 사진 개수 + 새로 등록할 사진)
-            if(count - deleteFileSize + dto.files().size() > 3) {
-                throw new CustomException(TOO_MANY_PHOTOS);
-            }
+//            int count = productPhotoRepository.findAllByProductAndIsDeletedIsFalse(product).size();
+//
+//            // 총 보여질 사진 개수 (현재 저장되어 있는 사진 개수 - 지울 사진 개수 + 새로 등록할 사진)
+//            if(count - deleteFileSize + dto.files().size() > 3) {
+//                throw new CustomException(TOO_MANY_PHOTOS);
+//            }
 
             try {
                 Product finalProduct = product;
