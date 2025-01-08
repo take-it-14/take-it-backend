@@ -47,4 +47,10 @@ public class UserCoupon extends BaseEntity {
                 .endDate(coupon.getStartDate().isBefore(LocalDateTime.now()) ? LocalDateTime.now().plusDays(coupon.getExpirationDate()) : coupon.getStartDate().plusDays(coupon.getExpirationDate()))
                 .build();
     }
+
+    public void delete(String username) {
+        this.deletedAt = LocalDateTime.now();
+        this.deletedBy = username;
+        this.isDeleted = true;
+    }
 }

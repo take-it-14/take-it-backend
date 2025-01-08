@@ -20,8 +20,8 @@ public enum ErrorCode {
     FAVORITE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 찜 정보입니다."),
 
     // auth
-    USERNAME_ALEADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 존재하는 username 입니다."),
-    EMAIL_ALEADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 존재하는 email 입니다."),
+    USERNAME_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 존재하는 username 입니다."),
+    EMAIL_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 존재하는 email 입니다."),
     PASSWORD_VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "비밀번호는 대문자, 소문자, 숫자, 특수문자를 포함한 8자 이상, 15자 이하여야 합니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 사용자를 찾을 수 없습니다."),
     PASSWORD_NOT_MATCHED(HttpStatus.NOT_FOUND, "비밀번호가 일치하지 않습니다."),
@@ -48,6 +48,7 @@ public enum ErrorCode {
     COUPON_END_DATE_MUST_BE_AFTER_START_DATE(HttpStatus.BAD_REQUEST, "쿠폰 종료 날짜는 시작 날짜 이후여야 합니다."),
     COUPON_UPDATED_FAIL_CAUSE_EXIST_USER_COUPON(HttpStatus.BAD_REQUEST, "유저가 등록한 해당 쿠폰이 존재하여 쿠폰 수정이 불가합니다."),
     COUPON_EXPIRED(HttpStatus.BAD_REQUEST, "등록 종료일이 지난 쿠폰입니다."),
+    USER_COUPON_NOT_FOUND(HttpStatus.BAD_REQUEST, "사용자 쿠폰을 찾을 수 없습니다."),
 
     // product
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 상품을 찾을 수 없습니다."),
