@@ -120,9 +120,9 @@ public class ProductService {
             }
         }
 
-        product.addPhotos(productPhotoRepository.findAllByProductAndIsDeletedIsFalse(product));
+        List<ProductPhoto> newPhotos = productPhotoRepository.findAllByProductAndIsDeletedIsFalse(product);
 
-        return ProductResponse.from(product);
+        return ProductResponse.of(product, newPhotos);
     }
 
     // 상품 삭제
@@ -134,7 +134,11 @@ public class ProductService {
 
         product.delete(username);
 
-        return ProductResponse.from(product);
+        List<ProductPhoto> deletePhotos = productPhotoRepository.findAllByProductAndIsDeletedIsFalse(product);
+        deletePhotos.forEach(productPhoto -> productPhoto.delete(username));
+        productPhotoRepository.saveAll(deletePhotos);
+
+        return ProductResponse.of(product, deletePhotos);
     }
 
     // 상품 단건 조회

@@ -10,12 +10,6 @@ public record ProductResponse(
         UUID ProductId,
         List<ProductPhotoDto> photos
 ) {
-    public static ProductResponse from(Product product) {
-        return new ProductResponse(
-            product.getUuid(),
-            product.getPhotoList().stream().map(ProductPhotoDto::from).toList()
-        );
-    }
 
     public static ProductResponse of(Product product, List<ProductPhoto> photos) {
         return new ProductResponse(
