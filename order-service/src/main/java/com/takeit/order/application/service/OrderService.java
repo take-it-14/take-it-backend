@@ -36,13 +36,17 @@ public class OrderService {
 		Long productId = 1L;
 		// TODO: product-service에서 quantity 만큼 재고가 있는지 확인하는 로직 필요
 
+		// TODO: coupon 검증 및 변환
+		Long userCouponId = 1L;
+
 		Order order = Order.create(
 			1L, // TODO: 사용자 정보 받아오기
 			productId,
+			userCouponId,
 			request.quantity(),
 			request.amount()
 		);
-		return OrderResponse.of(orderRepository.save(order), request.productId());
+		return OrderResponse.of(orderRepository.save(order), request.productId(), request.userCouponId());
 	}
 
 	public OrderDetailResponse getOrderDetail(UUID orderId){
@@ -53,7 +57,10 @@ public class OrderService {
 		// TODO: product-service에서 id->UUID 변환 필요
 		UUID productId = UUID.randomUUID();
 
-		return OrderDetailResponse.of(order, productId);
+		// TODO: userCouponId 변환
+		UUID userCouponId = UUID.randomUUID();
+
+		return OrderDetailResponse.of(order, productId, userCouponId);
 	}
 
 	public Page<OrderListResponse> getOrders(Pageable pageable, String status, String username){
@@ -85,9 +92,12 @@ public class OrderService {
 
 		checkStatus(order.getStatus());
 
+		// TODO: userCouponId 변환
+		UUID userCouponId = UUID.randomUUID();
+
 		order.update(request.quantity(), request.amount());
 
-		return OrderResponse.of(order, productId);
+		return OrderResponse.of(order, productId, userCouponId);
 	}
 
 	@Transactional
