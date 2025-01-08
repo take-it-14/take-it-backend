@@ -7,5 +7,5 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface JpaCouponRepository extends JpaRepository<Coupon, Long> {
-    Optional<Coupon> findByUuid(UUID couponId);
+    Optional<Coupon> findByUuidAndIsDeletedIsFalse(UUID couponId);
 }
