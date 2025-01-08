@@ -40,11 +40,10 @@ public class UserCouponService {
 
     @Transactional
     public void delete(UUID userCouponId, String username) {
-        // todo : user 권한 체크
+        // todo : user 권한 체크, customer 라면 validation 추가
         Long userId = 1L;
 
-        UserCoupon coupon = userCouponRepository.findByUuidAndUserIdAndIsDeletedIsFalse(userCouponId, userId).orElseThrow(() -> new CustomException(USER_COUPON_NOT_FOUND));
-        coupon.delete(username);
+        userCouponRepository.findByUuidAndIsDeletedIsFalse(userCouponId).orElseThrow(() -> new CustomException(USER_COUPON_NOT_FOUND)).delete(username);
     }
 
     @Transactional

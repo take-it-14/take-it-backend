@@ -4,6 +4,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.takeit.coupon.domain.entity.Coupon;
 import com.takeit.coupon.domain.entity.UserCoupon;
 import com.takeit.coupon.domain.repository.UserCouponRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,8 +29,13 @@ public class UserCouponRepositoryImpl implements UserCouponRepository {
     }
 
     @Override
-    public Optional<UserCoupon> findByUuidAndUserIdAndIsDeletedIsFalse(UUID userCouponId, Long userId) {
-        return jpaUserCouponRepository.findByUuidAndUserIdAndIsDeletedIsFalse(userCouponId, userId);
+    public Optional<UserCoupon> findByUuidAndIsDeletedIsFalse(UUID userCouponId) {
+        return jpaUserCouponRepository.findByUuidAndIsDeletedIsFalse(userCouponId);
+    }
+
+    @Override
+    public boolean existsByCouponAndIsDeletedIsFalse(Coupon coupon) {
+        return jpaUserCouponRepository.existsByCouponAndIsDeletedIsFalse(coupon);
     }
 
     @Override

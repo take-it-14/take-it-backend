@@ -12,7 +12,7 @@ spring:
         - id: auth-service
           uri: lb://auth-service
           predicates:
-            - Path=/api/v1/auths/**,/api/v1/users/**,/api/v1/admin/**
+            - Path=/api/v1/auths/**,/api/v1/users/**,/api/v1/admins/**
         - id: order-service
           uri: lb://order-service
           predicates:
@@ -32,7 +32,7 @@ spring:
         - id: coupon-service
           uri: lb://coupon-service
           predicates:
-            - Path=/api/v1/coupons/**
+            - Path=/api/v1/coupons/**,/api/v1/user-coupons/**
         - id: favorite-service
           uri: lb://favorite-service
           predicates:

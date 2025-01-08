@@ -72,6 +72,5 @@ public class FavoriteService {
                         favoritePage.getPageable(),
                         favoritePage.getTotalElements())
         );
-
     }
 }
