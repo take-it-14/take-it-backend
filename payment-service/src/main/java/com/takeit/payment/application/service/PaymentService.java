@@ -20,12 +20,15 @@ public class PaymentService {
     public void verifyTossPayment(VerifyTossPaymentDto request, String username) {
         // TODO: username으로 User 조회 + 권한 체크
         Long userId = 1L;
+        // TODO: orderUUID로 orderId 가져오기
+        Long orderId = 1L;
+
         // TODO: pg사에 결제 확인(실제로는 try catch를 통해 진행해야함)
         boolean isPaymentSuccess = true;
         String receipt = "영수증";
 
         if(isPaymentSuccess) {
-            paymentRepository.save(Payment.create(request.orderId(), userId, request.amount(), receipt));
+            paymentRepository.save(Payment.create(orderId, userId, request.amount(), receipt));
         } else {
             throw new CustomException(ErrorCode.WRONG_PAYMENT);
         }

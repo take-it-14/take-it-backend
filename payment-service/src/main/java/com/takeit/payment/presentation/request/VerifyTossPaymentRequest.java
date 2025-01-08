@@ -4,9 +4,11 @@ import com.takeit.payment.application.dto.payment.VerifyTossPaymentDto;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.util.UUID;
+
 public record VerifyTossPaymentRequest(
         @NotNull
-        Long orderId,
+        UUID orderId,
 
         @NotNull
         @Size(min = 6, max = 64)
