@@ -65,5 +65,4 @@ public class FavoriteRepositoryImpl implements FavoriteRepository {
 
         return new PageImpl<>(results, pageable, total);
     }
-
 }
