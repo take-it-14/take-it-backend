@@ -46,4 +46,13 @@ public class CategoryService {
         }).orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND));
 
     }
+
+    @Transactional
+    public void deleteCategory(Long categoryId, String username) {
+        // TODO: username으로 권한체크
+
+        categoryRepository.findByIdAndIsDeleteFalse(categoryId)
+                .orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND))
+                .delete(username);
+    }
 }

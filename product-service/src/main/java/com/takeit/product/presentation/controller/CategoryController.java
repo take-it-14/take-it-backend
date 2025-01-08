@@ -24,9 +24,18 @@ public class CategoryController {
     }
 
     @PatchMapping("/{categoryId}")
-    public CommonResponse<CategoryEntityResponse> updateCategory(@PathVariable UUID categoryId,
+    public CommonResponse<CategoryEntityResponse> updateCategory(@PathVariable Long categoryId,
                                                                  @Valid @RequestBody UpdateCategoryRequest request,
                                                                  @RequestHeader(value = "X-Username") String username) {
         return CommonResponse.ofSuccess("카테고리 수정", categoryService.updateCategory(request.toDto(), categoryId, username));
+    }
+
+    @DeleteMapping("/{categoryId}")
+    public CommonResponse<?> deleteCategory(@PathVariable Long categoryId,
+                                            @RequestHeader(value = "X-Username") String username) {
+
+        categoryService.deleteCategory(categoryId, username);
+
+        return CommonResponse.ofSuccess("카테고리 삭제",null);
     }
 }
