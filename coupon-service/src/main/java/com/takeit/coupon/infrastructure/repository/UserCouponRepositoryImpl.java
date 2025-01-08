@@ -8,6 +8,7 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.takeit.coupon.application.dto.QUserCouponPageResponse_UserCouponPage_UserCoupon;
 import com.takeit.coupon.application.dto.UserCouponPageResponse;
+import com.takeit.coupon.domain.entity.Coupon;
 import com.takeit.coupon.domain.entity.UserCoupon;
 import com.takeit.coupon.domain.repository.UserCouponRepository;
 import lombok.RequiredArgsConstructor;
@@ -37,8 +38,8 @@ public class UserCouponRepositoryImpl implements UserCouponRepository {
     }
 
     @Override
-    public Optional<UserCoupon> findByUuidAndUserIdAndIsDeletedIsFalse(UUID userCouponId, Long userId) {
-        return jpaUserCouponRepository.findByUuidAndUserIdAndIsDeletedIsFalse(userCouponId, userId);
+    public Optional<UserCoupon> findByUuidAndIsDeletedIsFalse(UUID userCouponId) {
+        return jpaUserCouponRepository.findByUuidAndIsDeletedIsFalse(userCouponId);
     }
 
     @Override
@@ -57,6 +58,11 @@ public class UserCouponRepositoryImpl implements UserCouponRepository {
         UserCoupon userCoupon = jpaQuery.fetchOne();
 
         return Optional.ofNullable(userCoupon);
+    }
+
+
+    public boolean existsByCouponAndIsDeletedIsFalse(Coupon coupon) {
+        return jpaUserCouponRepository.existsByCouponAndIsDeletedIsFalse(coupon);
     }
 
     @Override

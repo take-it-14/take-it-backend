@@ -55,6 +55,10 @@ public class CouponService {
 
         Coupon coupon = couponRepository.findByUuidAndIsDeletedIsFalse(couponId).orElseThrow(() -> new CustomException(COUPON_NOT_FOUND));
 
+        if(userCouponRepository.existsByCouponAndIsDeletedIsFalse(coupon)) {
+            throw new CustomException(COUPON_UPDATED_FAIL_CAUSE_EXIST_USER_COUPON);
+        }
+
         if(request.type().equals(CouponType.PERCENTAGE)) {
             validationPercentageValue(request.discountValue());
         }

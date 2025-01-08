@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 import java.util.UUID;
 
 import static com.takeit.common.exception.ErrorCode.*;
@@ -45,11 +44,10 @@ public class UserCouponService {
 
     @Transactional
     public void delete(UUID userCouponId, String username) {
-        // todo : user 권한 체크
+        // todo : user 권한 체크, customer 라면 validation 추가
         Long userId = 1L;
 
-        UserCoupon coupon = userCouponRepository.findByUuidAndUserIdAndIsDeletedIsFalse(userCouponId, userId).orElseThrow(() -> new CustomException(USER_COUPON_NOT_FOUND));
-        coupon.delete(username);
+        userCouponRepository.findByUuidAndIsDeletedIsFalse(userCouponId).orElseThrow(() -> new CustomException(USER_COUPON_NOT_FOUND)).delete(username);
     }
 
     @Transactional
@@ -57,7 +55,8 @@ public class UserCouponService {
         // todo : user 권한 체크
         Long userId = 1L;
 
-        UserCoupon coupon = userCouponRepository.findByUuidAndUserIdAndFetchJoinCouponAndIsDeletedIsFalse(userCouponId).orElseThrow(() -> new CustomException(USER_COUPON_NOT_FOUND));
+        // todo : user 권한이 master, manager 가 아닌 경우 validation 추가
+        UserCoupon coupon = userCouponRepository.findByUuidAndIsDeletedIsFalse(userCouponId).orElseThrow(() -> new CustomException(USER_COUPON_NOT_FOUND));
 
         // todo : user 권한이 master, manager 인 경우 validation x
         validationUserId(coupon, userId);
@@ -81,11 +80,8 @@ public class UserCouponService {
         // todo : user 권한 체크
         Long userId = 1L;
 
-        UserCoupon coupon = userCouponRepository.findByUuidAndUserIdAndFetchJoinCouponAndIsDeletedIsFalse(userCouponId).orElseThrow(() -> new CustomException(USER_COUPON_NOT_FOUND));
-
-        if(coupon.getEndDate().isBefore(LocalDateTime.now())) {
-            throw new CustomException(USER_COUPON_EXPIRED);
-        }
+        // todo : user 권한이 master, manager 가 아닌 경우 validation 추가
+        UserCoupon coupon = userCouponRepository.findByUuidAndIsDeletedIsFalse(userCouponId).orElseThrow(() -> new CustomException(USER_COUPON_NOT_FOUND));
 
         if(!coupon.getIsUsed()) {
             throw new CustomException(USER_COUPON_NOT_USED);
