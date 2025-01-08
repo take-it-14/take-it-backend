@@ -2,10 +2,10 @@ package com.takeit.coupon.domain.entity;
 
 import com.takeit.common.domain.model.BaseEntity;
 import com.takeit.coupon.domain.type.CouponType;
+import com.takeit.coupon.presentation.request.CreateCouponRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -35,8 +35,7 @@ public class Coupon extends BaseEntity {
     private int discountValue;
 
     @Column(name = "min_amount")
-    @Builder.Default
-    private int minAmount = 0;
+    private int minAmount;
 
     @Column(name = "category_id")
     private Long categoryId;
@@ -48,7 +47,18 @@ public class Coupon extends BaseEntity {
     private LocalDateTime endDate;
 
     @Column(name = "expiration_date")
-    @Builder.Default
-    private int expirationDate = 365 * 10;
+    private int expirationDate;
 
+    public static Coupon create(CreateCouponRequest request, Long categoryId) {
+        return Coupon.builder()
+                .name(request.name())
+                .type(request.type())
+                .categoryId(categoryId)
+                .discountValue(request.discountValue())
+                .minAmount(request.minAmount() != null ? request.minAmount() : 0)
+                .startDate(request.startDate())
+                .endDate(request.endDate())
+                .expirationDate(request.expirationDate() == null ? 3650 : request.expirationDate())
+                .build();
+    }
 }

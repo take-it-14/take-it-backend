@@ -1,10 +1,13 @@
 package com.takeit.coupon.presentation.controller;
 
+import com.takeit.common.presentation.dto.CommonResponse;
+import com.takeit.coupon.application.dto.CreateCouponResponse;
 import com.takeit.coupon.application.service.CouponService;
+import com.takeit.coupon.presentation.request.CreateCouponRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RequestMapping("/api/v1/coupons")
@@ -12,4 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class CouponController {
     private final CouponService couponService;
+
+    @PostMapping
+    public CommonResponse<CreateCouponResponse> createCoupon(
+            @RequestHeader(name = "X-Username") String username,
+            @RequestBody @Valid CreateCouponRequest request
+    ) {
+        return CommonResponse.ofSuccess("쿠폰 생성에 성공했습니다.", couponService.createCoupon(request, username));
+    }
 }
