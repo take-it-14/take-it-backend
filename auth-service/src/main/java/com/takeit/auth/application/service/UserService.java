@@ -32,12 +32,8 @@ public class UserService {
     // 사용자 등록
     @Transactional
     public UserResponse createUser(CreateUserDto request) {
-        // validation
-        if (isUsernameExists(request.username())) { // username 중복 확인
-            throw new CustomException(ErrorCode.USERNAME_ALREADY_EXISTS);
-        } else if (isEmailExists(request.email())) { // email 중복 확인
-            throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
-        }
+        // 중복 체크
+        duplicateCheckForUserInfo(request.username(), request.email());
 
         // 비밀번호 암호화
         String encryptedPassword = passwordEncoder.encode(request.password());
@@ -58,12 +54,8 @@ public class UserService {
     // 판매자 등록
     @Transactional
     public SellerResponse createSeller(CreateSellerDto request) {
-        // validation
-        if (isUsernameExists(request.username())) { // username 중복 확인
-            throw new CustomException(ErrorCode.USERNAME_ALREADY_EXISTS);
-        } else if (isEmailExists(request.email())) { // email 중복 확인
-            throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
-        }
+        // 중복 체크
+        duplicateCheckForUserInfo(request.username(), request.email());
         // TODO 사업자등록번호 검사
 
         // 비밀번호 암호화
@@ -95,7 +87,6 @@ public class UserService {
     }
 
     // 사용자 단건 조회
-    @Transactional(readOnly = true)
     public UserResponse getUserByUsername(String username) {
         // 사용자 확인
         User user = userRepository.findByUsernameAndIsDeletedFalse(username).orElseThrow(
@@ -106,7 +97,6 @@ public class UserService {
     }
 
     // 사용자 목록 조회
-    @Transactional(readOnly = true)
     public UserPageResponse getUsers(Predicate predicate, Pageable pageable) {
         Page<User> userPage = userRepository.findAll(predicate, pageable);
 
@@ -117,14 +107,23 @@ public class UserService {
         return UserPageResponse.from(userPage);
     }
 
+    // 사용자 정보 중복 체크
+    private void duplicateCheckForUserInfo(String username, String email) {
+        if (isUsernameExists(username)) { // username 중복 확인
+            throw new CustomException(ErrorCode.USERNAME_ALREADY_EXISTS);
+        } else if (isEmailExists(email)) { // email 중복 확인
+            throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
+        }
+    }
+
     // Username 존재 여부 확인
-    public Boolean isUsernameExists(String username) {
+    private Boolean isUsernameExists(String username) {
         // username 으로 User 를 조회 후 isPresent() 로 존재유무를 리턴함
         return userRepository.findByUsernameAndIsDeletedFalse(username).isPresent();
     }
 
     // Email 존재 여부 확인
-    public Boolean isEmailExists(String email) {
+    private Boolean isEmailExists(String email) {
         // email 로 User 를 조회 후 isPresent() 로 존재유무를 리턴함
         return userRepository.findByEmailAndIsDeletedFalse(email).isPresent();
     }

@@ -21,7 +21,6 @@ public class AdminService {
     private final SellerInfoRepository sellerInfoRepository;
 
     // 승인 요청된 판매자 목록 조회
-    @Transactional(readOnly = true)
     public SellerPageResponse getSellers(Pageable pageable) {
         Page<SellerInfo> sellerPage = sellerInfoRepository.findByStatusAndIsDeletedFalseOrderByIdAsc(SellerInfoStatus.PENDING, pageable);
 
