@@ -11,15 +11,21 @@ public enum ErrorCode {
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "권한이 없습니다."),
     FORBIDDEN(HttpStatus.FORBIDDEN, "해당 작업에 대한 권한이 없습니다."),
 
+    // Payment
+    WRONG_PAYMENT(HttpStatus.BAD_REQUEST, "결제 정보가 잘못되었습니다."),
+    PAYMENT_CANCEL_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "결제 취소에 실패하였습니다."),
+    PAYMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "결제 정보가 없습니다."),
+
     // favorite
     FAVORITE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 찜 정보입니다."),
 
-      // auth
-    USERNAME_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 존재하는 username 입니다."),
-    EMAIL_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 존재하는 email 입니다."),
+    // auth
+    USERNAME_ALEADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 존재하는 username 입니다."),
+    EMAIL_ALEADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 존재하는 email 입니다."),
     PASSWORD_VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "비밀번호는 대문자, 소문자, 숫자, 특수문자를 포함한 8자 이상, 15자 이하여야 합니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 사용자를 찾을 수 없습니다."),
     PASSWORD_NOT_MATCHED(HttpStatus.NOT_FOUND, "비밀번호가 일치하지 않습니다."),
+    SELLERINFO_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 판매자 정보를 찾을 수 없습니다."),
 
     // review
     FILE_UPLOAD_ERROR(HttpStatus.BAD_REQUEST , "파일 업로드에 실패했습니다"),
@@ -37,6 +43,11 @@ public enum ErrorCode {
     INVALID_DISCOUNT_PERCENTAGE_VALUE(HttpStatus.BAD_REQUEST, "할인 퍼센트 값이 유효하지 않습니다."),
     COUPON_START_DATE_IN_PAST(HttpStatus.BAD_REQUEST, "쿠폰 시작 날짜는 과거가 될 수 없습니다."),
     COUPON_END_DATE_MUST_BE_AFTER_START_DATE(HttpStatus.BAD_REQUEST, "쿠폰 종료 날짜는 시작 날짜 이후여야 합니다."),
+    // product
+    PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 상품을 찾을 수 없습니다."),
+
+    // product daily stat
+    INVALID_DATE_FORMAT(HttpStatus.BAD_REQUEST, "유효하지 않은 날짜 입력 형식입니다.")
 
     ;
 
