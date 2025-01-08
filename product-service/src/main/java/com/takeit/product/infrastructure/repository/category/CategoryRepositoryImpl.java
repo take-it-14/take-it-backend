@@ -5,9 +5,13 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.takeit.product.domain.entity.Category;
 import com.takeit.product.domain.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+
 import static com.takeit.product.domain.entity.QCategory.category;
 
 @Repository
@@ -33,9 +37,21 @@ public class CategoryRepositoryImpl implements CategoryRepository {
                 .where(category.id.eq(categoryId).and(category.isDeleted.eq(false)));
 
         return Optional.ofNullable(query.fetchOne());
+    }
   
     @Override
     public Optional<Category> findByUuid(UUID categoryId) {
         return jpaRepository.findByUuid(categoryId);
+    }
+  
+    @Override
+    public Page<Category> getAllCategories(Pageable pageable) {
+        JPAQuery<Category> query = queryFactory
+                .selectFrom(category)
+                .where(category.isDeleted.eq(false))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize());
+
+        return new PageImpl<>(query.fetch(), pageable, query.fetch().size());
     }
 }
