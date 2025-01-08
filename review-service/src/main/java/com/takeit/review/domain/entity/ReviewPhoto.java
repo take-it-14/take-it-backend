@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -38,12 +39,18 @@ public class ReviewPhoto extends BaseEntity {
     @Column(name = "is_s3_deleted")
     private boolean isS3Deleted;
 
-    public static ReviewPhoto of(S3UploadFile file, Review review, Long userId) {
+    public static ReviewPhoto of(S3UploadFile file, Review review, String username) {
         return ReviewPhoto.builder()
                 .uuid(UUID.randomUUID())
                 .review(review)
                 .fileName(file.filename())
                 .uri(file.uri())
                 .build();
+    }
+
+    public void deleted(String username) {
+        this.isDeleted = true;
+        this.deletedAt = LocalDateTime.now();
+        this.deletedBy = username;
     }
 }
