@@ -34,7 +34,7 @@ public class Category extends BaseEntity {
 
     public void restore() {
         this.isDeleted = false;
-        this.deletedAt = LocalDateTime.now();
+        this.deletedAt = null;
         this.deletedBy = null;
     }
 

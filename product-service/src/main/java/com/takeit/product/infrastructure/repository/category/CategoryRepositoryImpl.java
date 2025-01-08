@@ -22,7 +22,7 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     public Optional<Category> findByName(String name) {
         return jpaRepository.findByName(name);
     }
-
+  
     @Override
     public Optional<Category> findByUuid(UUID categoryId) {
         return jpaRepository.findByUuid(categoryId);
