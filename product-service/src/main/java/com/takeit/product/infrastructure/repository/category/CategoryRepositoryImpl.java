@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
@@ -20,5 +21,10 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     @Override
     public Optional<Category> findByName(String name) {
         return jpaRepository.findByName(name);
+    }
+  
+    @Override
+    public Optional<Category> findByUuid(UUID categoryId) {
+        return jpaRepository.findByUuid(categoryId);
     }
 }

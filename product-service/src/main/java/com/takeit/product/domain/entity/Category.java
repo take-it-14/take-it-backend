@@ -37,4 +37,8 @@ public class Category extends BaseEntity {
         this.deletedAt = null;
         this.deletedBy = null;
     }
+
+    public void update(String name) {
+        this.name = name;
+    }
 }
