@@ -1,5 +1,6 @@
 package com.takeit.coupon.infrastructure.repository;
 
+import com.takeit.coupon.domain.entity.Coupon;
 import com.takeit.coupon.domain.repository.UserCouponRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -8,4 +9,9 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class UserCouponRepositoryImpl implements UserCouponRepository {
     private final JpaUserCouponRepository jpaUserCouponRepository;
+
+    @Override
+    public boolean existsByCouponAndIsDeletedIsFalse(Coupon coupon) {
+        return jpaUserCouponRepository.existsByCouponAndIsDeletedIsFalse(coupon);
+    }
 }

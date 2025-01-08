@@ -9,7 +9,6 @@ import com.takeit.coupon.domain.repository.UserCouponRepository;
 import com.takeit.coupon.domain.type.CouponType;
 import com.takeit.coupon.presentation.request.CreateCouponRequest;
 import com.takeit.coupon.presentation.request.UpdateCouponRequest;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -48,6 +47,10 @@ public class CouponService {
         String categoryName = "가방";
 
         Coupon coupon = couponRepository.findByUuid(couponId).orElseThrow(() -> new CustomException(COUPON_NOT_FOUND));
+
+        if(userCouponRepository.existsByCouponAndIsDeletedIsFalse(coupon)) {
+            throw new CustomException(COUPON_UPDATED_FAIL_CAUSE_EXIST_USER_COUPON);
+        }
 
         if(request.type().equals(CouponType.PERCENTAGE)) {
             validationPercentageValue(request.discountValue());
