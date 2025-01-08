@@ -1,12 +1,14 @@
 package com.takeit.review.domain.entity;
 
 import com.takeit.common.domain.model.BaseEntity;
+import com.takeit.s3.infrastructure.util.dto.S3UploadFile;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -29,7 +31,7 @@ public class ReviewPhoto extends BaseEntity {
     private Review review;
 
     @Column(name = "file_name")
-    private UUID fileName;
+    private String fileName;
 
     @Column(name = "uri", length = 255)
     private String uri;
@@ -37,4 +39,18 @@ public class ReviewPhoto extends BaseEntity {
     @Column(name = "is_s3_deleted")
     private boolean isS3Deleted;
 
+    public static ReviewPhoto of(S3UploadFile file, Review review, String username) {
+        return ReviewPhoto.builder()
+                .uuid(UUID.randomUUID())
+                .review(review)
+                .fileName(file.filename())
+                .uri(file.uri())
+                .build();
+    }
+
+    public void deleted(String username) {
+        this.isDeleted = true;
+        this.deletedAt = LocalDateTime.now();
+        this.deletedBy = username;
+    }
 }
