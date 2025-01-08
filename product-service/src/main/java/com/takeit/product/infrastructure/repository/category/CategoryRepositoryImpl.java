@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
-
 import static com.takeit.product.domain.entity.QCategory.category;
 
 @Repository
@@ -34,5 +33,9 @@ public class CategoryRepositoryImpl implements CategoryRepository {
                 .where(category.id.eq(categoryId).and(category.isDeleted.eq(false)));
 
         return Optional.ofNullable(query.fetchOne());
+  
+    @Override
+    public Optional<Category> findByUuid(UUID categoryId) {
+        return jpaRepository.findByUuid(categoryId);
     }
 }
