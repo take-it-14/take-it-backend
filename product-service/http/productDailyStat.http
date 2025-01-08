@@ -1,0 +1,3 @@
+### 상품 판매 통계 조회
+GET localhost:19094/api/v1/products/board/8c7c72b3-1234-4e56-89ab-0c1234d56789?startDate=20241101&endDate=20250101
+Content-Type: application/json
