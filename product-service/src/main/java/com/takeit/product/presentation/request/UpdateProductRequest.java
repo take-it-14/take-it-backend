@@ -2,13 +2,16 @@ package com.takeit.product.presentation.request;
 
 import com.takeit.product.application.dto.UpdateProductDto;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 public record UpdateProductRequest(
         @NotNull
         String productName,
         String description,
-        String imageUrl,
         @NotNull
         Long price,
         @NotNull
@@ -19,19 +22,22 @@ public record UpdateProductRequest(
         LocalDateTime openTime,
         LocalDateTime closeTime,
         @NotNull
-        Boolean isActive
+        Boolean isActive,
+        List<UUID> deletePhotos,
+        List<MultipartFile> photos
 ) {
     public UpdateProductDto toDto() {
         return new UpdateProductDto(
                 productName,
                 description,
-                imageUrl,
                 price,
                 stock,
                 limitPerUser,
                 openTime,
                 closeTime,
-                isActive
+                isActive,
+                deletePhotos,
+                photos
         );
     }
 }
