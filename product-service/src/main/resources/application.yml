@@ -1,12 +1,5 @@
 spring:
   application:
     name: product-service
-
-server:
-  port: 19094
-
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:19090/eureka/
-
+  profiles:
+    active: local
