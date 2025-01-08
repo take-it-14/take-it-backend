@@ -114,6 +114,12 @@ public class OrderService {
 		return OrderStatusUpdateResponse.from(order);
 	}
 
+	public Long findProductIdByOrderUuidAndUserId(UUID orderId, Long userId){
+		Order order = findOrderByUuid(orderId);
+		validateOrderUser(order, userId);
+
+		return order.getProductId();
+	}
 
 	private Order findOrderByUuid(UUID uuid){
 		return orderRepository.findByUuid(uuid).orElseThrow(()-> new CustomException(ErrorCode.ORDER_NOT_FOUND));
@@ -126,5 +132,9 @@ public class OrderService {
 
 	private void checkStatus(OrderStatus status){
 		if(status == OrderStatus.CANCELLED || status == OrderStatus.DELIVERED) throw new CustomException(ErrorCode.ORDER_CANNOT_BE_MODIFIED);
+	}
+
+	private void validateOrderUser(Order order, Long userId){
+		if(!order.getCustomerId().equals(userId)) throw new CustomException(ErrorCode.FORBIDDEN);
 	}
 }
