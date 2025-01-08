@@ -43,6 +43,7 @@ public class CouponRepositoryImpl implements CouponRepository {
 
     @Override
     public CouponPageResponse findAll(Predicate predicate, Pageable pageable) {
+        // todo : findAll predicate로 리팩터링 해보기
         BooleanBuilder builder = new BooleanBuilder(predicate);
 
         builder.and(coupon.isDeleted.eq(false));
