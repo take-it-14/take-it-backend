@@ -4,6 +4,7 @@ import com.takeit.common.domain.model.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -22,7 +23,18 @@ public class Category extends BaseEntity {
     @Builder.Default
     private UUID uuid = UUID.randomUUID();
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50, unique = true)
     private String name;
 
+    public static Category create(String name) {
+        return Category.builder()
+                .name(name)
+                .build();
+    }
+
+    public void restore() {
+        this.isDeleted = false;
+        this.deletedAt = null;
+        this.deletedBy = null;
+    }
 }
