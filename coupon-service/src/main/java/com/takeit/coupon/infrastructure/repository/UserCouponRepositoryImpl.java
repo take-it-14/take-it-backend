@@ -20,8 +20,8 @@ public class UserCouponRepositoryImpl implements UserCouponRepository {
     }
 
     @Override
-    public Optional<UserCoupon> findByUuidAndUserIdAndIsDeletedIsFalse(UUID userCouponId, Long userId) {
-        return jpaUserCouponRepository.findByUuidAndUserIdAndIsDeletedIsFalse(userCouponId, userId);
+    public Optional<UserCoupon> findByUuidAndIsDeletedIsFalse(UUID userCouponId) {
+        return jpaUserCouponRepository.findByUuidAndIsDeletedIsFalse(userCouponId);
     }
 
     @Override
