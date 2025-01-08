@@ -39,7 +39,12 @@ public record UserPageResponse(
             }
 
             public static User from(com.takeit.auth.domain.entity.User user) {
-                return new User(user.getUsername(), user.getNickname(), user.getEmail(), user.getRole());
+                return new User(
+                        user.getUsername(),
+                        user.getNickname(),
+                        user.getEmail(),
+                        user.getRole()
+                );
             }
         }
     }
