@@ -38,6 +38,8 @@ public enum ErrorCode {
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 주문 정보입니다."),
     ORDER_CANNOT_BE_MODIFIED(HttpStatus.BAD_REQUEST, "현재 상태의 주문은 수정할 수 없습니다."),
 
+    // category
+    CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 카테고리가 없습니다."),
 
     // coupon
     INVALID_DISCOUNT_PERCENTAGE_VALUE(HttpStatus.BAD_REQUEST, "할인 퍼센트 값이 유효하지 않습니다."),
@@ -50,7 +52,6 @@ public enum ErrorCode {
     INVALID_DATE_FORMAT(HttpStatus.BAD_REQUEST, "유효하지 않은 날짜 입력 형식입니다.")
 
     ;
-
 
     private final HttpStatus status;
     private final String description;
