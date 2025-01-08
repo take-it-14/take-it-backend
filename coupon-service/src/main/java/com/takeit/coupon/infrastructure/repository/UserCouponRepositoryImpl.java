@@ -1,5 +1,6 @@
 package com.takeit.coupon.infrastructure.repository;
 
+import com.takeit.coupon.domain.entity.Coupon;
 import com.takeit.coupon.domain.entity.UserCoupon;
 import com.takeit.coupon.domain.repository.UserCouponRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,5 +14,10 @@ public class UserCouponRepositoryImpl implements UserCouponRepository {
     @Override
     public UserCoupon save(UserCoupon userCoupon) {
         return jpaUserCouponRepository.save(userCoupon);
+    }
+
+    @Override
+    public boolean existsByCouponAndIsDeletedIsFalse(Coupon coupon) {
+        return jpaUserCouponRepository.existsByCouponAndIsDeletedIsFalse(coupon);
     }
 }
