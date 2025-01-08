@@ -9,44 +9,70 @@ import com.takeit.product.application.dto.ProductPageResponse;
 import com.takeit.product.application.dto.ProductResponse;
 import com.takeit.product.application.dto.UpdateProductDto;
 import com.takeit.product.domain.entity.Product;
+import com.takeit.product.domain.entity.ProductPhoto;
+import com.takeit.product.domain.repository.ProductPhotoRepository;
 import com.takeit.product.domain.repository.ProductRepository;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+
+import com.takeit.s3.infrastructure.util.FileUpload;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.takeit.common.exception.ErrorCode.FILE_UPLOAD_ERROR;
+import static com.takeit.common.exception.ErrorCode.TOO_MANY_PHOTOS;
+
 @Service
 @RequiredArgsConstructor
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final ProductPhotoRepository productPhotoRepository;
+    private final FileUpload fileUpload;
 
     // 상품 등록
     @Transactional
     public ProductResponse createProduct(CreateProductDto dto) {
-        Product product = Product.create(
+        Product product = productRepository.save(Product.create(
                 dto.sellerId(),
                 dto.categoryId(),
                 dto.productName(),
                 dto.description(),
-                dto.imageUrl(),
                 dto.price(),
                 dto.stock(),
                 dto.limitPerUser(),
                 dto.openTime(),
                 dto.closeTime(),
                 dto.isActive()
-        );
-        productRepository.save(product);
+        ));
 
-        return ProductResponse.from(product);
+        List<ProductPhoto> photos = new ArrayList<>();
+        if(dto.files() != null && !dto.files().isEmpty()) {
+            // todo : 파일 개수 제한 로직
+            try {
+                photos = productPhotoRepository.saveAll(
+                        fileUpload.uploadMultipleFile(dto.files(), "product")
+                                .stream().map(file -> ProductPhoto.create(file, product)).toList()
+                );
+
+            } catch (IOException e) {
+                throw new CustomException(FILE_UPLOAD_ERROR);
+            }
+        }
+
+        return ProductResponse.of(product, photos);
     }
 
     // 상품 수정
     @Transactional
-    public ProductResponse updateProduct(UUID productId, UpdateProductDto dto) {
+    public ProductResponse updateProduct(UUID productId, UpdateProductDto dto, String username) {
+
         Product product = productRepository.findByUuidAndIsDeletedFalse(productId).orElseThrow(
                 () -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND)
         );
@@ -54,7 +80,6 @@ public class ProductService {
         product.update(
                 dto.productName(),
                 dto.description(),
-                dto.imageUrl(),
                 dto.price(),
                 dto.stock(),
                 dto.limitPerUser(),
@@ -62,6 +87,40 @@ public class ProductService {
                 dto.closeTime(),
                 dto.isActive()
         );
+
+        product = productRepository.save(product);
+
+        int deleteFileSize = 0;
+        if(dto.deletePhotos() != null && !dto.deletePhotos().isEmpty()) {
+            List<ProductPhoto> deletePhotos = productPhotoRepository.findByUuidInAndIsDeletedIsFalse(dto.deletePhotos());
+
+            deletePhotos.forEach(productPhoto -> productPhoto.delete(username));
+            deleteFileSize = deletePhotos.size();
+            productPhotoRepository.saveAll(deletePhotos);
+        }
+
+        if(dto.files() != null && !dto.files().isEmpty()) {
+            // todo : 파일 개수 제한 로직
+            int count = productPhotoRepository.findAllByProductAndIsDeletedIsFalse(product).size();
+
+            // 총 보여질 사진 개수 (현재 저장되어 있는 사진 개수 - 지울 사진 개수 + 새로 등록할 사진)
+            if(count - deleteFileSize + dto.files().size() > 3) {
+                throw new CustomException(TOO_MANY_PHOTOS);
+            }
+
+            try {
+                Product finalProduct = product;
+                productPhotoRepository.saveAll(
+                        fileUpload.uploadMultipleFile(dto.files(), "product")
+                                .stream().map(file -> ProductPhoto.create(file, finalProduct)).toList()
+                );
+
+            } catch (IOException e) {
+                throw new CustomException(FILE_UPLOAD_ERROR);
+            }
+        }
+
+        product.addPhotos(productPhotoRepository.findAllByProductAndIsDeletedIsFalse(product));
 
         return ProductResponse.from(product);
     }
