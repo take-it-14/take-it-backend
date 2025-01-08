@@ -67,7 +67,7 @@ public class UserCouponRepositoryImpl implements UserCouponRepository {
 
     @Override
     public UserCouponPageResponse findAll(Predicate predicate, Pageable pageable, Long userId) {
-        // todo : user 권한이 master, manager가 아닌경우 자신의 쿠폰만 조회하도록 조건 추가.
+        // todo : user 권한이 master, manager가 아닌경우 자신의 쿠폰만 조회하도록 조건 추가. findAll predicate 찾아보기
         BooleanBuilder builder = new BooleanBuilder(predicate);
 
         builder.and(coupon.isDeleted.eq(false));
