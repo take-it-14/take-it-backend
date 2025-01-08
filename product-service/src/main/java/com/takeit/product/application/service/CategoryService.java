@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -41,10 +42,10 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryEntityResponse updateCategory(UpdateCategoryDto request, Long categoryId, String username) {
+    public CategoryEntityResponse updateCategory(UpdateCategoryDto request, UUID categoryId, String username) {
         // TODO: username으로 권한체크
 
-        return categoryRepository.findByIdAndIsDeleteFalse(categoryId).map(category -> {
+        return categoryRepository.findByUuid(categoryId).map(category -> {
             category.update(request.name());
             return CategoryEntityResponse.from(category);
         }).orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND));
@@ -67,7 +68,7 @@ public class CategoryService {
                 .map(CategoryEntityResponse::from)
                 .orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND));
     }
-
+  
     public PagedModel<CategoryResponse> getAllCategories(Pageable pageable) {
         Page<Category> categoryPage = categoryRepository.getAllCategories(pageable);
         return new PagedModel<>(
