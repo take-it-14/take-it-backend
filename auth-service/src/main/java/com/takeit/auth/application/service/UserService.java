@@ -1,23 +1,27 @@
 package com.takeit.auth.application.service;
 
+import com.querydsl.core.types.Predicate;
 import com.takeit.auth.application.dto.CreateSellerDto;
 import com.takeit.auth.application.dto.CreateUserDto;
+import com.takeit.auth.application.dto.UserPageResponse;
 import com.takeit.auth.application.dto.UserResponse;
 import com.takeit.auth.domain.entity.SellerInfo;
 import com.takeit.auth.domain.entity.SellerInfoStatus;
 import com.takeit.auth.domain.entity.User;
-import com.takeit.auth.domain.entity.UserRole;
 import com.takeit.auth.domain.repository.SellerInfoRepository;
 import com.takeit.auth.domain.repository.UserRepository;
 import com.takeit.common.exception.CustomException;
 import com.takeit.common.exception.ErrorCode;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserService {
 
     private final UserRepository userRepository;
@@ -90,6 +94,29 @@ public class UserService {
         return UserResponse.from(user);
     }
 
+    // 사용자 단건 조회
+    @Transactional(readOnly = true)
+    public UserResponse getUserByUsername(String username) {
+        // 사용자 확인
+        User user = userRepository.findByUsernameAndIsDeletedFalse(username).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+
+        return UserResponse.from(user);
+    }
+
+    // 사용자 목록 조회
+    @Transactional(readOnly = true)
+    public UserPageResponse getUsers(Predicate predicate, Pageable pageable) {
+        Page<User> userPage = userRepository.findAll(predicate, pageable);
+
+        if (userPage.isEmpty()) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        return UserPageResponse.from(userPage);
+    }
+
     // Username 존재 여부 확인
     public Boolean isUsernameExists(String username) {
         // username 으로 User 를 조회 후 isPresent() 로 존재유무를 리턴함
@@ -100,23 +127,6 @@ public class UserService {
     public Boolean isEmailExists(String email) {
         // email 로 User 를 조회 후 isPresent() 로 존재유무를 리턴함
         return userRepository.findByEmailAndIsDeletedFalse(email).isPresent();
-    }
-
-    // 사용자 단건 조회
-    public UserResponse getUserByUsername(String username, String requesterRole, String requesterUsername) {
-        UserRole userRole = UserRole.from(requesterRole);
-
-        // 사용자 확인
-        User user = userRepository.findByUsernameAndIsDeletedFalse(username).orElseThrow(
-                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
-        );
-
-        // 역할 확인 및 요청 제한
-        if (userRole.isRestrictedRole() && !username.equals(requesterUsername)) {
-            throw new CustomException(ErrorCode.FORBIDDEN);
-        }
-
-        return UserResponse.from(user);
     }
 
 }
