@@ -74,4 +74,10 @@ public class Coupon extends BaseEntity {
         this.endDate = request.endDate() != null ? request.endDate() : this.endDate;
         this.expirationDate = request.expirationDate() != null ? request.expirationDate() : this.expirationDate;
     }
+
+    public void delete(String username) {
+        this.isDeleted = true;
+        this.deletedAt = LocalDateTime.now();
+        this.deletedBy = username;
+    }
 }

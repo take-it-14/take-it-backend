@@ -20,8 +20,8 @@ public enum ErrorCode {
     FAVORITE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 찜 정보입니다."),
 
     // auth
-    USERNAME_ALEADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 존재하는 username 입니다."),
-    EMAIL_ALEADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 존재하는 email 입니다."),
+    USERNAME_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 존재하는 username 입니다."),
+    EMAIL_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 존재하는 email 입니다."),
     PASSWORD_VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "비밀번호는 대문자, 소문자, 숫자, 특수문자를 포함한 8자 이상, 15자 이하여야 합니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 사용자를 찾을 수 없습니다."),
     PASSWORD_NOT_MATCHED(HttpStatus.NOT_FOUND, "비밀번호가 일치하지 않습니다."),
@@ -38,6 +38,8 @@ public enum ErrorCode {
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 주문 정보입니다."),
     ORDER_CANNOT_BE_MODIFIED(HttpStatus.BAD_REQUEST, "현재 상태의 주문은 수정할 수 없습니다."),
 
+    // category
+    CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 카테고리가 없습니다."),
 
     // coupon
     COUPON_NOT_FOUND(HttpStatus.BAD_REQUEST, "쿠폰을 찾을 수 없습니다."),
@@ -53,7 +55,6 @@ public enum ErrorCode {
     INVALID_DATE_FORMAT(HttpStatus.BAD_REQUEST, "유효하지 않은 날짜 입력 형식입니다.")
 
     ;
-
 
     private final HttpStatus status;
     private final String description;
