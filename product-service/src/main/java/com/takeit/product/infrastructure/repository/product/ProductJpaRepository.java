@@ -1,4 +1,4 @@
-package com.takeit.product.infrastructure.repository;
+package com.takeit.product.infrastructure.repository.product;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.StringPath;

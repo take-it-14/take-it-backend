@@ -1,4 +1,4 @@
-package com.takeit.product.infrastructure.repository;
+package com.takeit.product.infrastructure.repository.product;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
@@ -47,6 +47,6 @@ public class ProductRepositoryImpl implements ProductRepository {
             booleanBuilder.and(product.id.in(idList));
         }
         return (List<Product>) jpaRepository.findAll(booleanBuilder);
-    };
+    }
 
 }

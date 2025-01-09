@@ -3,7 +3,7 @@ package com.takeit.product.application.service;
 import com.querydsl.core.types.Predicate;
 import com.takeit.common.exception.CustomException;
 import com.takeit.common.exception.ErrorCode;
-import com.takeit.product.application.dto.*;
+import com.takeit.product.application.dto.product.*;
 import com.takeit.product.domain.entity.Product;
 import com.takeit.product.domain.entity.ProductDailyStat;
 import com.takeit.product.domain.entity.ProductPhoto;

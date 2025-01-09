@@ -1,7 +1,7 @@
 package com.takeit.product.presentation.controller;
 
 import com.querydsl.core.types.Predicate;
-import com.takeit.product.application.dto.ProductEntityResponse;
+import com.takeit.product.application.dto.product.ProductEntityResponse;
 import com.takeit.product.application.service.ProductService;
 import com.takeit.product.domain.entity.Product;
 import lombok.RequiredArgsConstructor;

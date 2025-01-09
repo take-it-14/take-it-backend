@@ -1,4 +1,4 @@
-package com.takeit.product.application.dto;
+package com.takeit.product.application.dto.product;
 
 import com.takeit.product.domain.entity.Product;
 import com.takeit.product.domain.entity.ProductPhoto;

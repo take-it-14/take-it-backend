@@ -1,6 +1,7 @@
-package com.takeit.product.application.dto;
+package com.takeit.product.application.dto.product;
 
 import com.takeit.product.domain.entity.Product;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
