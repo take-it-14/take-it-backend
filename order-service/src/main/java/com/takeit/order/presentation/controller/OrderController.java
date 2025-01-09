@@ -59,7 +59,7 @@ public class OrderController {
 	public CommonResponse<PageResponse<OrderListResponse>> getOrders(
 		Pageable pageable,
 		@RequestParam(required = false) String status,
-		@RequestParam UUID searchUserId,
+		@RequestParam Long searchUserId,
 		@RequestHeader(value = "X-UserId", required = true) Long userId,
 		@RequestHeader(value = "X-Role", required = true) String role
 	){
