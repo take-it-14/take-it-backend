@@ -1,13 +1,11 @@
 package com.takeit.product.domain.repository;
 
-import java.util.Date;
-
+import com.takeit.product.domain.entity.ProductDailyStat;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.takeit.product.domain.entity.ProductDailyStat;
+import java.util.Date;
 
 @Repository
 public interface ProductDailyStatRepository {

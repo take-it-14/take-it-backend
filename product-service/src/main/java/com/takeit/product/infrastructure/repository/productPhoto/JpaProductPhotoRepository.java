@@ -1,4 +1,4 @@
-package com.takeit.product.infrastructure.repository;
+package com.takeit.product.infrastructure.repository.productPhoto;
 
 import com.takeit.product.domain.entity.Product;
 import com.takeit.product.domain.entity.ProductPhoto;
