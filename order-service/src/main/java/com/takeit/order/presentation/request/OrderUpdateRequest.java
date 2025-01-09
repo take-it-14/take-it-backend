@@ -1,6 +1,6 @@
 package com.takeit.order.presentation.request;
 
-import com.takeit.order.application.dto.OrderUpdateDto;
+import com.takeit.order.application.dto.order.OrderUpdateDto;
 
 import jakarta.validation.constraints.NotNull;
 

@@ -9,13 +9,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.takeit.common.exception.CustomException;
 import com.takeit.common.exception.ErrorCode;
-import com.takeit.order.application.dto.OrderCreateDto;
-import com.takeit.order.application.dto.OrderResponse;
-import com.takeit.order.application.dto.OrderDetailResponse;
-import com.takeit.order.application.dto.OrderStatusUpdateDto;
-import com.takeit.order.application.dto.OrderStatusUpdateResponse;
-import com.takeit.order.application.dto.OrderUpdateDto;
-import com.takeit.order.application.dto.OrderListResponse;
+import com.takeit.order.application.dto.order.OrderCreateDto;
+import com.takeit.order.application.dto.order.OrderResponse;
+import com.takeit.order.application.dto.order.OrderDetailResponse;
+import com.takeit.order.application.dto.order.OrderStatusUpdateDto;
+import com.takeit.order.application.dto.order.OrderStatusUpdateResponse;
+import com.takeit.order.application.dto.order.OrderUpdateDto;
+import com.takeit.order.application.dto.order.OrderListResponse;
 import com.takeit.order.domain.entity.Order;
 import com.takeit.order.domain.enums.OrderStatus;
 import com.takeit.order.domain.repository.OrderRepository;
@@ -30,7 +30,7 @@ public class OrderService {
 	private final OrderRepository orderRepository;
 
 	@Transactional
-	public OrderResponse createOrder(OrderCreateDto request){
+	public OrderResponse createOrder(OrderCreateDto request, Long userId) {
 
 		// TODO: product-service에서 productId 유효성 검사 + id 받아오는 로직 구현 필요
 		Long productId = 1L;
@@ -40,7 +40,7 @@ public class OrderService {
 		Long userCouponId = 1L;
 
 		Order order = Order.create(
-			1L, // TODO: 사용자 정보 받아오기
+			userId,
 			productId,
 			userCouponId,
 			request.quantity(),
@@ -49,13 +49,14 @@ public class OrderService {
 		return OrderResponse.of(orderRepository.save(order), request.productId(), request.userCouponId());
 	}
 
-	public OrderDetailResponse getOrderDetail(UUID orderId){
+	public OrderDetailResponse getOrderDetail(UUID orderId, Long userId, String role) {
 		Order order = findOrderByUuid(orderId);
-
-		// TODO: 요청 유저의 정보인지 검증 필요
 
 		// TODO: product-service에서 id->UUID 변환 필요
 		UUID productId = UUID.randomUUID();
+
+		if(role.equals("CUSTOMER")) validateUser(userId, order.getCustomerId());
+		else if(role.equals("SELLER")) validateUser(userId, 1L); // TODO: product 정보 가져와서 판매자 id랑 비교해야함
 
 		// TODO: userCouponId 변환
 		UUID userCouponId = UUID.randomUUID();
@@ -63,15 +64,20 @@ public class OrderService {
 		return OrderDetailResponse.of(order, productId, userCouponId);
 	}
 
-	public Page<OrderListResponse> getOrders(Pageable pageable, String status, String username){
+	public Page<OrderListResponse> getOrders(Pageable pageable, String status, UUID searchUserId, Long userId, String role) {
 		Page<Order> orderPage;
 
-		// TODO: username->userId 가져오는 로직 필요
-		Long userId = 1L;
+		// TODO: UUID->ID 변환 auth
+		Long searchId=1L;
+
+		if(role.equals("CUSTOMER")) validateUser(userId, searchId);
 
 		OrderStatus stat = OrderStatus.of(status);
-		if(stat==null) orderPage = orderRepository.findByCustomerId(userId, pageable);
-		else orderPage = orderRepository.findByCustomerIdAndStatus(userId, stat, pageable);
+
+		if (stat == null)
+			orderPage = orderRepository.findByCustomerId(searchId, pageable);
+		else
+			orderPage = orderRepository.findByCustomerIdAndStatus(searchId, stat, pageable);
 
 		return orderPage.map(
 			order -> {
@@ -82,13 +88,15 @@ public class OrderService {
 	}
 
 	@Transactional
-	public OrderResponse updateOrder(UUID orderId, OrderUpdateDto request){
+	public OrderResponse updateOrder(UUID orderId, OrderUpdateDto request, Long userId, String role) {
 		Order order = findOrderByUuid(orderId);
 
 		// TODO: 요청 유저의 정보인지 검증 필요
 
 		// TODO: product-service에서 order.productId로 해당 상품 재고가 몇개 있는지 확인 + id->UUID 변환 필요
 		UUID productId = findProductUuidByProductId(1L);
+
+		if(role.equals("CUSTOMER")) validateUser(userId, order.getCustomerId());
 
 		checkStatus(order.getStatus());
 
@@ -101,10 +109,11 @@ public class OrderService {
 	}
 
 	@Transactional
-	public OrderStatusUpdateResponse updateOrderStatus(UUID orderId, OrderStatusUpdateDto request){
+	public OrderStatusUpdateResponse updateOrderStatus(UUID orderId, OrderStatusUpdateDto request, Long userId, String role) {
 		Order order = findOrderByUuid(orderId);
 
-		// TODO: 요청 유저의 정보인지 검증 필요
+		if(role.equals("SELLER")) validateUser(userId, 1L); // TODO: product 정보 가져와서 판매자 id랑 비교해야함
+
 		OrderStatus status = OrderStatus.of(request.status());
 		order.updateStatus(status);
 
@@ -112,10 +121,10 @@ public class OrderService {
 	}
 
 	@Transactional
-	public OrderStatusUpdateResponse cancelOrder(UUID orderId){
+	public OrderStatusUpdateResponse cancelOrder(UUID orderId, Long userId, String role) {
 		Order order = findOrderByUuid(orderId);
 
-		// TODO: 요청 유저의 정보인지 검증 필요
+		if(role.equals("CUSTOMER")) validateUser(userId, order.getCustomerId());
 
 		checkStatus(order.getStatus());
 
@@ -124,27 +133,29 @@ public class OrderService {
 		return OrderStatusUpdateResponse.from(order);
 	}
 
-	public Long findProductIdByOrderUuidAndUserId(UUID orderId, Long userId){
+	public Long findProductIdByOrderUuidAndUserId(UUID orderId, Long userId) {
 		Order order = findOrderByUuid(orderId);
-		validateOrderUser(order, userId);
+		validateUser(order.getCustomerId(), userId);
 
 		return order.getProductId();
 	}
 
-	private Order findOrderByUuid(UUID uuid){
-		return orderRepository.findByUuid(uuid).orElseThrow(()-> new CustomException(ErrorCode.ORDER_NOT_FOUND));
+	private Order findOrderByUuid(UUID uuid) {
+		return orderRepository.findByUuid(uuid).orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
 	}
 
-	private UUID findProductUuidByProductId(Long productId){
+	private UUID findProductUuidByProductId(Long productId) {
 		// TODO: product-service 요청 필요
 		return UUID.randomUUID();
 	}
 
-	private void checkStatus(OrderStatus status){
-		if(status == OrderStatus.CANCELLED || status == OrderStatus.DELIVERED) throw new CustomException(ErrorCode.ORDER_CANNOT_BE_MODIFIED);
+	private void checkStatus(OrderStatus status) {
+		if (status == OrderStatus.CANCELLED || status == OrderStatus.DELIVERED)
+			throw new CustomException(ErrorCode.ORDER_CANNOT_BE_MODIFIED);
 	}
 
-	private void validateOrderUser(Order order, Long userId){
-		if(!order.getCustomerId().equals(userId)) throw new CustomException(ErrorCode.FORBIDDEN);
+	private void validateUser(Long currentUserId, Long requiredUserId) {
+		if (!currentUserId.equals(requiredUserId))
+			throw new CustomException(ErrorCode.FORBIDDEN);
 	}
 }

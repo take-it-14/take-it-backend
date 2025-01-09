@@ -8,15 +8,17 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.takeit.common.presentation.dto.CommonResponse;
-import com.takeit.order.application.dto.OrderResponse;
-import com.takeit.order.application.dto.OrderDetailResponse;
-import com.takeit.order.application.dto.OrderStatusUpdateResponse;
-import com.takeit.order.application.dto.OrderListResponse;
+import com.takeit.order.application.annotation.RequireRole;
+import com.takeit.order.application.dto.order.OrderResponse;
+import com.takeit.order.application.dto.order.OrderDetailResponse;
+import com.takeit.order.application.dto.order.OrderStatusUpdateResponse;
+import com.takeit.order.application.dto.order.OrderListResponse;
 import com.takeit.order.application.dto.PageResponse;
 import com.takeit.order.application.service.OrderService;
 import com.takeit.order.presentation.request.OrderCreateRequest;
@@ -34,49 +36,65 @@ public class OrderController {
 	private final OrderService orderService;
 
 	@PostMapping
+	@RequireRole({"MASTER", "CUSTOMER"})
 	public CommonResponse<OrderResponse> createOrder(
-		@RequestBody @Valid OrderCreateRequest request
-	){
-		return CommonResponse.ofSuccess("주문 등록", orderService.createOrder(request.toServiceDto()));
+		@RequestBody @Valid OrderCreateRequest request,
+		@RequestHeader(value = "X-UserId", required = true) Long userId
+		){
+		return CommonResponse.ofSuccess("주문 등록", orderService.createOrder(request.toServiceDto(), userId));
 	}
 
 	@GetMapping("/{orderId}")
+	@RequireRole({"MASTER", "MANAGER", "CUSTOMER", "SELLER"})
 	public CommonResponse<OrderDetailResponse> getOrderDetail(
-		@PathVariable UUID orderId
+		@PathVariable UUID orderId,
+		@RequestHeader(value = "X-UserId", required = true) Long userId,
+		@RequestHeader(value = "X-Role", required = true) String role
 	){
-		return CommonResponse.ofSuccess("주문 상세 조회", orderService.getOrderDetail(orderId));
+		return CommonResponse.ofSuccess("주문 상세 조회", orderService.getOrderDetail(orderId, userId, role));
 	}
 
 	@GetMapping
+	@RequireRole({"MASTER", "MANAGER", "CUSTOMER"})
 	public CommonResponse<PageResponse<OrderListResponse>> getOrders(
 		Pageable pageable,
-		@RequestParam(required = false) String status
-		//@RequestHeader(value = "X-Username") String username
+		@RequestParam(required = false) String status,
+		@RequestParam UUID searchUserId,
+		@RequestHeader(value = "X-UserId", required = true) Long userId,
+		@RequestHeader(value = "X-Role", required = true) String role
 	){
-		String username = "aaaaaa";
-		return CommonResponse.ofSuccess("주문 목록 조회", PageResponse.of(orderService.getOrders(pageable, status, username)));
+		return CommonResponse.ofSuccess("주문 목록 조회", PageResponse.of(orderService.getOrders(pageable, status, searchUserId, userId, role)));
 	}
 
 	@PatchMapping("/{orderId}")
+	@RequireRole({"MASTER", "CUSTOMER"})
 	public CommonResponse<OrderResponse> updateOrder(
 		@PathVariable UUID orderId,
-		@RequestBody @Valid OrderUpdateRequest request
+		@RequestBody @Valid OrderUpdateRequest request,
+		@RequestHeader(value = "X-UserId", required = true) Long userId,
+		@RequestHeader(value = "X-Role", required = true) String role
 	){
-		return CommonResponse.ofSuccess("주문 정보 수정", orderService.updateOrder(orderId, request.toServiceDto()));
+		return CommonResponse.ofSuccess("주문 정보 수정", orderService.updateOrder(orderId, request.toServiceDto(), userId, role));
 	}
 
 	@PatchMapping("/{orderId}/status")
+	@RequireRole({"MASTER", "SELLER"})
 	public CommonResponse<OrderStatusUpdateResponse> updateOrderStatus(
 		@PathVariable UUID orderId,
-		@RequestBody @Valid OrderStatusUpdateRequest request
+		@RequestBody @Valid OrderStatusUpdateRequest request,
+		@RequestHeader(value = "X-UserId", required = true) Long userId,
+		@RequestHeader(value = "X-Role", required = true) String role
 	){
-		return CommonResponse.ofSuccess("주문 상태 변경", orderService.updateOrderStatus(orderId, request.toServiceDto()));
+		return CommonResponse.ofSuccess("주문 상태 변경", orderService.updateOrderStatus(orderId, request.toServiceDto(), userId, role));
 	}
 
 	@PatchMapping("/{orderId}/cancel")
+	@RequireRole({"MASTER", "CUSTOMER"})
 	public CommonResponse<OrderStatusUpdateResponse> cancelOrder(
-		@PathVariable UUID orderId
+		@PathVariable UUID orderId,
+		@RequestHeader(value = "X-UserId", required = true) Long userId,
+		@RequestHeader(value = "X-Role", required = true) String role
 	){
-		return CommonResponse.ofSuccess("주문 취소", orderService.cancelOrder(orderId));
+		return CommonResponse.ofSuccess("주문 취소", orderService.cancelOrder(orderId, userId, role));
 	}
 }
