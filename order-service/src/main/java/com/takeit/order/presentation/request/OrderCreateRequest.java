@@ -10,6 +10,8 @@ public record OrderCreateRequest(
 	@NotNull
 	UUID productId,
 
+	UUID userCouponId,
+
 	@NotNull
 	Long quantity,
 
@@ -17,6 +19,6 @@ public record OrderCreateRequest(
 	Long amount
 ) {
 	public OrderCreateDto toServiceDto(){
-		return new OrderCreateDto(productId, quantity, amount);
+		return new OrderCreateDto(productId, userCouponId, quantity, amount);
 	}
 }
