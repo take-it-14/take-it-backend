@@ -6,6 +6,7 @@ import com.takeit.coupon.application.dto.CreateUserCouponResponse;
 import com.takeit.coupon.application.dto.UpdateUserCouponResponse;
 import com.takeit.coupon.application.dto.UserCouponPageResponse;
 import com.takeit.coupon.application.dto.UserCouponResponse;
+import com.takeit.coupon.application.dto.user.UserDto;
 import com.takeit.coupon.domain.entity.Coupon;
 import com.takeit.coupon.domain.entity.UserCoupon;
 import com.takeit.coupon.domain.repository.CouponRepository;
@@ -28,38 +29,44 @@ import static com.takeit.common.exception.ErrorCode.*;
 public class UserCouponService {
     private final UserCouponRepository userCouponRepository;
     private final CouponRepository couponRepository;
+    private final UserService userService;
+    private final CategoryService categoryService;
 
     @Transactional
     public CreateUserCouponResponse create(CreateUserCouponRequest request, String username) {
-        // todo : user 권한 체크
-        Long userId = 1L;
+        UserDto couponUserDto = userService.getUser(request.username());
+
         Coupon coupon = couponRepository.findByUuidAndIsDeletedIsFalse(request.couponId()).orElseThrow(() -> new CustomException(COUPON_NOT_FOUND));
 
         if(coupon.getEndDate().isBefore(LocalDateTime.now())) {
             throw new CustomException(COUPON_EXPIRED);
         }
 
-        return CreateUserCouponResponse.of(userCouponRepository.save(UserCoupon.create(coupon, userId)), coupon.getName());
+        return CreateUserCouponResponse.of(userCouponRepository.save(UserCoupon.create(coupon, couponUserDto.id())), coupon.getName());
     }
 
     @Transactional
     public void delete(UUID userCouponId, String username) {
-        // todo : user 권한 체크, customer 라면 validation 추가
-        Long userId = 1L;
+        UserDto userDto = userService.getUser(username);
 
-        userCouponRepository.findByUuidAndIsDeletedIsFalse(userCouponId).orElseThrow(() -> new CustomException(USER_COUPON_NOT_FOUND)).delete(username);
+        UserCoupon coupon = userCouponRepository.findByUuidAndIsDeletedIsFalse(userCouponId).orElseThrow(() -> new CustomException(USER_COUPON_NOT_FOUND));
+
+        if(checkRoleMasterOrManager(userDto)) {
+            validationUserId(coupon, userDto.id());
+        }
+
+        coupon.delete(username);
     }
 
     @Transactional
     public UpdateUserCouponResponse used(UUID userCouponId, String username) {
-        // todo : user 권한 체크
-        Long userId = 1L;
+        UserDto userDto = userService.getUser(username);
 
-        // todo : user 권한이 master, manager 가 아닌 경우 validation 추가
         UserCoupon coupon = userCouponRepository.findByUuidAndIsDeletedIsFalse(userCouponId).orElseThrow(() -> new CustomException(USER_COUPON_NOT_FOUND));
 
-        // todo : user 권한이 master, manager 인 경우 validation x
-        validationUserId(coupon, userId);
+        if(checkRoleMasterOrManager(userDto)) {
+            validationUserId(coupon, userDto.id());
+        }
 
         if(LocalDateTime.now().isBefore(coupon.getStartDate()) || coupon.getEndDate().isBefore(LocalDateTime.now())) {
             throw new CustomException(USER_COUPON_INVALID_DATE_RANGE);
@@ -75,11 +82,13 @@ public class UserCouponService {
 
     @Transactional
     public UpdateUserCouponResponse cancel(UUID userCouponId, String username) {
-        // todo : user 권한 체크
-        Long userId = 1L;
+        UserDto userDto = userService.getUser(username);
 
-        // todo : user 권한이 master, manager 가 아닌 경우 validation 추가
         UserCoupon coupon = userCouponRepository.findByUuidAndIsDeletedIsFalse(userCouponId).orElseThrow(() -> new CustomException(USER_COUPON_NOT_FOUND));
+
+        if(checkRoleMasterOrManager(userDto)) {
+            validationUserId(coupon, userDto.id());
+        }
 
         if(!coupon.getIsUsed()) {
             throw new CustomException(USER_COUPON_NOT_USED);
@@ -102,7 +111,7 @@ public class UserCouponService {
     }
 
     private void validUserCouponUser(UserCoupon coupon, Long userId) {
-        if(!coupon.getUserId().equals(userId))  throw new CustomException(FORBIDDEN);
+        if(!coupon.getUserId().equals(userId))  throw new CustomException(UNAUTHORIZED);
     }
 
     private void validCouponIsNotUsed(UserCoupon coupon) {
@@ -115,12 +124,13 @@ public class UserCouponService {
 
     @Transactional(readOnly = true)
     public UserCouponResponse getUserCoupon(UUID userCouponId, String username) {
-        // todo : user 권한 체크
-        Long userId = 1L;
+        UserDto userDto = userService.getUser(username);
+
         UserCoupon userCoupon = userCouponRepository.findByUuidAndUserIdAndFetchJoinCouponAndIsDeletedIsFalse(userCouponId).orElseThrow(() -> new CustomException(USER_COUPON_NOT_FOUND));
 
-        // todo : user 권한이 master, manager 인 경우 validation x
-        validationUserId(userCoupon, userId);
+        if(checkRoleMasterOrManager(userDto)) {
+            validationUserId(userCoupon, userDto.id());
+        }
 
         return UserCouponResponse.from(userCoupon);
 
@@ -133,9 +143,12 @@ public class UserCouponService {
     }
 
     public UserCouponPageResponse getUserCoupons(Predicate predicate, Pageable pageable, String username) {
-        // todo : user 권한 체크 (master, manager)
-        Long userId = 1L;
+        UserDto userDto = userService.getUser(username);
 
-        return userCouponRepository.findAll(predicate, pageable, userId);
+        return userCouponRepository.findAll(predicate, pageable, userDto);
+    }
+
+    private boolean checkRoleMasterOrManager(UserDto userDto) {
+        return userDto.role() == null || (!userDto.role().equals("MANAGER") && !userDto.role().equals("MASTER"));
     }
 }

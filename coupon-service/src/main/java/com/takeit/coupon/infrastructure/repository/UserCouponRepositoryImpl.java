@@ -1,13 +1,13 @@
 package com.takeit.coupon.infrastructure.repository;
 
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.Tuple;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.takeit.coupon.application.dto.QUserCouponPageResponse_UserCouponPage_UserCoupon;
 import com.takeit.coupon.application.dto.UserCouponPageResponse;
+import com.takeit.coupon.application.dto.user.UserDto;
 import com.takeit.coupon.domain.entity.Coupon;
 import com.takeit.coupon.domain.entity.UserCoupon;
 import com.takeit.coupon.domain.repository.UserCouponRepository;
@@ -66,12 +66,13 @@ public class UserCouponRepositoryImpl implements UserCouponRepository {
     }
 
     @Override
-    public UserCouponPageResponse findAll(Predicate predicate, Pageable pageable, Long userId) {
-        // todo : user 권한이 master, manager가 아닌경우 자신의 쿠폰만 조회하도록 조건 추가. findAll predicate 찾아보기
+    public UserCouponPageResponse findAll(Predicate predicate, Pageable pageable, UserDto userDto) {
+        // todo : findAll predicate 찾아보기
         BooleanBuilder builder = new BooleanBuilder(predicate);
 
         builder.and(coupon.isDeleted.eq(false));
-        builder.and(userCoupon.userId.eq(userId));
+        if(!(userDto.role().equals("MASTER") || userDto.role().equals("MANAGER")))
+            builder.and(userCoupon.userId.eq(userDto.id()));
 
         JPAQuery<UserCouponPageResponse.UserCouponPage.UserCoupon> query =
                 queryFactory.select(new QUserCouponPageResponse_UserCouponPage_UserCoupon(

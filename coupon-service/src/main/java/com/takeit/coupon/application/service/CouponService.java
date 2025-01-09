@@ -6,6 +6,8 @@ import com.takeit.coupon.application.dto.CouponPageResponse;
 import com.takeit.coupon.application.dto.CouponResponse;
 import com.takeit.coupon.application.dto.CreateCouponResponse;
 import com.takeit.coupon.application.dto.UpdateCouponResponse;
+import com.takeit.coupon.application.dto.category.CategoryDto;
+import com.takeit.coupon.application.dto.user.UserDto;
 import com.takeit.coupon.domain.entity.Coupon;
 import com.takeit.coupon.domain.repository.CouponRepository;
 import com.takeit.coupon.domain.repository.UserCouponRepository;
@@ -27,15 +29,23 @@ import static com.takeit.common.exception.ErrorCode.*;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class CouponService {
     private final CouponRepository couponRepository;
     private final UserCouponRepository userCouponRepository;
+    private final UserService userService;
+    private final CategoryService categoryService;
 
     @Transactional
     public CreateCouponResponse createCoupon(CreateCouponRequest request, String username) {
-        // todo : user 권한 체크 (master, manager), 카테고리 객체 가져오기
-        Long categoryId = 1L;
-        String categoryName = "의류";
+        UserDto userDto = userService.getUser(username);
+
+        validRole(userDto);
+
+        CategoryDto categoryDto = null;
+
+        if(request.categoryId() != null)
+            categoryDto = categoryService.getCategory(request.categoryId());
 
         if(request.type().equals(CouponType.PERCENTAGE)) {
             validationPercentageValue(request.discountValue());
@@ -43,15 +53,24 @@ public class CouponService {
 
         validationDateRange(request.startDate(), request.endDate());
 
-        return CreateCouponResponse.of(couponRepository.save(Coupon.create(request, categoryId)), categoryName);
-
+        return CreateCouponResponse.of(
+                couponRepository.save(Coupon.create(request,categoryDto == null ? null : categoryDto.id())),
+                categoryDto == null ? null : categoryDto.name()
+        );
     }
+
+
 
     @Transactional
     public UpdateCouponResponse updateCoupon(UUID couponId, UpdateCouponRequest request, String username) {
-        // todo : user 권한 체크 (master, manager), 카테고리 객체 가져오기
-        Long categoryId = 1L;
-        String categoryName = "가방";
+        UserDto userDto = userService.getUser(username);
+
+        validRole(userDto);
+
+        CategoryDto categoryDto = null;
+
+        if(request.categoryId() != null)
+            categoryDto = categoryService.getCategory(request.categoryId());
 
         Coupon coupon = couponRepository.findByUuidAndIsDeletedIsFalse(couponId).orElseThrow(() -> new CustomException(COUPON_NOT_FOUND));
 
@@ -68,15 +87,18 @@ public class CouponService {
                     request.endDate() == null ? coupon.getEndDate() : request.endDate());
         }
 
-        coupon.update(request, categoryId);
+        coupon.update(request, categoryDto == null ? null : categoryDto.id());
 
-        return UpdateCouponResponse.of(couponRepository.save(coupon), categoryName);
+        return UpdateCouponResponse.of(couponRepository.save(coupon), categoryDto == null ? null : categoryDto.name());
 
     }
 
     @Transactional
     public void deleteCoupon(UUID couponId, String username) {
-        // todo : user 권한 체크 (master, manager)
+        UserDto userDto = userService.getUser(username);
+
+        validRole(userDto);
+
         Coupon coupon = couponRepository.findByUuidAndIsDeletedIsFalse(couponId).orElseThrow(() -> new CustomException(COUPON_NOT_FOUND));
 
         coupon.delete(username);
@@ -98,17 +120,30 @@ public class CouponService {
         }
     }
 
-    @Transactional(readOnly = true)
+
     public CouponResponse getCoupon(String username, UUID couponId) {
-        // todo : user 권한 체크 (master, manager), category name 받아오기
+        UserDto userDto = userService.getUser(username);
+
+        Coupon coupon = couponRepository.findByUuidAndIsDeletedIsFalse(couponId).orElseThrow(() -> new CustomException(COUPON_NOT_FOUND));
+
+        validRole(userDto);
+        // CategoryDto categoryDto = categoryService.getCategory(coupon.getCategoryId());
         String category = "의류";
-        return CouponResponse.of(couponRepository.findByUuidAndIsDeletedIsFalse(couponId).orElseThrow(() -> new CustomException(COUPON_NOT_FOUND)), category);
+
+        return CouponResponse.of(coupon, category);
     }
 
-    @Transactional(readOnly = true)
     public CouponPageResponse getCoupons(String username, Predicate predicate, Pageable pageable) {
-        // todo : user 권한 체크 (master, manager)
+        UserDto userDto = userService.getUser(username);
+
+        validRole(userDto);
 
         return couponRepository.findAll(predicate, pageable);
+    }
+
+    private void validRole(UserDto userDto) {
+        if(userDto.role() == null || !(userDto.role().equals("MANAGER") || userDto.role().equals("MASTER"))) {
+            throw new CustomException(UNAUTHORIZED);
+        }
     }
 }
