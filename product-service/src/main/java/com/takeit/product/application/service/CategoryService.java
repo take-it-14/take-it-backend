@@ -2,8 +2,8 @@ package com.takeit.product.application.service;
 
 import com.takeit.common.exception.CustomException;
 import com.takeit.common.exception.ErrorCode;
-import com.takeit.product.application.dto.CategoryResponse;
 import com.takeit.product.application.dto.category.CategoryEntityResponse;
+import com.takeit.product.application.dto.category.CategoryResponse;
 import com.takeit.product.application.dto.category.CreateCategoryDto;
 import com.takeit.product.application.dto.category.UpdateCategoryDto;
 import com.takeit.product.domain.entity.Category;

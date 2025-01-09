@@ -2,16 +2,12 @@ package com.takeit.product.domain.entity;
 
 import com.takeit.common.domain.model.BaseEntity;
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "p_product")
@@ -56,7 +52,7 @@ public class Product extends BaseEntity {
     @Column(nullable = false)
     private Boolean isActive; // 상품 전시 여부
 
-    private Integer stars; // 평점
+    private Double stars; // 평점
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "product")
     @Builder.Default

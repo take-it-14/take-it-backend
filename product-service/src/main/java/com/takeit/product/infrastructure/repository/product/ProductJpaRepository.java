@@ -1,21 +1,21 @@
-package com.takeit.product.infrastructure.repository;
+package com.takeit.product.infrastructure.repository.product;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.StringPath;
 import com.takeit.product.domain.entity.Product;
 import com.takeit.product.domain.entity.QProduct;
-import com.takeit.product.domain.repository.ProductRepository;
 import jakarta.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
 
-public interface ProductRepositoryImpl extends JpaRepository<Product, Long>, ProductRepository,
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+
+public interface ProductJpaRepository extends JpaRepository<Product, Long>,
         QuerydslPredicateExecutor<Product>, QuerydslBinderCustomizer<QProduct> {
 
     @Override
@@ -35,5 +35,4 @@ public interface ProductRepositoryImpl extends JpaRepository<Product, Long>, Pro
             return Optional.of(booleanBuilder);
         });
     }
-
 }

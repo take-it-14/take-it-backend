@@ -1,6 +1,6 @@
 package com.takeit.product.presentation.request;
 
-import com.takeit.product.application.dto.UpdateProductDto;
+import com.takeit.product.application.dto.product.UpdateProductDto;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.web.multipart.MultipartFile;
 

@@ -1,4 +1,4 @@
-package com.takeit.product.application.dto;
+package com.takeit.product.application.dto.product;
 
 import org.springframework.web.multipart.MultipartFile;
 

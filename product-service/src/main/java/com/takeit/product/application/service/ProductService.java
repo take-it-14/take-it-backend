@@ -3,7 +3,7 @@ package com.takeit.product.application.service;
 import com.querydsl.core.types.Predicate;
 import com.takeit.common.exception.CustomException;
 import com.takeit.common.exception.ErrorCode;
-import com.takeit.product.application.dto.*;
+import com.takeit.product.application.dto.product.*;
 import com.takeit.product.domain.entity.Product;
 import com.takeit.product.domain.entity.ProductDailyStat;
 import com.takeit.product.domain.entity.ProductPhoto;
@@ -176,5 +176,11 @@ public class ProductService {
     public ProductEntityResponse getProductEntity(UUID productId) {
         return ProductEntityResponse.from(productRepository.findByUuidAndIsDeletedFalse(productId)
                 .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND)));
+    }
+
+    public List<ProductEntityResponse> getProductEntities(List<Long> idList, Predicate predicate) {
+        return productRepository.getProductEntities(idList, predicate).stream()
+                .map(ProductEntityResponse::from)
+                .toList();
     }
 }
