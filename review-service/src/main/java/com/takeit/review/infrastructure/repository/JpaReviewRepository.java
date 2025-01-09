@@ -13,7 +13,7 @@ public interface JpaReviewRepository extends JpaRepository<Review, Long> {
     Optional<Review> findByUuidAndIsDeletedIsFalse(@Param("reviewId") UUID reviewId);
 
     @Query("select distinct r from Review r " +
-            "join fetch r.photoList p " +
-            "where r.isDeleted = false and p.isDeleted = false and r.uuid = :reviewId")
+            "left join fetch r.photoList p " +
+            "where r.isDeleted = false and (p.isDeleted = false or p is null) and r.uuid = :reviewId")
     Optional<Review> findReviewAndReviewPhotosByUuid(@Param("reviewId") UUID reviewId);
 }
