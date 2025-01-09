@@ -3,36 +3,27 @@ package com.takeit.product.application.service;
 import com.querydsl.core.types.Predicate;
 import com.takeit.common.exception.CustomException;
 import com.takeit.common.exception.ErrorCode;
-import com.takeit.product.application.dto.CreateProductDto;
-import com.takeit.product.application.dto.ProductDetailResponse;
-import com.takeit.product.application.dto.ProductPageResponse;
-import com.takeit.product.application.dto.ProductResponse;
-import com.takeit.product.application.dto.UpdateProductDto;
+import com.takeit.product.application.dto.product.*;
 import com.takeit.product.domain.entity.Product;
+import com.takeit.product.domain.entity.ProductDailyStat;
 import com.takeit.product.domain.entity.ProductPhoto;
+import com.takeit.product.domain.repository.ProductDailyStatRepository;
 import com.takeit.product.domain.repository.ProductPhotoRepository;
 import com.takeit.product.domain.repository.ProductRepository;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 import com.takeit.s3.infrastructure.util.FileUpload;
-import java.util.Date;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.takeit.product.application.dto.ProductDailyStatResponse;
-import com.takeit.product.domain.entity.ProductDailyStat;
-import com.takeit.product.domain.repository.ProductDailyStatRepository;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 import static com.takeit.common.exception.ErrorCode.FILE_UPLOAD_ERROR;
-import static com.takeit.common.exception.ErrorCode.TOO_MANY_PHOTOS;
 
 @Service
 @RequiredArgsConstructor
@@ -181,4 +172,15 @@ public class ProductService {
 			productDailyStat -> ProductDailyStatResponse.of(productDailyStat, productId)
 		);
 	}
+
+    public ProductEntityResponse getProductEntity(UUID productId) {
+        return ProductEntityResponse.from(productRepository.findByUuidAndIsDeletedFalse(productId)
+                .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND)));
+    }
+
+    public List<ProductEntityResponse> getProductEntities(List<Long> idList, Predicate predicate) {
+        return productRepository.getProductEntities(idList, predicate).stream()
+                .map(ProductEntityResponse::from)
+                .toList();
+    }
 }

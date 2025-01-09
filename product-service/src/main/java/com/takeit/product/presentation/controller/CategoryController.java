@@ -1,8 +1,8 @@
 package com.takeit.product.presentation.controller;
 
 import com.takeit.common.presentation.dto.CommonResponse;
-import com.takeit.product.application.dto.CategoryResponse;
 import com.takeit.product.application.dto.category.CategoryEntityResponse;
+import com.takeit.product.application.dto.category.CategoryResponse;
 import com.takeit.product.application.service.CategoryService;
 import com.takeit.product.presentation.request.CreateCategoryRequest;
 import com.takeit.product.presentation.request.UpdateCategoryRequest;

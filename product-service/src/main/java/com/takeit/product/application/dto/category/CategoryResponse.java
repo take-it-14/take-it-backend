@@ -1,4 +1,4 @@
-package com.takeit.product.application.dto;
+package com.takeit.product.application.dto.category;
 
 import java.util.UUID;
 
