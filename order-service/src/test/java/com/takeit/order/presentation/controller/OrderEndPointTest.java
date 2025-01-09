@@ -31,7 +31,7 @@ class OrderEndPointTest {
 
 		Mockito.when(orderService.findProductIdByOrderUuidAndUserId(orderId, userId)).thenReturn(productId);
 
-		mockMvc.perform(get("/feign/v1/orders/{orderId}/product", orderId)
+		mockMvc.perform(get("/feign/v1/orders/{orderId}/productId", orderId)
 			.param("userId", userId.toString()))
 			.andExpect(status().isOk())
 			.andExpect(content().string(productId.toString()));
