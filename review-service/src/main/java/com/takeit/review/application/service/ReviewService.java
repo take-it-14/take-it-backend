@@ -6,6 +6,8 @@ import com.takeit.review.application.dto.CreateReviewResponse;
 import com.takeit.review.application.dto.ReviewDetailResponse;
 import com.takeit.review.application.dto.ReviewPageResponse;
 import com.takeit.review.application.dto.UpdateReviewResponse;
+import com.takeit.review.application.dto.product.ProductDto;
+import com.takeit.review.application.dto.user.UserDto;
 import com.takeit.review.domain.repository.ReviewPhotoRepository;
 import com.takeit.review.domain.repository.ReviewRepository;
 import com.takeit.review.domain.entity.Review;
@@ -21,6 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,12 +38,17 @@ public class ReviewService {
     private final ReviewPhotoRepository reviewPhotoRepository;
     private final FileUpload fileUpload;
 
+    private final UserService userService;
+    private final ProductService productService;
+    private final OrderService orderService;
+
     @Transactional
     public CreateReviewResponse createReview(CreateReviewRequest request, String username) {
-        // todo : username 으로 user 권한 체크 및 order uuid로 productId와 userid 가 일치하는지 체크
-        Long productId = 1L;
+        UserDto userDto = userService.getUser(username);
 
-        Review review = reviewRepository.save(Review.of(request, username, productId));
+        Long productId = orderService.getProductId(request.orderId(), userDto.id());
+
+        Review review = reviewRepository.save(Review.of(request, productId));
 
         if(request.files() != null && !request.files().isEmpty()) {
             if(request.files().size() > 3) {
@@ -61,10 +70,12 @@ public class ReviewService {
 
     @Transactional
     public UpdateReviewResponse updateReview(@Valid UpdateReviewRequest request, UUID reviewId, String username) {
-        // todo : username 으로 user 권한 체크 및 order uuid로 productId가 일치하는지 체크
-        Long productId = 1L;
+        UserDto userDto = userService.getUser(username);
 
         Review review = findByUuid(reviewId);
+
+        if(checkMasterAndManager(userDto.role()))
+            validateUser(review, username);
 
         review.updateReview(request);
         review = reviewRepository.save(review);
@@ -105,8 +116,16 @@ public class ReviewService {
     }
 
     public ReviewDetailResponse getReview(String username, UUID reviewId) {
-        // todo : product 정보 같이 반환
         Review review = reviewRepository.findReviewAndReviewPhotosByUuid(reviewId).orElseThrow(() -> new CustomException(REVIEW_NOT_FOUND));
+
+        List<Long> idList = new ArrayList<>();
+        idList.add(review.getProductId());
+        List<ProductDto> productDto = productService.getProducts(idList);
+
+        if(productDto != null && !productDto.isEmpty()) {
+            return ReviewDetailResponse.of(review, productDto.get(0));
+        }
+
         return ReviewDetailResponse.from(review);
     }
 
@@ -116,9 +135,13 @@ public class ReviewService {
 
     @Transactional
     public void deleteReview(UUID reviewId, String username) {
-        // todo : username 으로 user 권한 체크
+        UserDto userDto = userService.getUser(username);
 
         Review review = findByUuid(reviewId);
+
+        if(checkMasterAndManager(userDto.role()))
+            validateUser(review, username);
+
         review.deleted(username);
 
         review = reviewRepository.save(review);
@@ -135,6 +158,16 @@ public class ReviewService {
 
     private Review findByUuid(UUID reviewId) {
         return reviewRepository.findByUuid(reviewId).orElseThrow(() -> new CustomException(REVIEW_NOT_FOUND));
+    }
+
+    private void validateUser(Review review, String username) {
+        if(!review.getCreatedBy().equals(username)) {
+            throw new CustomException(UNAUTHORIZED);
+        }
+    }
+
+    private boolean checkMasterAndManager(String role) {
+        return !role.equals("MASTER") && !role.equals("MANAGER");
     }
 
 }
