@@ -21,6 +21,7 @@ import com.takeit.order.application.dto.product.ProductDto;
 import com.takeit.order.domain.entity.Order;
 import com.takeit.order.domain.enums.OrderStatus;
 import com.takeit.order.domain.repository.OrderRepository;
+import com.takeit.order.infrastructure.client.CouponClient;
 import com.takeit.order.infrastructure.client.ProductClient;
 
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,7 @@ public class OrderService {
 
 	private final OrderRepository orderRepository;
 	private final ProductClient productClient;
+	private final CouponClient couponClient;
 
 	@Transactional
 	public OrderResponse createOrder(OrderCreateDto request, Long userId) {
@@ -40,8 +42,7 @@ public class OrderService {
 
 		checkStock(product.stock(), request.quantity().intValue());
 
-		// TODO: coupon 검증 및 변환
-		Long userCouponId = 1L;
+		Long userCouponId = couponClient.validUserCouponAndGetUserCouponId(request.userCouponId(), userId);
 
 		Order order = Order.create(
 			userId,
@@ -61,26 +62,22 @@ public class OrderService {
 		if(role.equals("CUSTOMER")) validateUser(userId, order.getCustomerId());
 		else if(role.equals("SELLER")) validateUser(userId, 1L); // TODO: product 정보 가져와서 판매자 id랑 비교해야함
 
-		// TODO: userCouponId 변환
-		UUID userCouponId = UUID.randomUUID();
+		UUID userCouponId = couponClient.getUserCouponUuid(order.getUserCouponId());
 
 		return OrderDetailResponse.of(order, product.productId(), userCouponId);
 	}
 
-	public Page<OrderListResponse> getOrders(Pageable pageable, String status, UUID searchUserId, Long userId, String role) {
+	public Page<OrderListResponse> getOrders(Pageable pageable, String status, Long searchUserId, Long userId, String role) {
 		Page<Order> orderPage;
 
-		// TODO: UUID->ID 변환 auth
-		Long searchId=1L;
-
-		if(role.equals("CUSTOMER")) validateUser(userId, searchId);
+		if(role.equals("CUSTOMER")) validateUser(userId, searchUserId);
 
 		OrderStatus stat = OrderStatus.of(status);
 
 		if (stat == null)
-			orderPage = orderRepository.findByCustomerId(searchId, pageable);
+			orderPage = orderRepository.findByCustomerId(searchUserId, pageable);
 		else
-			orderPage = orderRepository.findByCustomerIdAndStatus(searchId, stat, pageable);
+			orderPage = orderRepository.findByCustomerIdAndStatus(searchUserId, stat, pageable);
 
 		return orderPage.map(
 			order -> {
@@ -102,8 +99,7 @@ public class OrderService {
 
 		checkStatus(order.getStatus());
 
-		// TODO: userCouponId 변환
-		UUID userCouponId = UUID.randomUUID();
+		UUID userCouponId = couponClient.getUserCouponUuid(order.getUserCouponId());
 
 		order.update(request.quantity(), request.amount());
 
@@ -115,7 +111,7 @@ public class OrderService {
 		Order order = findOrderByUuid(orderId);
 
 		ProductDto product = findProductByProductId(order.getProductId());
-		
+
 		if(role.equals("SELLER")) validateUser(userId, 1L); // TODO: product 정보 가져와서 판매자 id랑 비교해야함
 
 		OrderStatus status = OrderStatus.of(request.status());
