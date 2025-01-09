@@ -1,13 +1,14 @@
 package com.takeit.product.presentation.controller;
 
+import com.querydsl.core.types.Predicate;
 import com.takeit.product.application.dto.ProductEntityResponse;
 import com.takeit.product.application.service.ProductService;
+import com.takeit.product.domain.entity.Product;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.querydsl.binding.QuerydslPredicate;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -19,5 +20,11 @@ public class ProductEndPoint {
     @GetMapping("/uuid/{productId}")
     public ProductEntityResponse getProductByUuid(@PathVariable UUID productId) {
         return productService.getProductEntity(productId);
+    }
+
+    @GetMapping
+    public List<ProductEntityResponse> getAllProducts(@RequestParam(required = false) List<Long> idList,
+                                                      @QuerydslPredicate(root = Product.class) Predicate predicate) {
+        return productService.getProductEntities(idList, predicate);
     }
 }

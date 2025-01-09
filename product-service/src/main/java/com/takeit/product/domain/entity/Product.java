@@ -56,7 +56,7 @@ public class Product extends BaseEntity {
     @Column(nullable = false)
     private Boolean isActive; // 상품 전시 여부
 
-    private Integer stars; // 평점
+    private Double stars; // 평점
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "product")
     @Builder.Default

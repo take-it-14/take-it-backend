@@ -1,39 +1,52 @@
 package com.takeit.product.infrastructure.repository;
 
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.dsl.StringPath;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.takeit.product.domain.entity.Product;
-import com.takeit.product.domain.entity.QProduct;
 import com.takeit.product.domain.repository.ProductRepository;
-import jakarta.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.Collection;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
+
 import java.util.List;
 import java.util.Optional;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.querydsl.QuerydslPredicateExecutor;
-import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
-import org.springframework.data.querydsl.binding.QuerydslBindings;
+import java.util.UUID;
 
-public interface ProductRepositoryImpl extends JpaRepository<Product, Long>, ProductRepository,
-        QuerydslPredicateExecutor<Product>, QuerydslBinderCustomizer<QProduct> {
+import static com.takeit.product.domain.entity.QProduct.product;
+@Repository
+@RequiredArgsConstructor
+public class ProductRepositoryImpl implements ProductRepository {
+    private final JPAQueryFactory queryFactory;
+    private final ProductJpaRepository jpaRepository;
 
     @Override
-    default void customize(QuerydslBindings querydslBindings, @NotNull QProduct qProduct) {
-        // 모든 String 필드에 대해 동적 검색
-        querydslBindings.bind(String.class).all((StringPath path, Collection<? extends String> values) -> {
-            List<String> valueList = new ArrayList<>(values.stream().map(String::trim).toList());
-            if (valueList.isEmpty()) {
-                return Optional.empty();
-            }
-            BooleanBuilder booleanBuilder = new BooleanBuilder();
-            //booleanBuilder.and(qUser.isDeleted.eq(false)); // is_deleted = false
-
-            for (String s : valueList) {
-                booleanBuilder.or(path.containsIgnoreCase(s));
-            }
-            return Optional.of(booleanBuilder);
-        });
+    public Product save(Product product) {
+        return jpaRepository.save(product);
     }
+
+    @Override
+    public Optional<Product> findByUuidAndIsDeletedFalse(UUID uuid) {
+        JPAQuery<Product> query = queryFactory
+                .selectFrom(product)
+                .where(product.uuid.eq(uuid).and(product.isDeleted.isFalse()));
+
+        return Optional.ofNullable(query.fetchOne());
+    }
+
+    @Override
+    public Page<Product> findAll(Predicate predicate, Pageable pageable) {
+        return jpaRepository.findAll(predicate, pageable);
+    }
+
+    public List<Product> getProductEntities(List<Long> idList, Predicate predicate) {
+        BooleanBuilder booleanBuilder = new BooleanBuilder(predicate);
+        if(idList != null && !idList.isEmpty()) {
+            booleanBuilder.and(product.id.in(idList));
+        }
+        return (List<Product>) jpaRepository.findAll(booleanBuilder);
+    };
 
 }

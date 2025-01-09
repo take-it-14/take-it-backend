@@ -177,4 +177,10 @@ public class ProductService {
         return ProductEntityResponse.from(productRepository.findByUuidAndIsDeletedFalse(productId)
                 .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND)));
     }
+
+    public List<ProductEntityResponse> getProductEntities(List<Long> idList, Predicate predicate) {
+        return productRepository.getProductEntities(idList, predicate).stream()
+                .map(ProductEntityResponse::from)
+                .toList();
+    }
 }
