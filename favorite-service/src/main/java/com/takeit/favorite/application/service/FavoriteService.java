@@ -5,6 +5,7 @@ import com.takeit.common.exception.ErrorCode;
 import com.takeit.favorite.application.dto.favorite.CreateFavoriteDto;
 import com.takeit.favorite.application.dto.favorite.CreateFavoriteResponse;
 import com.takeit.favorite.application.dto.favorite.FavoriteResponse;
+import com.takeit.favorite.application.dto.user.UserDto;
 import com.takeit.favorite.domain.entity.Favorite;
 import com.takeit.favorite.domain.repository.FavoriteRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,16 +20,23 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.takeit.favorite.utils.AccessValidator.*;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class FavoriteService {
     private final FavoriteRepository favoriteRepository;
+    private final UserService userService;
 
     @Transactional
-    public CreateFavoriteResponse addFavorite(CreateFavoriteDto request, String username) {
-        // TODO: username으로 User 정보 받아오는 메소드 추가 + 권한체크 customer: 본인 것만 가능, manager,master: 아무나 가능)
-        Long userId = 1L;
+    public CreateFavoriteResponse addFavorite(CreateFavoriteDto request, String requesterUsername) {
+        UserDto userDto = userService.getUser(requesterUsername);
+        if(!isMaster(userDto) && !isManager(userDto) && !isRequesterAuthorized(request.username(), requesterUsername)) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
+        Long userId = userDto.id();
+
         // TODO: UUID로 Product 정보 받아오는 메소드 추가
         Long productId = 1L;
 
@@ -41,22 +49,28 @@ public class FavoriteService {
             ));
         }
 
-        return CreateFavoriteResponse.of(favorite.get().getUuid(), username,  request.productId());
+        return CreateFavoriteResponse.of(favorite.get().getUuid(), requesterUsername,  request.productId());
     }
 
     @Transactional
-    public void cancelFavorite(UUID favoriteId, String username) {
-        // TODO: username으로 User 정보 받아오는 메소드 추가 + 권한체크(customer: 본인 것만 가능, manager,master: 아무나 가능)
+    public void cancelFavorite(UUID favoriteId, String requesterUsername) {
         Favorite favorite = favoriteRepository.findByUuidIsDeleteFalse(favoriteId)
                 .orElseThrow(() -> new CustomException(ErrorCode.FAVORITE_NOT_FOUND));
 
-        favorite.cancel(username);
+        UserDto userDto = userService.getUser(requesterUsername);
+        if(!isMaster(userDto) && !isManager(userDto) && favorite.getUserId().equals(userDto.id())) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
 
+        favorite.cancel(requesterUsername);
     }
 
-    public PagedModel<FavoriteResponse> getUserFavorites(String username, Pageable pageable) {
-        // TODO: username으로 User 정보 받아오는 메소드 추가 + 권한체크(customer: 본인 것만 가능, manager,master: 아무나 가능)
-        Long userId = 1L;
+    public PagedModel<FavoriteResponse> getUserFavorites(String username, String requesterUsername, Pageable pageable) {
+        UserDto userDto = userService.getUser(username);
+        if(!isMaster(userDto) && !isManager(userDto) && !isRequesterAuthorized(username, requesterUsername)) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
+        Long userId = userDto.id();
 
         Page<Favorite> favoritePage = favoriteRepository.getUserFavorites(userId, pageable);
         List<Long> productIds = favoritePage.getContent().stream().map(Favorite::getProductId).toList();
