@@ -39,12 +39,16 @@ public class CategoryRepositoryImpl implements CategoryRepository {
 
         return Optional.ofNullable(query.fetchOne());
     }
-  
+
     @Override
-    public Optional<Category> findByUuid(UUID categoryId) {
-        return jpaRepository.findByUuid(categoryId);
+    public Optional<Category> findByUuidAndIsDeleteFalse(UUID categoryId) {
+        JPAQuery<Category> query = queryFactory
+                .selectFrom(category)
+                .where(category.uuid.eq(categoryId).and(category.isDeleted.eq(false)));
+
+        return Optional.ofNullable(query.fetchOne());
     }
-  
+
     @Override
     public Page<Category> getAllCategories(Pageable pageable) {
         JPAQuery<Category> query = queryFactory
