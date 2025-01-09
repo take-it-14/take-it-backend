@@ -1,5 +1,6 @@
 package com.takeit.order.application.service;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -16,9 +17,11 @@ import com.takeit.order.application.dto.order.OrderStatusUpdateDto;
 import com.takeit.order.application.dto.order.OrderStatusUpdateResponse;
 import com.takeit.order.application.dto.order.OrderUpdateDto;
 import com.takeit.order.application.dto.order.OrderListResponse;
+import com.takeit.order.application.dto.product.ProductDto;
 import com.takeit.order.domain.entity.Order;
 import com.takeit.order.domain.enums.OrderStatus;
 import com.takeit.order.domain.repository.OrderRepository;
+import com.takeit.order.infrastructure.client.ProductClient;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,20 +31,21 @@ import lombok.RequiredArgsConstructor;
 public class OrderService {
 
 	private final OrderRepository orderRepository;
+	private final ProductClient productClient;
 
 	@Transactional
 	public OrderResponse createOrder(OrderCreateDto request, Long userId) {
 
-		// TODO: product-service에서 productId 유효성 검사 + id 받아오는 로직 구현 필요
-		Long productId = 1L;
-		// TODO: product-service에서 quantity 만큼 재고가 있는지 확인하는 로직 필요
+		ProductDto product = productClient.getProductByUuid(request.productId());
+
+		checkStock(product.stock(), request.quantity().intValue());
 
 		// TODO: coupon 검증 및 변환
 		Long userCouponId = 1L;
 
 		Order order = Order.create(
 			userId,
-			productId,
+			product.id(),
 			userCouponId,
 			request.quantity(),
 			request.amount()
@@ -52,8 +56,7 @@ public class OrderService {
 	public OrderDetailResponse getOrderDetail(UUID orderId, Long userId, String role) {
 		Order order = findOrderByUuid(orderId);
 
-		// TODO: product-service에서 id->UUID 변환 필요
-		UUID productId = UUID.randomUUID();
+		ProductDto product = findProductByProductId(order.getProductId());
 
 		if(role.equals("CUSTOMER")) validateUser(userId, order.getCustomerId());
 		else if(role.equals("SELLER")) validateUser(userId, 1L); // TODO: product 정보 가져와서 판매자 id랑 비교해야함
@@ -61,7 +64,7 @@ public class OrderService {
 		// TODO: userCouponId 변환
 		UUID userCouponId = UUID.randomUUID();
 
-		return OrderDetailResponse.of(order, productId, userCouponId);
+		return OrderDetailResponse.of(order, product.productId(), userCouponId);
 	}
 
 	public Page<OrderListResponse> getOrders(Pageable pageable, String status, UUID searchUserId, Long userId, String role) {
@@ -91,10 +94,9 @@ public class OrderService {
 	public OrderResponse updateOrder(UUID orderId, OrderUpdateDto request, Long userId, String role) {
 		Order order = findOrderByUuid(orderId);
 
-		// TODO: 요청 유저의 정보인지 검증 필요
+		ProductDto product = findProductByProductId(order.getProductId());
 
-		// TODO: product-service에서 order.productId로 해당 상품 재고가 몇개 있는지 확인 + id->UUID 변환 필요
-		UUID productId = findProductUuidByProductId(1L);
+		checkStock(product.stock(), request.quantity().intValue());
 
 		if(role.equals("CUSTOMER")) validateUser(userId, order.getCustomerId());
 
@@ -105,13 +107,15 @@ public class OrderService {
 
 		order.update(request.quantity(), request.amount());
 
-		return OrderResponse.of(order, productId, userCouponId);
+		return OrderResponse.of(order, product.productId(), userCouponId);
 	}
 
 	@Transactional
 	public OrderStatusUpdateResponse updateOrderStatus(UUID orderId, OrderStatusUpdateDto request, Long userId, String role) {
 		Order order = findOrderByUuid(orderId);
 
+		ProductDto product = findProductByProductId(order.getProductId());
+		
 		if(role.equals("SELLER")) validateUser(userId, 1L); // TODO: product 정보 가져와서 판매자 id랑 비교해야함
 
 		OrderStatus status = OrderStatus.of(request.status());
@@ -157,5 +161,15 @@ public class OrderService {
 	private void validateUser(Long currentUserId, Long requiredUserId) {
 		if (!currentUserId.equals(requiredUserId))
 			throw new CustomException(ErrorCode.FORBIDDEN);
+	}
+
+	private void checkStock(Integer currentStock, Integer requiredStock) {
+		if(currentStock < requiredStock) throw new CustomException(ErrorCode.INVALID_STOCK);
+	}
+
+	private ProductDto findProductByProductId(Long productId){
+		List<ProductDto> products = productClient.getAllProducts(List.of(productId));
+		if(products.isEmpty()) throw new CustomException(ErrorCode.PRODUCT_NOT_FOUND);
+		return products.get(0);
 	}
 }

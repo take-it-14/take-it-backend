@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.takeit.order.application.dto.ProductDto;
+import com.takeit.order.application.dto.product.ProductDto;
 
 @FeignClient(name = "product-service")
 public interface ProductClient {
