@@ -27,7 +27,7 @@ public class CategoryController {
     }
 
     @PatchMapping("/{categoryId}")
-    public CommonResponse<CategoryEntityResponse> updateCategory(@PathVariable Long categoryId,
+    public CommonResponse<CategoryEntityResponse> updateCategory(@PathVariable UUID categoryId,
                                                                  @Valid @RequestBody UpdateCategoryRequest request,
                                                                  @RequestHeader(value = "X-Username") String username) {
         return CommonResponse.ofSuccess("카테고리 수정", categoryService.updateCategory(request.toDto(), categoryId, username));

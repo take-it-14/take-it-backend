@@ -34,10 +34,6 @@ public interface ProductRepositoryImpl extends JpaRepository<Product, Long>, Pro
             }
             return Optional.of(booleanBuilder);
         });
-
-        // 검색 제외 필드
-        querydslBindings.excluding(qProduct.imageUrl);
-
     }
 
 }

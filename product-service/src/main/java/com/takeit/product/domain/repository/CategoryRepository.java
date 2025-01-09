@@ -12,7 +12,7 @@ public interface CategoryRepository {
 
     Optional<Category> findByName(String name);
     Optional<Category> findByIdAndIsDeleteFalse(Long categoryId);
-    Optional<Category> findByUuid(UUID categoryId);
+    Optional<Category> findByUuidAndIsDeleteFalse(UUID categoryId);
   
     Page<Category> getAllCategories(Pageable pageable);
 }

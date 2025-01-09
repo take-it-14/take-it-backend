@@ -49,16 +49,17 @@ public class ProductController {
 
     // 상품 등록
     @PostMapping
-    public ResponseEntity<CommonResponse<ProductResponse>> createProduct(@RequestBody @Valid CreateProductRequest request) {
+    public ResponseEntity<CommonResponse<ProductResponse>> createProduct(@Valid CreateProductRequest request) {
         return ResponseEntity.ok().body(CommonResponse.ofSuccess("상품 등록 성공", productService.createProduct(request.toDto())));
     }
 
     // 상품 수정
     @PutMapping("/{productId}")
     public ResponseEntity<CommonResponse<ProductResponse>> updateProduct(
+            @RequestHeader(name = "X-Username") String username,
             @PathVariable UUID productId,
-            @RequestBody @Valid UpdateProductRequest request) {
-        return ResponseEntity.ok().body(CommonResponse.ofSuccess("상품 수정 성공", productService.updateProduct(productId, request.toDto())));
+            @Valid UpdateProductRequest request) {
+        return ResponseEntity.ok().body(CommonResponse.ofSuccess("상품 수정 성공", productService.updateProduct(productId, request.toDto(), username)));
     }
 
     // 상품 삭제

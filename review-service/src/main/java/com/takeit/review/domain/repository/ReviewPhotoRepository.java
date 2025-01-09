@@ -1,4 +1,4 @@
-package com.takeit.review.application.repository;
+package com.takeit.review.domain.repository;
 
 import com.takeit.review.domain.entity.Review;
 import com.takeit.review.domain.entity.ReviewPhoto;
