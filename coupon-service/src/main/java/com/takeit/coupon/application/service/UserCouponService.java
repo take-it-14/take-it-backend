@@ -65,9 +65,7 @@ public class UserCouponService {
             throw new CustomException(USER_COUPON_INVALID_DATE_RANGE);
         }
 
-        if(coupon.getIsUsed()) {
-            throw new CustomException(USER_COUPON_ALREADY_USED);
-        }
+        validCouponIsNotUsed(coupon);
 
         String couponName = coupon.getCoupon().getName();
         coupon.used();
@@ -91,6 +89,28 @@ public class UserCouponService {
         coupon.cancel();
 
         return UpdateUserCouponResponse.of(userCouponRepository.save(coupon), couponName);
+    }
+
+    public Long validUserCouponAndGetUserCouponId(UUID userCouponId, Long userId) {
+        UserCoupon coupon = userCouponRepository.findByUuidAndIsDeletedIsFalse(userCouponId).orElseThrow(() -> new CustomException(USER_COUPON_NOT_FOUND));
+
+        validUserCouponUser(coupon, userId);
+
+        validCouponIsNotUsed(coupon);
+
+        return coupon.getId();
+    }
+
+    private void validUserCouponUser(UserCoupon coupon, Long userId) {
+        if(!coupon.getUserId().equals(userId))  throw new CustomException(FORBIDDEN);
+    }
+
+    private void validCouponIsNotUsed(UserCoupon coupon) {
+        if(coupon.getIsUsed()) throw new CustomException(USER_COUPON_ALREADY_USED);
+    }
+
+    public UUID getUserCouponUuid(Long userCouponId) {
+        return userCouponRepository.findByIdAndIsDeletedIsFalse(userCouponId).orElseThrow(()-> new CustomException(COUPON_NOT_FOUND)).getUuid();
     }
 
     @Transactional(readOnly = true)

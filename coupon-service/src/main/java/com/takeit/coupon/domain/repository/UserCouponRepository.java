@@ -20,4 +20,6 @@ public interface UserCouponRepository {
     Optional<UserCoupon> findByUuidAndUserIdAndFetchJoinCouponAndIsDeletedIsFalse(UUID userCouponId);
 
     UserCouponPageResponse findAll(Predicate predicate, Pageable pageable, Long userId);
+
+    Optional<UserCoupon> findByIdAndIsDeletedIsFalse(Long userCouponId);
 }

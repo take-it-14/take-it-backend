@@ -11,4 +11,6 @@ import java.util.UUID;
 public interface JpaUserCouponRepository extends JpaRepository<UserCoupon, Long> {
     Optional<UserCoupon> findByUuidAndIsDeletedIsFalse(UUID userCouponId);
     boolean existsByCouponAndIsDeletedIsFalse(Coupon coupon);
+
+    Optional<UserCoupon> findByIdAndIsDeletedIsFalse(Long userCouponId);
 }

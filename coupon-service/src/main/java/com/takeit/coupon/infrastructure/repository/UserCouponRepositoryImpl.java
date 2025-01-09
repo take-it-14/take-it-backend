@@ -139,4 +139,9 @@ public class UserCouponRepositoryImpl implements UserCouponRepository {
 
         return orderSpecifiers.toArray(new OrderSpecifier[0]);
     }
+
+    @Override
+    public Optional<UserCoupon> findByIdAndIsDeletedIsFalse(Long userCouponId) {
+        return jpaUserCouponRepository.findByIdAndIsDeletedIsFalse(userCouponId);
+    }
 }
