@@ -1,9 +1,9 @@
-package com.takeit.product.application.dto;
+package com.takeit.product.application.dto.product;
+
+import com.takeit.product.domain.entity.ProductDailyStat;
 
 import java.util.Date;
 import java.util.UUID;
-
-import com.takeit.product.domain.entity.ProductDailyStat;
 
 public record ProductDailyStatResponse(
 	UUID productId,

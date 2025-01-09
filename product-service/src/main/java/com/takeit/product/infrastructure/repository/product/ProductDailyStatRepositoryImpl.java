@@ -1,15 +1,14 @@
-package com.takeit.product.infrastructure.repository;
+package com.takeit.product.infrastructure.repository.product;
 
-import java.util.Date;
-
+import com.takeit.product.domain.entity.ProductDailyStat;
+import com.takeit.product.domain.repository.ProductDailyStatRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.takeit.product.domain.entity.ProductDailyStat;
-import com.takeit.product.domain.repository.ProductDailyStatRepository;
+import java.util.Date;
 
 public interface ProductDailyStatRepositoryImpl extends JpaRepository<ProductDailyStat, Long>,
 	ProductDailyStatRepository {

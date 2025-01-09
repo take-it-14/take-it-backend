@@ -1,14 +1,15 @@
-package com.takeit.product.application.dto;
+package com.takeit.product.application.dto.product;
 
 import com.takeit.product.domain.entity.Product;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public record ProductDetailResponse(
+public record ProductEntityResponse(
+        Long id,
         UUID ProductId,
         String productName,
         String description,
-        String imageUrl,
         Long price,
         Integer stock,
         Integer limitPerUser,
@@ -16,18 +17,17 @@ public record ProductDetailResponse(
         LocalDateTime closeTime,
         Boolean isActive
 ) {
-    public static ProductDetailResponse from(Product product) {
-        return new ProductDetailResponse(
+    public static ProductEntityResponse from(Product product) {
+        return new ProductEntityResponse(
+                product.getId(),
                 product.getUuid(),
                 product.getProductName(),
                 product.getDescription(),
-                product.getImageUrl(),
                 product.getPrice(),
                 product.getStock(),
                 product.getLimitPerUser(),
                 product.getOpenTime(),
                 product.getCloseTime(),
-                product.getIsActive()
-        );
+                product.getIsActive());
     }
 }

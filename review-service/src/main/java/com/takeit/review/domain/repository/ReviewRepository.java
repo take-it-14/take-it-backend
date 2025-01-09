@@ -1,4 +1,4 @@
-package com.takeit.review.application.repository;
+package com.takeit.review.domain.repository;
 
 import com.querydsl.core.types.Predicate;
 import com.takeit.review.application.dto.ReviewPageResponse;

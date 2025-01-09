@@ -1,8 +1,11 @@
 package com.takeit.product.presentation.request;
 
-import com.takeit.product.application.dto.CreateProductDto;
+import com.takeit.product.application.dto.product.CreateProductDto;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record CreateProductRequest(
         @NotNull
@@ -12,7 +15,6 @@ public record CreateProductRequest(
         @NotNull
         String productName,
         String description,
-        String imageUrl,
         @NotNull
         Long price,
         @NotNull
@@ -23,7 +25,8 @@ public record CreateProductRequest(
         LocalDateTime openTime,
         LocalDateTime closeTime,
         @NotNull
-        Boolean isActive
+        Boolean isActive,
+        List<MultipartFile> photos
 ) {
     public CreateProductDto toDto() {
         return new CreateProductDto(
@@ -31,13 +34,13 @@ public record CreateProductRequest(
                 categoryId,
                 productName,
                 description,
-                imageUrl,
                 price,
                 stock,
                 limitPerUser,
                 openTime,
                 closeTime,
-                isActive
+                isActive,
+                photos
         );
     }
 }

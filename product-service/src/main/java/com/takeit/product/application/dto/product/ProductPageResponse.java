@@ -1,11 +1,12 @@
-package com.takeit.product.application.dto;
+package com.takeit.product.application.dto.product;
 
 import com.takeit.product.domain.entity.Product;
-import java.util.List;
-import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.web.PagedModel;
+
+import java.util.List;
+import java.util.UUID;
 
 public record ProductPageResponse(
     ProductPage productPage

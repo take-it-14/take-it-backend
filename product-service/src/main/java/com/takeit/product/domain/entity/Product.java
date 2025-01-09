@@ -1,19 +1,13 @@
 package com.takeit.product.domain.entity;
 
 import com.takeit.common.domain.model.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.*;
+
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "p_product")
@@ -41,8 +35,6 @@ public class Product extends BaseEntity {
 
     private String description;
 
-    private String imageUrl;
-
     @Column(nullable = false)
     private Long price;
 
@@ -60,7 +52,11 @@ public class Product extends BaseEntity {
     @Column(nullable = false)
     private Boolean isActive; // 상품 전시 여부
 
-    private Integer stars; // 평점
+    private Double stars; // 평점
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "product")
+    @Builder.Default
+    private List<ProductPhoto> photoList = new ArrayList<>();
 
     // 상품 생성 메서드
     public static Product create(
@@ -68,7 +64,6 @@ public class Product extends BaseEntity {
             Long categoryId,
             String productName,
             String description,
-            String imageUrl,
             Long price,
             Integer stock,
             Integer limitPerUser,
@@ -82,7 +77,6 @@ public class Product extends BaseEntity {
                 .categoryId(categoryId)
                 .productName(productName)
                 .description(description)
-                .imageUrl(imageUrl)
                 .price(price)
                 .stock(stock)
                 .limitPerUser(limitPerUser)
@@ -96,7 +90,6 @@ public class Product extends BaseEntity {
     public void update(
             String productName,
             String description,
-            String imageUrl,
             Long price,
             Integer stock,
             Integer limitPerUser,
@@ -106,7 +99,6 @@ public class Product extends BaseEntity {
     ) {
         if (productName != null) this.productName = productName;
         if (description != null) this.description = description;
-        if (imageUrl != null) this.imageUrl = imageUrl;
         if (price != null) this.price = price;
         if (stock != null) this.stock = stock;
         if (limitPerUser != null) this.limitPerUser = limitPerUser;
@@ -120,5 +112,9 @@ public class Product extends BaseEntity {
         this.deletedAt = LocalDateTime.now();
         this.deletedBy = deletedBy;
         this.isDeleted = true;
+    }
+
+    public void addPhotos(List<ProductPhoto> productPhotos) {
+        photoList = new ArrayList<>(productPhotos);
     }
 }

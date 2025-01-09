@@ -2,8 +2,8 @@ package com.takeit.product.application.service;
 
 import com.takeit.common.exception.CustomException;
 import com.takeit.common.exception.ErrorCode;
-import com.takeit.product.application.dto.CategoryResponse;
 import com.takeit.product.application.dto.category.CategoryEntityResponse;
+import com.takeit.product.application.dto.category.CategoryResponse;
 import com.takeit.product.application.dto.category.CreateCategoryDto;
 import com.takeit.product.application.dto.category.UpdateCategoryDto;
 import com.takeit.product.domain.entity.Category;
@@ -45,7 +45,7 @@ public class CategoryService {
     public CategoryEntityResponse updateCategory(UpdateCategoryDto request, UUID categoryId, String username) {
         // TODO: username으로 권한체크
 
-        return categoryRepository.findByUuid(categoryId).map(category -> {
+        return categoryRepository.findByUuidAndIsDeleteFalse(categoryId).map(category -> {
             category.update(request.name());
             return CategoryEntityResponse.from(category);
         }).orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND));
@@ -68,6 +68,12 @@ public class CategoryService {
                 .map(CategoryEntityResponse::from)
                 .orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND));
     }
+
+    public CategoryEntityResponse getCategoryByUuid(UUID categoryId) {
+        return categoryRepository.findByUuidAndIsDeleteFalse(categoryId)
+                .map(CategoryEntityResponse::from)
+                .orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND));
+    }
   
     public PagedModel<CategoryResponse> getAllCategories(Pageable pageable) {
         Page<Category> categoryPage = categoryRepository.getAllCategories(pageable);
@@ -81,4 +87,5 @@ public class CategoryService {
                 )
         );
     }
+
 }
