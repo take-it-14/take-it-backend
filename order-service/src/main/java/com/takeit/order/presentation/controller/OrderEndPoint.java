@@ -19,7 +19,7 @@ public class OrderEndPoint {
 
 	private final OrderService orderService;
 
-	@GetMapping("/{orderId}/product")
+	@GetMapping("/{orderId}/productId")
 	public Long findProductIdByOrderUuidAndUserId(
 		@PathVariable("orderId") UUID orderId,
 		@RequestParam("userId") Long userId
