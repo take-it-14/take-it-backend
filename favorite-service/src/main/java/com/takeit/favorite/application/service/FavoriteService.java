@@ -5,6 +5,7 @@ import com.takeit.common.exception.ErrorCode;
 import com.takeit.favorite.application.dto.favorite.CreateFavoriteDto;
 import com.takeit.favorite.application.dto.favorite.CreateFavoriteResponse;
 import com.takeit.favorite.application.dto.favorite.FavoriteResponse;
+import com.takeit.favorite.application.dto.product.ProductDto;
 import com.takeit.favorite.application.dto.user.UserDto;
 import com.takeit.favorite.domain.entity.Favorite;
 import com.takeit.favorite.domain.repository.FavoriteRepository;
@@ -17,8 +18,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.takeit.favorite.utils.AccessValidator.*;
 
@@ -28,6 +31,7 @@ import static com.takeit.favorite.utils.AccessValidator.*;
 public class FavoriteService {
     private final FavoriteRepository favoriteRepository;
     private final UserService userService;
+    private final ProductService productService;
 
     @Transactional
     public CreateFavoriteResponse addFavorite(CreateFavoriteDto request, String requesterUsername) {
@@ -37,8 +41,8 @@ public class FavoriteService {
         }
         Long userId = userDto.id();
 
-        // TODO: UUID로 Product 정보 받아오는 메소드 추가
-        Long productId = 1L;
+        ProductDto productDto = productService.getProduct(request.productId());
+        Long productId = productDto.id();
 
         Optional<Favorite> favorite = favoriteRepository.findByProductIdAndUserId(productId, userId);
         if (favorite.isPresent()) {
@@ -75,13 +79,13 @@ public class FavoriteService {
         Page<Favorite> favoritePage = favoriteRepository.getUserFavorites(userId, pageable);
         List<Long> productIds = favoritePage.getContent().stream().map(Favorite::getProductId).toList();
 
-        // TODO: prouductIds 를 통해 product 가져오기
-        UUID productId = UUID.randomUUID();
+        Map<Long, UUID> productIdToUuidMap = productService.getProducts(productIds).stream()
+                .collect(Collectors.toMap(ProductDto::id, ProductDto::uuid));
 
         return new PagedModel<>(
                 new PageImpl<>(
                         favoritePage.getContent().stream()
-                                .map(favorite -> new FavoriteResponse(favorite.getUuid(), productId))
+                                .map(favorite -> new FavoriteResponse(favorite.getUuid(), productIdToUuidMap.get(favorite.getProductId())))
                                 .toList(),
                         favoritePage.getPageable(),
                         favoritePage.getTotalElements())

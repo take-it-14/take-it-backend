@@ -23,8 +23,8 @@ public class ProductEndPoint {
     }
 
     @GetMapping
-    public List<ProductEntityResponse> getAllProducts(@RequestParam(required = false) List<Long> idList,
+    public List<ProductEntityResponse> getAllProducts(@RequestParam(required = false) List<Long> productIdList,
                                                       @QuerydslPredicate(root = Product.class) Predicate predicate) {
-        return productService.getProductEntities(idList, predicate);
+        return productService.getProductEntities(productIdList, predicate);
     }
 }
