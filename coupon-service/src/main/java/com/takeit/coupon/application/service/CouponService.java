@@ -43,10 +43,7 @@ public class CouponService {
 
         validRole(userDto.role());
 
-        CategoryDto categoryDto = null;
-
-        if(request.categoryId() != null)
-            categoryDto = categoryService.getCategory(request.categoryId());
+        CategoryDto categoryDto = request.categoryId() != null ? categoryService.getCategory(request.categoryId()) : null;
 
         if(request.type().equals(CouponType.PERCENTAGE)) {
             validationPercentageValue(request.discountValue());
@@ -68,10 +65,7 @@ public class CouponService {
 
         validRole(userDto.role());
 
-        CategoryDto categoryDto = null;
-
-        if(request.categoryId() != null)
-            categoryDto = categoryService.getCategory(request.categoryId());
+        CategoryDto categoryDto = request.categoryId() != null ? categoryService.getCategory(request.categoryId()) : null;
 
         Coupon coupon = couponRepository.findByUuidAndIsDeletedIsFalse(couponId).orElseThrow(() -> new CustomException(COUPON_NOT_FOUND));
 
@@ -129,14 +123,11 @@ public class CouponService {
     public CouponResponse getCoupon(String username, UUID couponId) {
         UserDto userDto = userService.getUser(username);
 
-        Coupon coupon = couponRepository.findByUuidAndIsDeletedIsFalse(couponId).orElseThrow(() -> new CustomException(COUPON_NOT_FOUND));
-
         validRole(userDto.role());
 
-        String categoryName = null;
+        Coupon coupon = couponRepository.findByUuidAndIsDeletedIsFalse(couponId).orElseThrow(() -> new CustomException(COUPON_NOT_FOUND));
 
-        if(coupon.getCategoryId() != null)
-            categoryName = categoryService.getCategory(coupon.getCategoryId()).name();
+        String categoryName = coupon.getCategoryId() != null ? categoryService.getCategory(coupon.getCategoryId()).name() : null;
 
         return CouponResponse.of(coupon, categoryName);
     }
