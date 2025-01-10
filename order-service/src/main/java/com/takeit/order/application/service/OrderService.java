@@ -60,11 +60,11 @@ public class OrderService {
 		ProductDto product = findProductByProductId(order.getProductId());
 
 		if(role.equals("CUSTOMER")) validateUser(userId, order.getCustomerId());
-		else if(role.equals("SELLER")) validateUser(userId, 1L); // TODO: product 정보 가져와서 판매자 id랑 비교해야함
+		else if(role.equals("SELLER")) validateUser(userId, product.sellerId());
 
 		UUID userCouponId = couponClient.getUserCouponUuid(order.getUserCouponId());
 
-		return OrderDetailResponse.of(order, product.productId(), userCouponId);
+		return OrderDetailResponse.of(order, product.uuid(), userCouponId);
 	}
 
 	public Page<OrderListResponse> getOrders(Pageable pageable, String status, Long searchUserId, Long userId, String role) {
@@ -103,7 +103,7 @@ public class OrderService {
 
 		order.update(request.quantity(), request.amount());
 
-		return OrderResponse.of(order, product.productId(), userCouponId);
+		return OrderResponse.of(order, product.uuid(), userCouponId);
 	}
 
 	@Transactional
@@ -112,7 +112,7 @@ public class OrderService {
 
 		ProductDto product = findProductByProductId(order.getProductId());
 
-		if(role.equals("SELLER")) validateUser(userId, 1L); // TODO: product 정보 가져와서 판매자 id랑 비교해야함
+		if(role.equals("SELLER")) validateUser(userId, product.sellerId());
 
 		OrderStatus status = OrderStatus.of(request.status());
 		order.updateStatus(status);

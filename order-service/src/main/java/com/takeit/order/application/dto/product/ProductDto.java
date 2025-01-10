@@ -5,7 +5,9 @@ import java.util.UUID;
 
 public record ProductDto(
 	Long id,
-	UUID productId,
+	UUID uuid,
+	Long sellerId,
+	Long categoryId,
 	String productName,
 	String description,
 	Long price,
