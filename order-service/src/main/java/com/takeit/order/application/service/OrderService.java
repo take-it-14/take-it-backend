@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.takeit.common.exception.CustomException;
 import com.takeit.common.exception.ErrorCode;
+import static com.takeit.common.utils.AccessValidator.*;
 import com.takeit.order.application.dto.order.OrderCreateDto;
 import com.takeit.order.application.dto.order.OrderResponse;
 import com.takeit.order.application.dto.order.OrderDetailResponse;
@@ -61,8 +62,8 @@ public class OrderService {
 
 		ProductDto product = findProductByProductId(order.getProductId());
 
-		if(role.equals("CUSTOMER")) validateUser(userId, order.getCustomerId());
-		else if(role.equals("SELLER")) validateUser(userId, product.sellerId());
+		if(isCustomer(role)) validateUser(userId, order.getCustomerId());
+		else if(isSeller(role)) validateUser(userId, product.sellerId());
 
 		UUID userCouponId = couponClient.getUserCouponUuid(order.getUserCouponId());
 
@@ -72,7 +73,7 @@ public class OrderService {
 	public Page<OrderListResponse> getOrders(Pageable pageable, String status, Long searchUserId, Long userId, String role) {
 		Page<Order> orderPage;
 
-		if(role.equals("CUSTOMER")) validateUser(userId, searchUserId);
+		if(isCustomer(role)) validateUser(userId, searchUserId);
 
 		OrderStatus stat = OrderStatus.of(status);
 
@@ -107,7 +108,7 @@ public class OrderService {
 
 		checkStock(product.stock(), request.quantity().intValue());
 
-		if(role.equals("CUSTOMER")) validateUser(userId, order.getCustomerId());
+		if(isCustomer(role)) validateUser(userId, order.getCustomerId());
 
 		checkStatus(order.getStatus());
 
@@ -124,7 +125,7 @@ public class OrderService {
 
 		ProductDto product = findProductByProductId(order.getProductId());
 
-		if(role.equals("SELLER")) validateUser(userId, product.sellerId());
+		if(isSeller(role)) validateUser(userId, product.sellerId());
 
 		OrderStatus status = OrderStatus.of(request.status());
 		order.updateStatus(status);
@@ -136,7 +137,7 @@ public class OrderService {
 	public OrderStatusUpdateResponse cancelOrder(UUID orderId, Long userId, String role) {
 		Order order = findOrderByUuid(orderId);
 
-		if(role.equals("CUSTOMER")) validateUser(userId, order.getCustomerId());
+		if(isCustomer(role)) validateUser(userId, order.getCustomerId());
 
 		checkStatus(order.getStatus());
 
