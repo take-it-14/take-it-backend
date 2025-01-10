@@ -124,6 +124,12 @@ public class UserService {
         return UserPageResponse.from(userPage);
     }
 
+    // UserId로 판매자 정보 조회
+    public SellerInfo getSellerInfoByUserId(Long userId) {
+        return sellerInfoRepository.findByUserIdAndIsDeletedFalse(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.SELLERINFO_NOT_FOUND));
+    }
+
     // 사용자 정보 중복 체크
     public void duplicateCheckForUserInfo(String username, String email) {
         if (isUsernameExists(username)) { // username 중복 확인
