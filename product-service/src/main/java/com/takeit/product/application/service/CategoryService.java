@@ -26,7 +26,7 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
 
     @Transactional
-    public CategoryEntityResponse createCategory(CreateCategoryDto request, String username) {
+    public CategoryEntityResponse createCategory(CreateCategoryDto request, String requesterUsername) {
         // TODO: username으로 권한체크
 
         Optional<Category> category = categoryRepository.findByName(request.name());
@@ -42,7 +42,7 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryEntityResponse updateCategory(UpdateCategoryDto request, UUID categoryId, String username) {
+    public CategoryEntityResponse updateCategory(UpdateCategoryDto request, UUID categoryId, String requesterUsername) {
         // TODO: username으로 권한체크
 
         return categoryRepository.findByUuidAndIsDeleteFalse(categoryId).map(category -> {

@@ -22,30 +22,30 @@ public class CategoryController {
 
     @PostMapping
     public CommonResponse<CategoryEntityResponse> createCategory(@Valid @RequestBody CreateCategoryRequest request,
-                                                                 @RequestHeader(value = "X-Username") String username) {
-        return CommonResponse.ofSuccess("카테고리 생성", categoryService.createCategory(request.toDto(), username));
+                                                                 @RequestHeader(value = "X-Username") String requesterUsername) {
+        return CommonResponse.ofSuccess("카테고리 생성", categoryService.createCategory(request.toDto(), requesterUsername));
     }
 
     @PatchMapping("/{categoryId}")
     public CommonResponse<CategoryEntityResponse> updateCategory(@PathVariable UUID categoryId,
                                                                  @Valid @RequestBody UpdateCategoryRequest request,
-                                                                 @RequestHeader(value = "X-Username") String username) {
-        return CommonResponse.ofSuccess("카테고리 수정", categoryService.updateCategory(request.toDto(), categoryId, username));
+                                                                 @RequestHeader(value = "X-Username") String requesterUsername) {
+        return CommonResponse.ofSuccess("카테고리 수정", categoryService.updateCategory(request.toDto(), categoryId, requesterUsername));
     }
 
     @DeleteMapping("/{categoryId}")
     public CommonResponse<?> deleteCategory(@PathVariable Long categoryId,
-                                            @RequestHeader(value = "X-Username") String username) {
+                                            @RequestHeader(value = "X-Username") String requesterUsername) {
 
-        categoryService.deleteCategory(categoryId, username);
+        categoryService.deleteCategory(categoryId, requesterUsername);
 
         return CommonResponse.ofSuccess("카테고리 삭제",null);
     }
 
     @GetMapping("/{categoryId}")
     public CommonResponse<CategoryEntityResponse> getCategory(@PathVariable Long categoryId,
-                                                        @RequestHeader(value = "X-Username") String username) {
-        return CommonResponse.ofSuccess("카테고리 조회", categoryService.getCategory(categoryId, username));
+                                                        @RequestHeader(value = "X-Username") String requesterUsername) {
+        return CommonResponse.ofSuccess("카테고리 조회", categoryService.getCategory(categoryId, requesterUsername));
     }
 
     @GetMapping("/all")
