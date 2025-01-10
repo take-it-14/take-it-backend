@@ -2,6 +2,8 @@ package com.takeit.order.presentation.controller;
 
 import java.util.UUID;
 
+import com.takeit.order.application.dto.OrderDto;
+import com.takeit.order.application.dto.OrderResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,5 +27,13 @@ public class OrderEndPoint {
 		@RequestParam("userId") Long userId
 	) {
 		return orderService.findProductIdByOrderUuidAndUserId(orderId, userId);
+	}
+
+	@GetMapping("/{orderId}")
+	public OrderDto findOrderByOrderUuidAndUserId(
+			@PathVariable("orderId") UUID orderId,
+			@RequestParam("userId") Long userId
+	) {
+		return orderService.findOrderByOrderUuidAndUserId(orderId, userId);
 	}
 }

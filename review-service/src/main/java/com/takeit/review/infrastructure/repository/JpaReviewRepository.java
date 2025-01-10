@@ -16,4 +16,6 @@ public interface JpaReviewRepository extends JpaRepository<Review, Long> {
             "left join fetch r.photoList p " +
             "where r.isDeleted = false and (p.isDeleted = false or p is null) and r.uuid = :reviewId")
     Optional<Review> findReviewAndReviewPhotosByUuid(@Param("reviewId") UUID reviewId);
+
+    boolean existsByOrderIdAndIsDeletedIsFalse(Long orderId);
 }

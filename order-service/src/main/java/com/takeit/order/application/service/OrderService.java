@@ -2,6 +2,7 @@ package com.takeit.order.application.service;
 
 import java.util.UUID;
 
+import com.takeit.order.application.dto.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -9,13 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.takeit.common.exception.CustomException;
 import com.takeit.common.exception.ErrorCode;
-import com.takeit.order.application.dto.OrderCreateDto;
-import com.takeit.order.application.dto.OrderResponse;
-import com.takeit.order.application.dto.OrderDetailResponse;
-import com.takeit.order.application.dto.OrderStatusUpdateDto;
-import com.takeit.order.application.dto.OrderStatusUpdateResponse;
-import com.takeit.order.application.dto.OrderUpdateDto;
-import com.takeit.order.application.dto.OrderListResponse;
 import com.takeit.order.domain.entity.Order;
 import com.takeit.order.domain.enums.OrderStatus;
 import com.takeit.order.domain.repository.OrderRepository;
@@ -129,6 +123,13 @@ public class OrderService {
 		validateOrderUser(order, userId);
 
 		return order.getProductId();
+	}
+
+	public OrderDto findOrderByOrderUuidAndUserId(UUID orderId, Long userId){
+		Order order = findOrderByUuid(orderId);
+		validateOrderUser(order, userId);
+
+		return OrderDto.from(order);
 	}
 
 	private Order findOrderByUuid(UUID uuid){

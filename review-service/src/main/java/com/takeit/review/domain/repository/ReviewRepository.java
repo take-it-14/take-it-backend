@@ -16,4 +16,6 @@ public interface ReviewRepository {
     Optional<Review> findReviewAndReviewPhotosByUuid(UUID reviewId);
 
     ReviewPageResponse findAll(Predicate predicate, Pageable pageable);
+
+    boolean existsByOrderIdAndIsDeletedIsFalse(Long orderId);
 }
