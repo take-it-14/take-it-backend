@@ -36,7 +36,7 @@ public class ReviewService {
 
     @Transactional
     public CreateReviewResponse createReview(CreateReviewRequest request, String username) {
-        // todo : username 으로 user 권한 체크 및 order uuid로 productId와 userid 가 일치하는지 체크
+        // todo : username 으로 user 권한 체크 및 order uuid로 productId와 userid 가 일치하는지 체크, 상품 이름 가져오기
         Long productId = 1L;
 
         Review review = reviewRepository.save(Review.of(request, username, productId));
@@ -61,7 +61,7 @@ public class ReviewService {
 
     @Transactional
     public UpdateReviewResponse updateReview(@Valid UpdateReviewRequest request, UUID reviewId, String username) {
-        // todo : username 으로 user 권한 체크 및 order uuid로 productId가 일치하는지 체크
+        // todo : username 으로 user 권한 체크 및 order uuid로 productId가 일치하는지 체크, 상품 이름 가져오기
         Long productId = 1L;
 
         Review review = findByUuid(reviewId);
@@ -101,7 +101,7 @@ public class ReviewService {
         review.getPhotoList().clear();
         review.addPhotos(reviewPhotoRepository.findAllByReview(review));
 
-        return UpdateReviewResponse.of(review, request.orderId());
+        return UpdateReviewResponse.of(review, "상품이름");
     }
 
     public ReviewDetailResponse getReview(String username, UUID reviewId) {
