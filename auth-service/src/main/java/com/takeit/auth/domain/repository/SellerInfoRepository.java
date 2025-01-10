@@ -12,4 +12,7 @@ public interface SellerInfoRepository {
     Page<SellerInfo> findByStatusAndIsDeletedFalseOrderByIdAsc(SellerInfoStatus status, Pageable pageable);
 
     Optional<SellerInfo> findByIdAndIsDeletedFalse(Long SellerInfoId);
+
+    // User의 ID로 SellerInfo 조회
+    Optional<SellerInfo> findByUserIdAndIsDeletedFalse(Long userId);
 }
