@@ -68,12 +68,6 @@ public class CategoryService {
                 .map(CategoryEntityResponse::from)
                 .orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND));
     }
-
-    public CategoryEntityResponse getCategoryByUuid(UUID categoryId) {
-        return categoryRepository.findByUuidAndIsDeleteFalse(categoryId)
-                .map(CategoryEntityResponse::from)
-                .orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND));
-    }
   
     public PagedModel<CategoryResponse> getAllCategories(Pageable pageable) {
         Page<Category> categoryPage = categoryRepository.getAllCategories(pageable);
@@ -88,4 +82,19 @@ public class CategoryService {
         );
     }
 
+    /*
+        feign 전용 service
+     */
+
+    public CategoryEntityResponse getCategoryByUuid(UUID categoryId) {
+        return categoryRepository.findByUuidAndIsDeleteFalse(categoryId)
+                .map(CategoryEntityResponse::from)
+                .orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND));
+    }
+
+    public CategoryEntityResponse getCategoryById(Long categoryId) {
+        return categoryRepository.findByIdAndIsDeleteFalse(categoryId)
+                .map(CategoryEntityResponse::from)
+                .orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND));
+    }
 }
