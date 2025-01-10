@@ -14,6 +14,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,16 +27,18 @@ public class UserController {
 
     // 사용자 조회
     @GetMapping("/{username}")
-    public ResponseEntity<CommonResponse<UserResponse>> getUserByUsername(@PathVariable String username) {
-        return ResponseEntity.ok().body(CommonResponse.ofSuccess("사용자 조회 성공", userService.getUserByUsername(username)));
+    public ResponseEntity<CommonResponse<UserResponse>> getUserByUsername(@PathVariable String username,
+            @RequestHeader(value = "X-Username") String requesterUsername) {
+        return ResponseEntity.ok().body(CommonResponse.ofSuccess("사용자 조회 성공", userService.getUserByUsername(username, requesterUsername)));
     }
 
     // 사용자 목록 조회
     @GetMapping
     public ResponseEntity<CommonResponse<UserPageResponse>> getUsers(
             @QuerydslPredicate(root = User.class) Predicate predicate,
-            @PageableDefault(sort = "id", direction = Sort.Direction.DESC, page = 0, size = 10) Pageable pageable) {
-        return ResponseEntity.ok().body(CommonResponse.ofSuccess("사용자 목록 조회 성공", userService.getUsers(predicate, pageable)));
+            @PageableDefault(sort = "id", direction = Sort.Direction.DESC, page = 0, size = 10) Pageable pageable,
+            @RequestHeader(value = "X-Username") String requesterUsername) {
+        return ResponseEntity.ok().body(CommonResponse.ofSuccess("사용자 목록 조회 성공", userService.getUsers(predicate, pageable, requesterUsername)));
     }
 
 }

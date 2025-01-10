@@ -1,5 +1,9 @@
 package com.takeit.auth.application.service;
 
+import static com.takeit.common.utils.AccessValidator.isManager;
+import static com.takeit.common.utils.AccessValidator.isMaster;
+import static com.takeit.common.utils.AccessValidator.isRequesterAuthorized;
+
 import com.querydsl.core.types.Predicate;
 import com.takeit.auth.application.dto.CreateSellerDto;
 import com.takeit.auth.application.dto.CreateUserDto;
@@ -28,6 +32,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final SellerInfoRepository sellerInfoRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthService authService;
 
     // 사용자 등록
     @Transactional
@@ -87,7 +92,13 @@ public class UserService {
     }
 
     // 사용자 단건 조회
-    public UserResponse getUserByUsername(String username) {
+    public UserResponse getUserByUsername(String username, String requesterUsername) {
+        // 권한 체크
+        String requesterUserRole = authService.getUserRoleByUsername(requesterUsername).getRoleName();
+        if(!isMaster(requesterUserRole) && !isManager(requesterUserRole) && !isRequesterAuthorized(username, requesterUsername)) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
+
         // 사용자 확인
         User user = userRepository.findByUsernameAndIsDeletedFalse(username).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
@@ -97,7 +108,13 @@ public class UserService {
     }
 
     // 사용자 목록 조회
-    public UserPageResponse getUsers(Predicate predicate, Pageable pageable) {
+    public UserPageResponse getUsers(Predicate predicate, Pageable pageable, String requesterUsername) {
+        // 권한 체크
+        String requesterUserRole = authService.getUserRoleByUsername(requesterUsername).getRoleName();
+        if(!isMaster(requesterUserRole) && !isManager(requesterUserRole)) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
+
         Page<User> userPage = userRepository.findAll(predicate, pageable);
 
         if (userPage.isEmpty()) {
@@ -108,7 +125,7 @@ public class UserService {
     }
 
     // 사용자 정보 중복 체크
-    private void duplicateCheckForUserInfo(String username, String email) {
+    public void duplicateCheckForUserInfo(String username, String email) {
         if (isUsernameExists(username)) { // username 중복 확인
             throw new CustomException(ErrorCode.USERNAME_ALREADY_EXISTS);
         } else if (isEmailExists(email)) { // email 중복 확인

@@ -3,6 +3,7 @@ package com.takeit.auth.application.service;
 import com.takeit.auth.application.dto.AuthResponse;
 import com.takeit.auth.application.dto.UserAuthResponse;
 import com.takeit.auth.domain.entity.User;
+import com.takeit.auth.domain.entity.UserRole;
 import com.takeit.auth.domain.repository.UserRepository;
 import com.takeit.auth.jwt.JwtUtil;
 import com.takeit.auth.presentation.request.SignInRequest;
@@ -46,6 +47,14 @@ public class AuthService {
         );
 
         return new UserAuthResponse(user.getId(), user.getUsername(), user.getNickname(), user.getEmail(), user.getRole());
+    }
+
+    // 권한 체크 내부용
+    public UserRole getUserRoleByUsername(String requesterUsername) {
+        User user = userRepository.findByUsernameAndIsDeletedFalse(requesterUsername).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+        return user.getRole();
     }
 
 }

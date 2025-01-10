@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,20 +35,23 @@ public class AdminController {
     // 승인 요청된 판매자 목록 조회
     @GetMapping("/sellers")
     public ResponseEntity<CommonResponse<SellerPageResponse>> getSellers(
-            @PageableDefault(sort = "id", direction = Sort.Direction.DESC, page = 0, size = 10) Pageable pageable) {
-        return ResponseEntity.ok().body(CommonResponse.ofSuccess("승인 요청된 판매자 목록 조회 성공", adminService.getSellers(pageable)));
+            @PageableDefault(sort = "id", direction = Sort.Direction.DESC, page = 0, size = 10) Pageable pageable,
+            @RequestHeader(value = "X-Username") String requesterUsername) {
+        return ResponseEntity.ok().body(CommonResponse.ofSuccess("승인 요청된 판매자 목록 조회 성공", adminService.getSellers(pageable, requesterUsername)));
     }
 
     // 판매자 승인
     @PatchMapping("/sellers/{sellerInfoId}/approve")
-    public ResponseEntity<CommonResponse<SellerResponse>> approveSeller(@PathVariable Long sellerInfoId) {
-        return ResponseEntity.ok().body(CommonResponse.ofSuccess("판매자 승인 처리 성공", adminService.approveSeller(sellerInfoId)));
+    public ResponseEntity<CommonResponse<SellerResponse>> approveSeller(@PathVariable Long sellerInfoId,
+            @RequestHeader(value = "X-Username") String requesterUsername) {
+        return ResponseEntity.ok().body(CommonResponse.ofSuccess("판매자 승인 처리 성공", adminService.approveSeller(sellerInfoId, requesterUsername)));
     }
 
     // 관리자 등록
     @PostMapping("/register/manager")
-    public ResponseEntity<CommonResponse<UserResponse>> createManager(@RequestBody @Valid CreateManagerRequest request) {
-        return ResponseEntity.ok().body(CommonResponse.ofSuccess("관리자 등록 성공", userService.createUser(request.toDto())));
+    public ResponseEntity<CommonResponse<UserResponse>> createManager(@RequestBody @Valid CreateManagerRequest request,
+            @RequestHeader(value = "X-Username") String requesterUsername) {
+        return ResponseEntity.ok().body(CommonResponse.ofSuccess("관리자 등록 성공", adminService.createManager(request.toDto(), requesterUsername)));
     }
 
 }
