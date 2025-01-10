@@ -2,6 +2,7 @@ package com.takeit.review.application.service;
 
 import com.querydsl.core.types.Predicate;
 import com.takeit.common.exception.CustomException;
+import com.takeit.common.utils.AccessValidator;
 import com.takeit.review.application.dto.CreateReviewResponse;
 import com.takeit.review.application.dto.ReviewDetailResponse;
 import com.takeit.review.application.dto.ReviewPageResponse;
@@ -171,7 +172,7 @@ public class ReviewService {
     }
 
     private boolean checkMasterAndManager(String role) {
-        return !role.equals("MASTER") && !role.equals("MANAGER");
+        return !AccessValidator.isManager(role) && !AccessValidator.isMaster(role);
     }
 
 }
