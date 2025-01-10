@@ -2,6 +2,7 @@ package com.takeit.coupon.application.service;
 
 import com.querydsl.core.types.Predicate;
 import com.takeit.common.exception.CustomException;
+import com.takeit.common.utils.AccessValidator;
 import com.takeit.coupon.application.dto.CouponPageResponse;
 import com.takeit.coupon.application.dto.CouponResponse;
 import com.takeit.coupon.application.dto.CreateCouponResponse;
@@ -40,7 +41,7 @@ public class CouponService {
     public CreateCouponResponse createCoupon(CreateCouponRequest request, String username) {
         UserDto userDto = userService.getUser(username);
 
-        validRole(userDto);
+        validRole(userDto.role());
 
         CategoryDto categoryDto = null;
 
@@ -65,7 +66,7 @@ public class CouponService {
     public UpdateCouponResponse updateCoupon(UUID couponId, UpdateCouponRequest request, String username) {
         UserDto userDto = userService.getUser(username);
 
-        validRole(userDto);
+        validRole(userDto.role());
 
         CategoryDto categoryDto = null;
 
@@ -97,7 +98,7 @@ public class CouponService {
     public void deleteCoupon(UUID couponId, String username) {
         UserDto userDto = userService.getUser(username);
 
-        validRole(userDto);
+        validRole(userDto.role());
 
         Coupon coupon = couponRepository.findByUuidAndIsDeletedIsFalse(couponId).orElseThrow(() -> new CustomException(COUPON_NOT_FOUND));
 
@@ -115,7 +116,11 @@ public class CouponService {
             throw new CustomException(COUPON_START_DATE_IN_PAST);
         }
 
-        if(endDate.isBefore(LocalDateTime.now()) || endDate.isBefore(startDate) || endDate.isEqual(startDate)) {
+        if(endDate.isBefore(LocalDateTime.now())) {
+            throw new CustomException(COUPON_END_DATE_IN_PAST);
+        }
+
+        if(endDate.isBefore(startDate) || endDate.isEqual(startDate)) {
             throw new CustomException(COUPON_END_DATE_MUST_BE_AFTER_START_DATE);
         }
     }
@@ -126,23 +131,26 @@ public class CouponService {
 
         Coupon coupon = couponRepository.findByUuidAndIsDeletedIsFalse(couponId).orElseThrow(() -> new CustomException(COUPON_NOT_FOUND));
 
-        validRole(userDto);
-        // CategoryDto categoryDto = categoryService.getCategory(coupon.getCategoryId());
-        String category = "의류";
+        validRole(userDto.role());
 
-        return CouponResponse.of(coupon, category);
+        String categoryName = null;
+
+        if(coupon.getCategoryId() != null)
+            categoryName = categoryService.getCategory(coupon.getCategoryId()).name();
+
+        return CouponResponse.of(coupon, categoryName);
     }
 
     public CouponPageResponse getCoupons(String username, Predicate predicate, Pageable pageable) {
         UserDto userDto = userService.getUser(username);
 
-        validRole(userDto);
+        validRole(userDto.role());
 
         return couponRepository.findAll(predicate, pageable);
     }
 
-    private void validRole(UserDto userDto) {
-        if(userDto.role() == null || !(userDto.role().equals("MANAGER") || userDto.role().equals("MASTER"))) {
+    private void validRole(String role) {
+        if(!AccessValidator.isManager(role) && !AccessValidator.isMaster(role)) {
             throw new CustomException(UNAUTHORIZED);
         }
     }

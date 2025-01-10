@@ -10,6 +10,9 @@ import java.util.UUID;
 
 @FeignClient(name = "product-service")
 public interface CategoryClient extends CategoryService {
-    @GetMapping("/feign/v1/categories/{categoryId}")
+    @GetMapping("/feign/v1/categories/uuid/{categoryId}")
     CategoryDto getCategory(@PathVariable UUID categoryId);
+
+    @GetMapping("/feign/v1/categories/id/{categoryId}")
+    CategoryDto getCategory(@PathVariable Long categoryId);
 }

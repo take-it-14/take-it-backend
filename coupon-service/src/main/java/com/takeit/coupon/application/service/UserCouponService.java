@@ -2,10 +2,12 @@ package com.takeit.coupon.application.service;
 
 import com.querydsl.core.types.Predicate;
 import com.takeit.common.exception.CustomException;
+import com.takeit.common.utils.AccessValidator;
 import com.takeit.coupon.application.dto.CreateUserCouponResponse;
 import com.takeit.coupon.application.dto.UpdateUserCouponResponse;
 import com.takeit.coupon.application.dto.UserCouponPageResponse;
 import com.takeit.coupon.application.dto.UserCouponResponse;
+import com.takeit.coupon.application.dto.category.CategoryDto;
 import com.takeit.coupon.application.dto.user.UserDto;
 import com.takeit.coupon.domain.entity.Coupon;
 import com.takeit.coupon.domain.entity.UserCoupon;
@@ -29,6 +31,7 @@ import static com.takeit.common.exception.ErrorCode.*;
 public class UserCouponService {
     private final UserCouponRepository userCouponRepository;
     private final CouponRepository couponRepository;
+
     private final UserService userService;
     private final CategoryService categoryService;
 
@@ -38,11 +41,13 @@ public class UserCouponService {
 
         Coupon coupon = couponRepository.findByUuidAndIsDeletedIsFalse(request.couponId()).orElseThrow(() -> new CustomException(COUPON_NOT_FOUND));
 
+        CategoryDto categoryDto = categoryService.getCategory(coupon.getCategoryId());
+
         if(coupon.getEndDate().isBefore(LocalDateTime.now())) {
             throw new CustomException(COUPON_EXPIRED);
         }
 
-        return CreateUserCouponResponse.of(userCouponRepository.save(UserCoupon.create(coupon, couponUserDto.id())), coupon.getName());
+        return CreateUserCouponResponse.of(userCouponRepository.save(UserCoupon.create(coupon, couponUserDto.id())), coupon.getName(), categoryDto.name());
     }
 
     @Transactional
@@ -51,7 +56,7 @@ public class UserCouponService {
 
         UserCoupon coupon = userCouponRepository.findByUuidAndIsDeletedIsFalse(userCouponId).orElseThrow(() -> new CustomException(USER_COUPON_NOT_FOUND));
 
-        if(checkRoleMasterOrManager(userDto)) {
+        if(checkRoleMasterOrManager(userDto.role())) {
             validationUserId(coupon, userDto.id());
         }
 
@@ -64,7 +69,7 @@ public class UserCouponService {
 
         UserCoupon coupon = userCouponRepository.findByUuidAndIsDeletedIsFalse(userCouponId).orElseThrow(() -> new CustomException(USER_COUPON_NOT_FOUND));
 
-        if(checkRoleMasterOrManager(userDto)) {
+        if(checkRoleMasterOrManager(userDto.role())) {
             validationUserId(coupon, userDto.id());
         }
 
@@ -86,7 +91,7 @@ public class UserCouponService {
 
         UserCoupon coupon = userCouponRepository.findByUuidAndIsDeletedIsFalse(userCouponId).orElseThrow(() -> new CustomException(USER_COUPON_NOT_FOUND));
 
-        if(checkRoleMasterOrManager(userDto)) {
+        if(checkRoleMasterOrManager(userDto.role())) {
             validationUserId(coupon, userDto.id());
         }
 
@@ -128,7 +133,7 @@ public class UserCouponService {
 
         UserCoupon userCoupon = userCouponRepository.findByUuidAndUserIdAndFetchJoinCouponAndIsDeletedIsFalse(userCouponId).orElseThrow(() -> new CustomException(USER_COUPON_NOT_FOUND));
 
-        if(checkRoleMasterOrManager(userDto)) {
+        if(checkRoleMasterOrManager(userDto.role())) {
             validationUserId(userCoupon, userDto.id());
         }
 
@@ -148,7 +153,7 @@ public class UserCouponService {
         return userCouponRepository.findAll(predicate, pageable, userDto);
     }
 
-    private boolean checkRoleMasterOrManager(UserDto userDto) {
-        return userDto.role() == null || (!userDto.role().equals("MANAGER") && !userDto.role().equals("MASTER"));
+    private boolean checkRoleMasterOrManager(String role) {
+        return !AccessValidator.isMaster(role) && !AccessValidator.isManager(role);
     }
 }

@@ -6,4 +6,6 @@ import java.util.UUID;
 
 public interface CategoryService {
     CategoryDto getCategory(UUID categoryId);
+
+    CategoryDto getCategory(Long categoryId);
 }
