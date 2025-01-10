@@ -28,9 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminController {
 
     private final AdminService adminService;
-    private final UserService userService;
-
-    // TODO : 관리자 권한 체크
 
     // 승인 요청된 판매자 목록 조회
     @GetMapping("/sellers")
