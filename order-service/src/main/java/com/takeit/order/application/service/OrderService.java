@@ -1,7 +1,9 @@
 package com.takeit.order.application.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -79,10 +81,20 @@ public class OrderService {
 		else
 			orderPage = orderRepository.findByCustomerIdAndStatus(searchUserId, stat, pageable);
 
+		List<Long> productIds = orderPage.getContent()
+			.stream()
+			.map(Order::getProductId)
+			.toList();
+
+		List<ProductDto> products = productClient.getAllProducts(productIds);
+
+		Map<Long, UUID> productIdToUuidMap = products.stream()
+			.collect(Collectors.toMap(ProductDto::id, ProductDto::uuid));
+
+
 		return orderPage.map(
 			order -> {
-				UUID productUuid = findProductUuidByProductId(order.getProductId());
-				return OrderListResponse.of(order, productUuid);
+				return OrderListResponse.of(order, productIdToUuidMap.get(order.getProductId()));
 			}
 		);
 	}
@@ -142,11 +154,6 @@ public class OrderService {
 
 	private Order findOrderByUuid(UUID uuid) {
 		return orderRepository.findByUuid(uuid).orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
-	}
-
-	private UUID findProductUuidByProductId(Long productId) {
-		// TODO: product-service 요청 필요
-		return UUID.randomUUID();
 	}
 
 	private void checkStatus(OrderStatus status) {
