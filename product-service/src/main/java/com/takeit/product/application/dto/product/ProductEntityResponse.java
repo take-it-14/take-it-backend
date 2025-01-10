@@ -7,7 +7,9 @@ import java.util.UUID;
 
 public record ProductEntityResponse(
         Long id,
-        UUID ProductId,
+        UUID uuid,
+        Long sellerId,
+        Long categoryId,
         String productName,
         String description,
         Long price,
@@ -21,6 +23,8 @@ public record ProductEntityResponse(
         return new ProductEntityResponse(
                 product.getId(),
                 product.getUuid(),
+                product.getSellerId(),
+                product.getCategoryId(),
                 product.getProductName(),
                 product.getDescription(),
                 product.getPrice(),
