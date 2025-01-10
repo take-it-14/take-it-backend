@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import java.util.UUID;
 
+import com.takeit.order.application.dto.OrderDto;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,5 +36,22 @@ class OrderEndPointTest {
 			.param("userId", userId.toString()))
 			.andExpect(status().isOk())
 			.andExpect(content().string(productId.toString()));
+	}
+
+	@Test
+	void validOrderRequest() throws Exception {
+		UUID orderUuid = UUID.randomUUID();
+		Long userId = 1L;
+		Long productId = 2L;
+		Long orderId = 1L;
+		OrderDto orderDto = new OrderDto(orderId, productId);
+
+		Mockito.when(orderService.findOrderByOrderUuidAndUserId(orderUuid, userId)).thenReturn(orderDto);
+
+		mockMvc.perform(get("/feign/v1/orders/{orderId}", orderUuid)
+						.param("userId", userId.toString()))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.orderId").value(orderId))
+				.andExpect(jsonPath("$.productId").value(productId));
 	}
 }
