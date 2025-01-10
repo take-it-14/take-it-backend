@@ -24,7 +24,7 @@ public class AuthEndPoint {
     }
 
     @GetMapping("/seller/{userId}")
-    public SellerInfo getUser(@PathVariable Long userId) {
+    public SellerInfo getSellerInfo(@PathVariable Long userId) {
         return userService.getSellerInfoByUserId(userId);
     }
 
