@@ -14,7 +14,6 @@ public record UpdateReviewRequest(
         int stars,
         @Length(max = 255, message = "255자 이하로 입력할 수 있습니다.")
         String comment,
-        UUID orderId,
         List<MultipartFile> files,
         List<UUID> deleteFileNames
 ) {
