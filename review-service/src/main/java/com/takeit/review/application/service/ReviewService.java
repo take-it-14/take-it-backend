@@ -25,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -78,9 +77,7 @@ public class ReviewService {
         if(checkMasterAndManager(userDto.role()))
             validateUser(review, username);
 
-        List<Long> idList = new ArrayList<>();
-        idList.add(review.getProductId());
-        ProductDto productDto = productService.getProducts(idList).get(0);
+        ProductDto productDto = productService.getProducts(List.of(review.getProductId())).get(0);
 
         review.updateReview(request);
         review = reviewRepository.save(review);
@@ -123,9 +120,7 @@ public class ReviewService {
     public ReviewDetailResponse getReview(String username, UUID reviewId) {
         Review review = reviewRepository.findReviewAndReviewPhotosByUuid(reviewId).orElseThrow(() -> new CustomException(REVIEW_NOT_FOUND));
 
-        List<Long> idList = new ArrayList<>();
-        idList.add(review.getProductId());
-        List<ProductDto> productDto = productService.getProducts(idList);
+        List<ProductDto> productDto = productService.getProducts(List.of(review.getProductId()));
 
         if(productDto != null && !productDto.isEmpty()) {
             return ReviewDetailResponse.of(review, productDto.get(0));
