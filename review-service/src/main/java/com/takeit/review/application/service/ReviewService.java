@@ -77,7 +77,7 @@ public class ReviewService {
         if(checkMasterAndManager(userDto.role()))
             validateUser(review, username);
 
-        ProductDto productDto = productService.getProducts(List.of(review.getProductId())).get(0);
+        List<ProductDto> productDto = productService.getProducts(List.of(review.getProductId()));
 
         review.updateReview(request);
         review = reviewRepository.save(review);
@@ -114,7 +114,7 @@ public class ReviewService {
         review.getPhotoList().clear();
         review.addPhotos(reviewPhotoRepository.findAllByReview(review));
 
-        return UpdateReviewResponse.of(review, productDto.productName());
+        return UpdateReviewResponse.of(review, productDto.isEmpty() ? null : productDto.get(0).productName());
     }
 
     public ReviewDetailResponse getReview(String username, UUID reviewId) {
