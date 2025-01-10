@@ -16,8 +16,13 @@ import java.util.UUID;
 public class CategoryEndPoint {
     private final CategoryService categoryService;
 
-    @GetMapping("/{categoryId}")
-    public CategoryEntityResponse getCategory(@PathVariable UUID categoryId) {
+    @GetMapping("/uuid/{categoryId}")
+    public CategoryEntityResponse getCategoryByUuid(@PathVariable UUID categoryId) {
         return categoryService.getCategoryByUuid(categoryId);
+    }
+
+    @GetMapping("/id/{categoryId}")
+    public CategoryEntityResponse getCategoryById(@PathVariable Long categoryId) {
+        return categoryService.getCategoryById(categoryId);
     }
 }

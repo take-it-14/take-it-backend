@@ -1,0 +1,25 @@
+### user coupon 생성
+POST /api/v1/user-coupons
+Host: localhost:19097
+X-Username: username
+Content-Type: application/json
+
+{
+  "couponId":"2d89fc24-f944-4110-b719-0f00b8f7e85a"
+}
+
+### user coupon 삭제
+DELETE /api/v1/user-coupons/129d1651-6c28-450d-99a2-061dfaf2242f HTTP/1.1
+Host: localhost:19097
+X-Username: username
+
+
+### user coupon 사용
+PATCH /api/v1/user-coupons/4d5d7043-6057-4490-a74c-f794b592bd08/used HTTP/1.1
+Host: localhost:19097
+X-Username: username
+
+### user coupon 사용 취소
+PATCH /api/v1/user-coupons/4d5d7043-6057-4490-a74c-f794b592bd08/cancel HTTP/1.1
+Host: localhost:19097
+X-Username: username
