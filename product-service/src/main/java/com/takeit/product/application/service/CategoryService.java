@@ -6,6 +6,7 @@ import com.takeit.product.application.dto.category.CategoryEntityResponse;
 import com.takeit.product.application.dto.category.CategoryResponse;
 import com.takeit.product.application.dto.category.CreateCategoryDto;
 import com.takeit.product.application.dto.category.UpdateCategoryDto;
+import com.takeit.product.application.dto.user.UserDto;
 import com.takeit.product.domain.entity.Category;
 import com.takeit.product.domain.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,15 +20,21 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.takeit.common.utils.AccessValidator.*;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CategoryService {
     private final CategoryRepository categoryRepository;
+    private final UserService userService;
 
     @Transactional
-    public CategoryEntityResponse createCategory(CreateCategoryDto request, String username) {
-        // TODO: username으로 권한체크
+    public CategoryEntityResponse createCategory(CreateCategoryDto request, String requesterUsername) {
+        UserDto userDto = userService.getUser(requesterUsername);
+        if(!isMaster(userDto.role()) && !isManager(userDto.role())) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
 
         Optional<Category> category = categoryRepository.findByName(request.name());
         if (category.isPresent()) {
@@ -42,8 +49,11 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryEntityResponse updateCategory(UpdateCategoryDto request, UUID categoryId, String username) {
-        // TODO: username으로 권한체크
+    public CategoryEntityResponse updateCategory(UpdateCategoryDto request, UUID categoryId, String requesterUsername) {
+        UserDto userDto = userService.getUser(requesterUsername);
+        if(!isMaster(userDto.role()) && !isManager(userDto.role())) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
 
         return categoryRepository.findByUuidAndIsDeleteFalse(categoryId).map(category -> {
             category.update(request.name());
@@ -53,16 +63,22 @@ public class CategoryService {
     }
 
     @Transactional
-    public void deleteCategory(Long categoryId, String username) {
-        // TODO: username으로 권한체크
+    public void deleteCategory(Long categoryId, String requesterUsername) {
+        UserDto userDto = userService.getUser(requesterUsername);
+        if(!isMaster(userDto.role()) && !isManager(userDto.role())) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
 
         categoryRepository.findByIdAndIsDeleteFalse(categoryId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND))
-                .delete(username);
+                .delete(userDto.username());
     }
 
-    public CategoryEntityResponse getCategory(Long categoryId, String username) {
-        // TODO: username으로 권한체크
+    public CategoryEntityResponse getCategory(Long categoryId, String requesterUsername) {
+        UserDto userDto = userService.getUser(requesterUsername);
+        if(!isMaster(userDto.role()) && !isManager(userDto.role())) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
 
         return categoryRepository.findByIdAndIsDeleteFalse(categoryId)
                 .map(CategoryEntityResponse::from)
