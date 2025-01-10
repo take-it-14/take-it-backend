@@ -21,23 +21,24 @@ public class FavoriteController {
 
     @PostMapping
     public CommonResponse<CreateFavoriteResponse> createFavorite(@Valid @RequestBody CreateFavoriteRequest request,
-                                                                 @RequestHeader(value = "X-Username") String username) {
+                                                                 @RequestHeader(value = "X-Username") String requesterUsername) {
 
-        return CommonResponse.ofSuccess("찜 하기", favoriteService.addFavorite(request.toDto(), username));
+        return CommonResponse.ofSuccess("찜 하기", favoriteService.addFavorite(request.toDto(), requesterUsername));
     }
 
     @DeleteMapping("/{favoriteId}")
     public CommonResponse<?> cancelFavorite(@PathVariable UUID favoriteId,
-                                            @RequestHeader(value = "X-Username") String username) {
+                                            @RequestHeader(value = "X-Username") String requesterUsername) {
 
-        favoriteService.cancelFavorite(favoriteId, username);
+        favoriteService.cancelFavorite(favoriteId, requesterUsername);
 
         return CommonResponse.ofSuccess("찜 제거", null);
     }
 
     @GetMapping("/user/{username}")
     public CommonResponse<PagedModel<FavoriteResponse>> getUserFavorites(@PathVariable String username,
+                                                                         @RequestHeader(value = "X-Username") String requesterUsername,
                                                                          Pageable pageable) {
-        return CommonResponse.ofSuccess("유저 찜 목록 조회", favoriteService.getUserFavorites(username, pageable));
+        return CommonResponse.ofSuccess("유저 찜 목록 조회", favoriteService.getUserFavorites(username, requesterUsername, pageable));
     }
 }

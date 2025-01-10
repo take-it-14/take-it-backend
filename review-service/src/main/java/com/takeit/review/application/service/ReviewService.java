@@ -77,6 +77,10 @@ public class ReviewService {
         if(checkMasterAndManager(userDto.role()))
             validateUser(review, username);
 
+        List<Long> idList = new ArrayList<>();
+        idList.add(review.getProductId());
+        ProductDto productDto = productService.getProducts(idList).get(0);
+
         review.updateReview(request);
         review = reviewRepository.save(review);
 
@@ -112,7 +116,7 @@ public class ReviewService {
         review.getPhotoList().clear();
         review.addPhotos(reviewPhotoRepository.findAllByReview(review));
 
-        return UpdateReviewResponse.of(review, request.orderId());
+        return UpdateReviewResponse.of(review, productDto.productName());
     }
 
     public ReviewDetailResponse getReview(String username, UUID reviewId) {

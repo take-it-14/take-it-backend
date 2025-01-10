@@ -4,6 +4,25 @@ spring:
       username: takeit_review
       password: takeit_review
       url: jdbc:postgresql://localhost:15432/takeit_review
+    jpa:
+      hibernate:
+        ddl-auto: update
+      show-sql: true
+      properties:
+        hibernate:
+          format_sql: true
+          highlight_sql: true
+          default_batch_fetch_size: 10
+      open-in-view: false
+
+server:
+  port: 19096
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:19090/eureka/
+
 cloud:
   aws:
     s3:
