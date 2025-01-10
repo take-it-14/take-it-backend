@@ -23,7 +23,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static com.takeit.favorite.utils.AccessValidator.*;
+import static com.takeit.common.utils.AccessValidator.*;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +36,7 @@ public class FavoriteService {
     @Transactional
     public CreateFavoriteResponse addFavorite(CreateFavoriteDto request, String requesterUsername) {
         UserDto userDto = userService.getUser(requesterUsername);
-        if(!isMaster(userDto) && !isManager(userDto) && !isRequesterAuthorized(request.username(), requesterUsername)) {
+        if(!isMaster(userDto.role()) && !isManager(userDto.role()) && !isRequesterAuthorized(request.username(), requesterUsername)) {
             throw new CustomException(ErrorCode.FORBIDDEN);
         }
         Long userId = userDto.id();
@@ -62,7 +62,7 @@ public class FavoriteService {
                 .orElseThrow(() -> new CustomException(ErrorCode.FAVORITE_NOT_FOUND));
 
         UserDto userDto = userService.getUser(requesterUsername);
-        if(!isMaster(userDto) && !isManager(userDto) && favorite.getUserId().equals(userDto.id())) {
+        if(!isMaster(userDto.role()) && !isManager(userDto.role()) && favorite.getUserId().equals(userDto.id())) {
             throw new CustomException(ErrorCode.FORBIDDEN);
         }
 
@@ -71,7 +71,7 @@ public class FavoriteService {
 
     public PagedModel<FavoriteResponse> getUserFavorites(String username, String requesterUsername, Pageable pageable) {
         UserDto userDto = userService.getUser(username);
-        if(!isMaster(userDto) && !isManager(userDto) && !isRequesterAuthorized(username, requesterUsername)) {
+        if(!isMaster(userDto.role()) && !isManager(userDto.role()) && !isRequesterAuthorized(username, requesterUsername)) {
             throw new CustomException(ErrorCode.FORBIDDEN);
         }
         Long userId = userDto.id();
