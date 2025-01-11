@@ -26,6 +26,9 @@ public class Review extends BaseEntity {
     @Column(name = "uuid",unique = true, nullable = false)
     private UUID uuid;
 
+    @Column(name = "order_Id", nullable = false)
+    private Long orderId;
+
     @Column(name = "product_id", nullable = false)
     private Long productId;
 
@@ -39,9 +42,10 @@ public class Review extends BaseEntity {
     @Builder.Default
     private List<ReviewPhoto> photoList = new ArrayList<>();
 
-    public static Review of(CreateReviewRequest request, Long productId) {
+    public static Review of(CreateReviewRequest request, Long orderId, Long productId) {
         return Review.builder()
                .uuid(UUID.randomUUID())
+                .orderId(orderId)
                .productId(productId)
                .stars(request.stars())
                .comment(request.comment())

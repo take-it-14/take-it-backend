@@ -39,16 +39,3 @@ X-Username: username
 GET /api/v1/coupons
 Host: localhost:19097
 X-username: username
-
-
-### 쿠폰 상태 수정
-PATCH localhost:19097/api/v1/coupons/f8e28451-1c57-450a-a535-d64dd0624a73/status
-Content-Type: application/json
-
-{
-  "status": "COMPLETED"
-}
-
-### 쿠폰 취소
-PATCH localhost:19097/api/v1/coupons/f8e28451-1c57-450a-a535-d64dd0624a73/cancel
-Content-Type: application/json

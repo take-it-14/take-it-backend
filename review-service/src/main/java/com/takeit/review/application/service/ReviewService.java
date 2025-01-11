@@ -7,6 +7,7 @@ import com.takeit.review.application.dto.CreateReviewResponse;
 import com.takeit.review.application.dto.ReviewDetailResponse;
 import com.takeit.review.application.dto.ReviewPageResponse;
 import com.takeit.review.application.dto.UpdateReviewResponse;
+import com.takeit.review.application.dto.order.OrderDto;
 import com.takeit.review.application.dto.product.ProductDto;
 import com.takeit.review.application.dto.user.UserDto;
 import com.takeit.review.domain.repository.ReviewPhotoRepository;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static com.takeit.common.exception.ErrorCode.*;
@@ -42,13 +44,19 @@ public class ReviewService {
     private final ProductService productService;
     private final OrderService orderService;
 
+    private final ReviewRedisService reviewRedisService;
+
     @Transactional
     public CreateReviewResponse createReview(CreateReviewRequest request, String username) {
         UserDto userDto = userService.getUser(username);
 
-        Long productId = orderService.getProductId(request.orderId(), userDto.id());
+        OrderDto orderDto = orderService.getOrder(request.orderId(), userDto.id());
 
-        Review review = reviewRepository.save(Review.of(request, productId));
+        if(reviewRepository.existsByOrderIdAndIsDeletedIsFalse(orderDto.orderId())) {
+            throw new CustomException(REVIEW_ALREADY_EXISTS);
+        }
+
+        Review review = reviewRepository.save(Review.of(request, orderDto.orderId(), orderDto.productId()));
 
         if(request.files() != null && !request.files().isEmpty()) {
             if(request.files().size() > 3) {
@@ -65,6 +73,8 @@ public class ReviewService {
             }
         }
 
+        productService.updateProductStars(orderDto.productId(), updateStars(orderDto.productId(), request.stars(), "CREATE"));
+
         return CreateReviewResponse.of(review, request.orderId());
     }
 
@@ -79,7 +89,10 @@ public class ReviewService {
 
         List<ProductDto> productDto = productService.getProducts(List.of(review.getProductId()));
 
+        int updateStar = request.stars() - review.getStars();
+
         review.updateReview(request);
+
         review = reviewRepository.save(review);
 
         int deleteFileSize = 0;
@@ -113,6 +126,8 @@ public class ReviewService {
 
         review.getPhotoList().clear();
         review.addPhotos(reviewPhotoRepository.findAllByReview(review));
+
+        productService.updateProductStars(review.getProductId(), updateStars(review.getProductId(), updateStar, "UPDATE"));
 
         return UpdateReviewResponse.of(review, productDto.isEmpty() ? null : productDto.get(0).productName());
     }
@@ -154,6 +169,8 @@ public class ReviewService {
 
         reviewPhotoRepository.saveAll(reviewPhotos);
 
+        productService.updateProductStars(review.getProductId(), updateStars(review.getProductId(), -review.getStars(), "DELETE"));
+
     }
 
     private Review findByUuid(UUID reviewId) {
@@ -170,4 +187,26 @@ public class ReviewService {
         return !AccessValidator.isManager(role) && !AccessValidator.isMaster(role);
     }
 
+    private double updateStars(Long productId, int stars, String method) {
+        // 기존 데이터 조회
+        Map<String, Object> reviewData = reviewRedisService.getReviewData(productId);
+
+        int reviewCount = 0;
+        int totalStars = 0;
+
+        if (reviewData != null) {
+            reviewCount = (int) reviewData.get("reviewCount");
+            totalStars = (int) reviewData.get("totalStars");
+        }
+
+        // 데이터 업데이트
+        if(method.equals("CREATE")) reviewCount++;
+        else if(method.equals("DELETE")) reviewCount--;
+        totalStars += stars;
+
+        // Redis에 저장
+        reviewRedisService.saveReviewData(productId, reviewCount, totalStars);
+
+        return totalStars / (double)reviewCount;
+    }
 }

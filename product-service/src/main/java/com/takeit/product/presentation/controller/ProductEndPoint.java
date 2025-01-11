@@ -27,4 +27,9 @@ public class ProductEndPoint {
                                                       @QuerydslPredicate(root = Product.class) Predicate predicate) {
         return productService.getProductEntities(idList, predicate);
     }
+
+    @PostMapping("/{productId}")
+    public void updateProductStars(@RequestBody Double stars, @PathVariable Long productId) {
+        productService.updateProductStars(productId, stars);
+    }
 }

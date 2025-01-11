@@ -54,6 +54,7 @@ public enum ErrorCode {
     USER_COUPON_ALREADY_USED(HttpStatus.BAD_REQUEST, "이미 사용한 쿠폰입니다."),
     USER_COUPON_NOT_USED(HttpStatus.BAD_REQUEST, "아직 사용하지 않은 쿠폰입니다."),
     USER_COUPON_EXPIRED(HttpStatus.BAD_REQUEST, "사용 기한이 지난 쿠폰입니다."),
+    REVIEW_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 작성된 리뷰가 존재합니다."),
 
     // product
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 상품을 찾을 수 없습니다."),

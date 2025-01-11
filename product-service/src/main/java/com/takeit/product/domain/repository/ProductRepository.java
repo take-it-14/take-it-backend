@@ -18,4 +18,6 @@ public interface ProductRepository{
     Page<Product> findAll(Predicate predicate, Pageable pageable);
 
     List<Product> getProductEntities(List<Long> idList, Predicate predicate);
+
+    Optional<Product> findById(Long productId);
 }

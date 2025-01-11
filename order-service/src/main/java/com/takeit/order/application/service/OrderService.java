@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.takeit.order.application.dto.OrderDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -156,6 +157,13 @@ public class OrderService {
 	private Order findOrderByUuid(UUID uuid) {
 		return orderRepository.findByUuid(uuid).orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
 	}
+
+    public OrderDto findOrderByOrderUuidAndUserId(UUID orderId, Long userId){
+        Order order = findOrderByUuid(orderId);
+        validateUser(order.getCustomerId(), userId);
+
+        return OrderDto.from(order);
+    }
 
 	private void checkStatus(OrderStatus status) {
 		if (status == OrderStatus.CANCELLED || status == OrderStatus.DELIVERED)
