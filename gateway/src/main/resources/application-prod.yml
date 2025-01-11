@@ -1,11 +1,11 @@
 server:
-  port: {GATEWAY_PORT}
+  port: ${GATEWAY_PORT}
 
 eureka:
   client:
     service-url:
-      defaultZone: {EUREKA_SERVER_URL}
+      defaultZone: ${EUREKA_SERVER_URL}
 
 service:
   jwt:
-    secret-key: ${JWT_SECRET_KEY}
+    secret-key: $${JWT_SECRET_KEY}

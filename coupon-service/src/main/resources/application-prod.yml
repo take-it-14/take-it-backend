@@ -1,14 +1,14 @@
 spring:
   datasource:
-    url: {COUPON_DB_URL}
-    username: {COUPON_DB_USERNAME}
-    password: {COUPON_DB_PASSWORD}
+    url: ${COUPON_DB_URL}
+    username: ${COUPON_DB_USERNAME}
+    password: ${COUPON_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: {COUPON_DDL_AUTO}
+      ddl-auto: ${COUPON_DDL_AUTO}
     show-sql: true
     properties:
       hibernate:
@@ -26,9 +26,9 @@ logging:
     org.hibernate.SQL: trace
 
 server:
-  port: {COUPON_SERVICE_PORT}
+  port: ${COUPON_SERVICE_PORT}
 
 eureka:
   client:
     service-url:
-      defaultZone: {EUREKA_SERVER_URL}
+      defaultZone: ${EUREKA_SERVER_URL}
