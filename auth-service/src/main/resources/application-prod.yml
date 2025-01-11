@@ -34,3 +34,16 @@ service:
   jwt:
     access-expiration: 360000
     secret-key: ${JWT_SECRET_KEY}
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_ENDPOINT}
+  endpoint:
+    health:
+      show-details: when_authorized
+    prometheus:
+      enabled: true

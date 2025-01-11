@@ -11,3 +11,16 @@ eureka:
     fetch-registry: false
   instance:
     hostname: ${EUREKA_HOSTNAME}
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_ENDPOINT}
+  endpoint:
+    health:
+      show-details: when_authorized
+    prometheus:
+      enabled: true
