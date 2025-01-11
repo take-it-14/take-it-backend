@@ -4,6 +4,8 @@ import com.querydsl.core.types.Predicate;
 import com.takeit.common.exception.CustomException;
 import com.takeit.common.exception.ErrorCode;
 import com.takeit.product.application.dto.product.*;
+import com.takeit.product.application.dto.user.SellerDto;
+import com.takeit.product.application.dto.user.UserDto;
 import com.takeit.product.domain.entity.Product;
 import com.takeit.product.domain.entity.ProductDailyStat;
 import com.takeit.product.domain.entity.ProductPhoto;
@@ -25,12 +27,13 @@ import java.util.UUID;
 
 import static com.takeit.common.exception.ErrorCode.FILE_UPLOAD_ERROR;
 import static com.takeit.common.exception.ErrorCode.PRODUCT_NOT_FOUND;
+import static com.takeit.common.utils.AccessValidator.*;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ProductService {
-
+    private final UserService userService;
 	private final ProductDailyStatRepository productDailyStatRepository;
     private final ProductRepository productRepository;
     private final ProductPhotoRepository productPhotoRepository;
@@ -38,7 +41,9 @@ public class ProductService {
 
     // 상품 등록
     @Transactional
-    public ProductResponse createProduct(CreateProductDto dto) {
+    public ProductResponse createProduct(CreateProductDto dto, String requesterUsername) {
+        checkRequesterIsAdminOrApprovedSeller(requesterUsername);
+
         Product product = productRepository.save(Product.create(
                 dto.sellerId(),
                 dto.categoryId(),
@@ -71,7 +76,8 @@ public class ProductService {
 
     // 상품 수정
     @Transactional
-    public ProductResponse updateProduct(UUID productId, UpdateProductDto dto, String username) {
+    public ProductResponse updateProduct(UUID productId, UpdateProductDto dto, String requesterUsername) {
+        checkRequesterIsAdminOrApprovedSeller(requesterUsername);
 
         Product product = productRepository.findByUuidAndIsDeletedFalse(productId).orElseThrow(
                 () -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND)
@@ -94,7 +100,7 @@ public class ProductService {
         if(dto.deletePhotos() != null && !dto.deletePhotos().isEmpty()) {
             List<ProductPhoto> deletePhotos = productPhotoRepository.findByUuidInAndIsDeletedIsFalse(dto.deletePhotos());
 
-            deletePhotos.forEach(productPhoto -> productPhoto.delete(username));
+            deletePhotos.forEach(productPhoto -> productPhoto.delete(requesterUsername));
             deleteFileSize = deletePhotos.size();
             productPhotoRepository.saveAll(deletePhotos);
         }
@@ -127,22 +133,24 @@ public class ProductService {
 
     // 상품 삭제
     @Transactional
-    public ProductResponse deleteProduct(UUID productId, String username) {
+    public ProductResponse deleteProduct(UUID productId, String requesterUsername) {
+
+        checkRequesterIsAdminOrApprovedSeller(requesterUsername);
+
         Product product = productRepository.findByUuidAndIsDeletedFalse(productId).orElseThrow(
                 () -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND)
         );
 
-        product.delete(username);
+        product.delete(requesterUsername);
 
         List<ProductPhoto> deletePhotos = productPhotoRepository.findAllByProductAndIsDeletedIsFalse(product);
-        deletePhotos.forEach(productPhoto -> productPhoto.delete(username));
+        deletePhotos.forEach(productPhoto -> productPhoto.delete(requesterUsername));
         productPhotoRepository.saveAll(deletePhotos);
 
         return ProductResponse.of(product, deletePhotos);
     }
 
     // 상품 단건 조회
-    @Transactional(readOnly = true)
     public ProductDetailResponse getProduct(UUID productId) {
         Product product = productRepository.findByUuidAndIsDeletedFalse(productId).orElseThrow(
                 () -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND)
@@ -152,7 +160,6 @@ public class ProductService {
     }
 
     // 상품 목록
-    @Transactional(readOnly = true)
     public ProductPageResponse getProducts(Predicate predicate, Pageable pageable) {
         Page<Product> userPage = productRepository.findAll(predicate, pageable);
 
@@ -164,10 +171,10 @@ public class ProductService {
     }
 
 	public Page<ProductDailyStatResponse> getProductDailyStat(UUID productId, Date startDate, Date endDate, Pageable pageable) {
-		// TODO: product UUID->ID 변환 요청
-		Long newProductId=1L;
+		Product product = productRepository.findByUuidAndIsDeletedFalse(productId)
+                .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
 
-		Page<ProductDailyStat> productDailyStats = productDailyStatRepository.findByProductIdAndBaseDateBetween(newProductId, startDate, endDate, pageable);
+		Page<ProductDailyStat> productDailyStats = productDailyStatRepository.findByProductIdAndBaseDateBetween(product.getId(), startDate, endDate, pageable);
 
 		return productDailyStats.map(
 			productDailyStat -> ProductDailyStatResponse.of(productDailyStat, productId)
@@ -190,5 +197,18 @@ public class ProductService {
         Product product = productRepository.findById(productId).orElseThrow(() -> new CustomException(PRODUCT_NOT_FOUND));
 
         product.updateStars(stars);
+    }
+
+    private void checkRequesterIsAdminOrApprovedSeller(String requesterUsername) {
+        UserDto userDto = userService.getUser(requesterUsername);
+
+        if(isCustomer(userDto.role())) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        } else if(isSeller(userDto.role())) {
+            SellerDto sellerDto = userService.getSeller(userDto.id());
+            if(!isSellerApproved(sellerDto.status())) {
+                throw new CustomException(ErrorCode.FORBIDDEN);
+            }
+        }
     }
 }

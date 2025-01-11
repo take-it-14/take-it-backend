@@ -17,4 +17,7 @@ public class AccessValidator {
     public static boolean isRequesterAuthorized(String username, String requesterUsername) {
         return username.equals(requesterUsername);
     }
+    public static boolean isSellerApproved(String sellerStatus) {
+        return sellerStatus.equals("APPROVED");
+    }
 }

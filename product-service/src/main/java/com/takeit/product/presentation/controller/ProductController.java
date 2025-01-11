@@ -38,8 +38,9 @@ public class ProductController {
 
     // 상품 등록
     @PostMapping
-    public ResponseEntity<CommonResponse<ProductResponse>> createProduct(@Valid CreateProductRequest request) {
-        return ResponseEntity.ok().body(CommonResponse.ofSuccess("상품 등록 성공", productService.createProduct(request.toDto())));
+    public ResponseEntity<CommonResponse<ProductResponse>> createProduct(@RequestBody @Valid CreateProductRequest request,
+                                                                         @RequestHeader(name = "X-Username") String requesterUsername) {
+        return ResponseEntity.ok().body(CommonResponse.ofSuccess("상품 등록 성공", productService.createProduct(request.toDto(), requesterUsername)));
     }
 
     // 상품 수정
