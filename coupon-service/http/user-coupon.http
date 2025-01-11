@@ -5,7 +5,8 @@ X-Username: username
 Content-Type: application/json
 
 {
-  "couponId":"2d89fc24-f944-4110-b719-0f00b8f7e85a"
+  "couponId":"2d89fc24-f944-4110-b719-0f00b8f7e85a",
+  "username": "username"
 }
 
 ### user coupon 삭제
