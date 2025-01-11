@@ -1,7 +1,11 @@
 package com.takeit.order.application.service;
 
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+import com.takeit.order.application.dto.OrderDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -9,16 +13,20 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.takeit.common.exception.CustomException;
 import com.takeit.common.exception.ErrorCode;
-import com.takeit.order.application.dto.OrderCreateDto;
-import com.takeit.order.application.dto.OrderResponse;
-import com.takeit.order.application.dto.OrderDetailResponse;
-import com.takeit.order.application.dto.OrderStatusUpdateDto;
-import com.takeit.order.application.dto.OrderStatusUpdateResponse;
-import com.takeit.order.application.dto.OrderUpdateDto;
-import com.takeit.order.application.dto.OrderListResponse;
+import static com.takeit.common.utils.AccessValidator.*;
+import com.takeit.order.application.dto.order.OrderCreateDto;
+import com.takeit.order.application.dto.order.OrderResponse;
+import com.takeit.order.application.dto.order.OrderDetailResponse;
+import com.takeit.order.application.dto.order.OrderStatusUpdateDto;
+import com.takeit.order.application.dto.order.OrderStatusUpdateResponse;
+import com.takeit.order.application.dto.order.OrderUpdateDto;
+import com.takeit.order.application.dto.order.OrderListResponse;
+import com.takeit.order.application.dto.product.ProductDto;
 import com.takeit.order.domain.entity.Order;
 import com.takeit.order.domain.enums.OrderStatus;
 import com.takeit.order.domain.repository.OrderRepository;
+import com.takeit.order.infrastructure.client.CouponClient;
+import com.takeit.order.infrastructure.client.ProductClient;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,20 +36,21 @@ import lombok.RequiredArgsConstructor;
 public class OrderService {
 
 	private final OrderRepository orderRepository;
+	private final ProductClient productClient;
+	private final CouponClient couponClient;
 
 	@Transactional
-	public OrderResponse createOrder(OrderCreateDto request){
+	public OrderResponse createOrder(OrderCreateDto request, Long userId) {
 
-		// TODO: product-service에서 productId 유효성 검사 + id 받아오는 로직 구현 필요
-		Long productId = 1L;
-		// TODO: product-service에서 quantity 만큼 재고가 있는지 확인하는 로직 필요
+		ProductDto product = productClient.getProductByUuid(request.productId());
 
-		// TODO: coupon 검증 및 변환
-		Long userCouponId = 1L;
+		checkStock(product.stock(), request.quantity().intValue());
+
+		Long userCouponId = couponClient.validUserCouponAndGetUserCouponId(request.userCouponId(), userId);
 
 		Order order = Order.create(
-			1L, // TODO: 사용자 정보 받아오기
-			productId,
+			userId,
+			product.id(),
 			userCouponId,
 			request.quantity(),
 			request.amount()
@@ -49,62 +58,76 @@ public class OrderService {
 		return OrderResponse.of(orderRepository.save(order), request.productId(), request.userCouponId());
 	}
 
-	public OrderDetailResponse getOrderDetail(UUID orderId){
+	public OrderDetailResponse getOrderDetail(UUID orderId, Long userId, String role) {
 		Order order = findOrderByUuid(orderId);
 
-		// TODO: 요청 유저의 정보인지 검증 필요
+		ProductDto product = findProductByProductId(order.getProductId());
 
-		// TODO: product-service에서 id->UUID 변환 필요
-		UUID productId = UUID.randomUUID();
+		if(isCustomer(role)) validateUser(userId, order.getCustomerId());
+		else if(isSeller(role)) validateUser(userId, product.sellerId());
 
-		// TODO: userCouponId 변환
-		UUID userCouponId = UUID.randomUUID();
+		UUID userCouponId = couponClient.getUserCouponUuid(order.getUserCouponId());
 
-		return OrderDetailResponse.of(order, productId, userCouponId);
+		return OrderDetailResponse.of(order, product.uuid(), userCouponId);
 	}
 
-	public Page<OrderListResponse> getOrders(Pageable pageable, String status, String username){
+	public Page<OrderListResponse> getOrders(Pageable pageable, String status, Long searchUserId, Long userId, String role) {
 		Page<Order> orderPage;
 
-		// TODO: username->userId 가져오는 로직 필요
-		Long userId = 1L;
+		if(isCustomer(role)) validateUser(userId, searchUserId);
 
 		OrderStatus stat = OrderStatus.of(status);
-		if(stat==null) orderPage = orderRepository.findByCustomerId(userId, pageable);
-		else orderPage = orderRepository.findByCustomerIdAndStatus(userId, stat, pageable);
+
+		if (stat == null)
+			orderPage = orderRepository.findByCustomerId(searchUserId, pageable);
+		else
+			orderPage = orderRepository.findByCustomerIdAndStatus(searchUserId, stat, pageable);
+
+		List<Long> productIds = orderPage.getContent()
+			.stream()
+			.map(Order::getProductId)
+			.toList();
+
+		List<ProductDto> products = productClient.getAllProducts(productIds);
+
+		Map<Long, UUID> productIdToUuidMap = products.stream()
+			.collect(Collectors.toMap(ProductDto::id, ProductDto::uuid));
+
 
 		return orderPage.map(
 			order -> {
-				UUID productUuid = findProductUuidByProductId(order.getProductId());
-				return OrderListResponse.of(order, productUuid);
+				return OrderListResponse.of(order, productIdToUuidMap.get(order.getProductId()));
 			}
 		);
 	}
 
 	@Transactional
-	public OrderResponse updateOrder(UUID orderId, OrderUpdateDto request){
+	public OrderResponse updateOrder(UUID orderId, OrderUpdateDto request, Long userId, String role) {
 		Order order = findOrderByUuid(orderId);
 
-		// TODO: 요청 유저의 정보인지 검증 필요
+		ProductDto product = findProductByProductId(order.getProductId());
 
-		// TODO: product-service에서 order.productId로 해당 상품 재고가 몇개 있는지 확인 + id->UUID 변환 필요
-		UUID productId = findProductUuidByProductId(1L);
+		checkStock(product.stock(), request.quantity().intValue());
+
+		if(isCustomer(role)) validateUser(userId, order.getCustomerId());
 
 		checkStatus(order.getStatus());
 
-		// TODO: userCouponId 변환
-		UUID userCouponId = UUID.randomUUID();
+		UUID userCouponId = couponClient.getUserCouponUuid(order.getUserCouponId());
 
 		order.update(request.quantity(), request.amount());
 
-		return OrderResponse.of(order, productId, userCouponId);
+		return OrderResponse.of(order, product.uuid(), userCouponId);
 	}
 
 	@Transactional
-	public OrderStatusUpdateResponse updateOrderStatus(UUID orderId, OrderStatusUpdateDto request){
+	public OrderStatusUpdateResponse updateOrderStatus(UUID orderId, OrderStatusUpdateDto request, Long userId, String role) {
 		Order order = findOrderByUuid(orderId);
 
-		// TODO: 요청 유저의 정보인지 검증 필요
+		ProductDto product = findProductByProductId(order.getProductId());
+
+		if(isSeller(role)) validateUser(userId, product.sellerId());
+
 		OrderStatus status = OrderStatus.of(request.status());
 		order.updateStatus(status);
 
@@ -112,10 +135,10 @@ public class OrderService {
 	}
 
 	@Transactional
-	public OrderStatusUpdateResponse cancelOrder(UUID orderId){
+	public OrderStatusUpdateResponse cancelOrder(UUID orderId, Long userId, String role) {
 		Order order = findOrderByUuid(orderId);
 
-		// TODO: 요청 유저의 정보인지 검증 필요
+		if(isCustomer(role)) validateUser(userId, order.getCustomerId());
 
 		checkStatus(order.getStatus());
 
@@ -124,27 +147,41 @@ public class OrderService {
 		return OrderStatusUpdateResponse.from(order);
 	}
 
-	public Long findProductIdByOrderUuidAndUserId(UUID orderId, Long userId){
+	public Long findProductIdByOrderUuidAndUserId(UUID orderId, Long userId) {
 		Order order = findOrderByUuid(orderId);
-		validateOrderUser(order, userId);
+		validateUser(order.getCustomerId(), userId);
 
 		return order.getProductId();
 	}
 
-	private Order findOrderByUuid(UUID uuid){
-		return orderRepository.findByUuid(uuid).orElseThrow(()-> new CustomException(ErrorCode.ORDER_NOT_FOUND));
+	private Order findOrderByUuid(UUID uuid) {
+		return orderRepository.findByUuid(uuid).orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
 	}
 
-	private UUID findProductUuidByProductId(Long productId){
-		// TODO: product-service 요청 필요
-		return UUID.randomUUID();
+    public OrderDto findOrderByOrderUuidAndUserId(UUID orderId, Long userId){
+        Order order = findOrderByUuid(orderId);
+        validateUser(order.getCustomerId(), userId);
+
+        return OrderDto.from(order);
+    }
+
+	private void checkStatus(OrderStatus status) {
+		if (status == OrderStatus.CANCELLED || status == OrderStatus.DELIVERED)
+			throw new CustomException(ErrorCode.ORDER_CANNOT_BE_MODIFIED);
 	}
 
-	private void checkStatus(OrderStatus status){
-		if(status == OrderStatus.CANCELLED || status == OrderStatus.DELIVERED) throw new CustomException(ErrorCode.ORDER_CANNOT_BE_MODIFIED);
+	private void validateUser(Long currentUserId, Long requiredUserId) {
+		if (!currentUserId.equals(requiredUserId))
+			throw new CustomException(ErrorCode.FORBIDDEN);
 	}
 
-	private void validateOrderUser(Order order, Long userId){
-		if(!order.getCustomerId().equals(userId)) throw new CustomException(ErrorCode.FORBIDDEN);
+	private void checkStock(Integer currentStock, Integer requiredStock) {
+		if(currentStock < requiredStock) throw new CustomException(ErrorCode.INVALID_STOCK);
+	}
+
+	private ProductDto findProductByProductId(Long productId){
+		List<ProductDto> products = productClient.getAllProducts(List.of(productId));
+		if(products.isEmpty()) throw new CustomException(ErrorCode.PRODUCT_NOT_FOUND);
+		return products.get(0);
 	}
 }

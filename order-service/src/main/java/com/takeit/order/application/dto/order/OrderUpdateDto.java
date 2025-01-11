@@ -1,4 +1,4 @@
-package com.takeit.order.application.dto;
+package com.takeit.order.application.dto.order;
 
 public record OrderUpdateDto(
 	Long quantity,

@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.takeit.common.exception.ErrorCode.FILE_UPLOAD_ERROR;
+import static com.takeit.common.exception.ErrorCode.PRODUCT_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -182,5 +183,12 @@ public class ProductService {
         return productRepository.getProductEntities(idList, predicate).stream()
                 .map(ProductEntityResponse::from)
                 .toList();
+    }
+
+    @Transactional
+    public void updateProductStars(Long productId, Double stars) {
+        Product product = productRepository.findById(productId).orElseThrow(() -> new CustomException(PRODUCT_NOT_FOUND));
+
+        product.updateStars(stars);
     }
 }

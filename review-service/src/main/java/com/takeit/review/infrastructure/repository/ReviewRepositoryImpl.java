@@ -75,6 +75,11 @@ public class ReviewRepositoryImpl implements ReviewRepository {
         return ReviewPageResponse.from(page);
     }
 
+    @Override
+    public boolean existsByOrderIdAndIsDeletedIsFalse(Long orderId) {
+        return jpaReviewRepository.existsByOrderIdAndIsDeletedIsFalse(orderId);
+    }
+
     private OrderSpecifier<?>[] buildOrderBy(Sort sort) {
         List<OrderSpecifier<?>> orderSpecifiers = new ArrayList<>();
 

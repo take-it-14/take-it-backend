@@ -49,4 +49,9 @@ public class ProductRepositoryImpl implements ProductRepository {
         return (List<Product>) jpaRepository.findAll(booleanBuilder);
     }
 
+    @Override
+    public Optional<Product> findById(Long productId) {
+        return jpaRepository.findById(productId);
+    }
+
 }

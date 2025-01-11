@@ -118,4 +118,8 @@ public class Product extends BaseEntity {
     public void addPhotos(List<ProductPhoto> productPhotos) {
         photoList = new ArrayList<>(productPhotos);
     }
+
+    public void updateStars(Double stars) {
+        this.stars = stars;
+    }
 }

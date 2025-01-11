@@ -54,9 +54,11 @@ public enum ErrorCode {
     USER_COUPON_ALREADY_USED(HttpStatus.BAD_REQUEST, "이미 사용한 쿠폰입니다."),
     USER_COUPON_NOT_USED(HttpStatus.BAD_REQUEST, "아직 사용하지 않은 쿠폰입니다."),
     USER_COUPON_EXPIRED(HttpStatus.BAD_REQUEST, "사용 기한이 지난 쿠폰입니다."),
+    REVIEW_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 작성된 리뷰가 존재합니다."),
 
     // product
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 상품을 찾을 수 없습니다."),
+    INVALID_STOCK(HttpStatus.BAD_REQUEST, "주문 수량보다 재고가 부족합니다."),
 
     // product daily stat
     INVALID_DATE_FORMAT(HttpStatus.BAD_REQUEST, "유효하지 않은 날짜 입력 형식입니다."),
