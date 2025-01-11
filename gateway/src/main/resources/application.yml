@@ -1,9 +1,8 @@
-server:
-  port: 19091
-
 spring:
   application:
     name: gateway-service
+  profiles:
+    default: local
   main:
     web-application-type: reactive
   cloud:
@@ -37,12 +36,3 @@ spring:
           uri: lb://favorite-service
           predicates:
             - Path=/api/v1/favorites/**,/feign/v1/favorites/**
-
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:19090/eureka/
-
-service:
-  jwt:
-    secret-key: ${JWT_SECRET_KEY}
