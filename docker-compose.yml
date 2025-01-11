@@ -1,0 +1,80 @@
+services:
+  eureka-server:
+    image: gogohaena/takeit-eureka-server:latest
+    container_name: eureka-server
+    ports:
+      - "19090:19090"
+
+  gateway:
+    image: gogohaena/takeit-gateway:latest
+    container_name: gateway
+    ports:
+      - "19091:19091"
+    environment:
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+    depends_on:
+      - eureka-server
+
+  auth-service:
+    image: gogohaena/takeit-auth-service:latest
+    container_name: auth-service
+    ports:
+      - "19092:19092"
+    depends_on:
+      - eureka-server
+
+  order-service:
+    image: gogohaena/takeit-order-service:latest
+    container_name: order-service
+    ports:
+      - "19093:19093"
+    depends_on:
+      - eureka-server
+
+  product-service:
+    image: gogohaena/takeit-product-service:latest
+    container_name: product-service
+    ports:
+      - "19094:19094"
+    environment:
+      - S3_BUCKET=${S3_BUCKET}
+      - S3_ACCESS_KEY=${S3_ACCESS_KEY}
+      - S3_SECRET_KEY=${S3_SECRET_KEY}
+    depends_on:
+      - eureka-server
+
+  payment-service:
+    image: gogohaena/takeit-payment-service:latest
+    container_name: payment-service
+    ports:
+      - "19095:19095"
+    depends_on:
+      - eureka-server
+
+  review-service:
+    image: gogohaena/takeit-review-service:latest
+    container_name: review-service
+    ports:
+      - "19096:19096"
+    environment:
+      - S3_BUCKET=${S3_BUCKET}
+      - S3_ACCESS_KEY=${S3_ACCESS_KEY}
+      - S3_SECRET_KEY=${S3_SECRET_KEY}
+    depends_on:
+      - eureka-server
+
+  coupon-service:
+    image: gogohaena/takeit-coupon-service:latest
+    container_name: coupon-service
+    ports:
+      - "19097:19097"
+    depends_on:
+      - eureka-server
+
+  favorite-service:
+    image: gogohaena/takeit-favorite-service:latest
+    container_name: favorite-service
+    ports:
+      - "19098:19098"
+    depends_on:
+      - eureka-server

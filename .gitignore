@@ -39,3 +39,5 @@ company/src/main/resources/application-secret.yml
 .vscode/
 .idea/
 .DS_Store
+
+.env
