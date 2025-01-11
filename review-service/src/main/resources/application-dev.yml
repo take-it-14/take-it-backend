@@ -21,7 +21,7 @@ server:
 eureka:
   client:
     service-url:
-      defaultZone: http://eureka-server:19090/
+      defaultZone: http://eureka-server:19090/eureka/
 
 cloud:
   aws:

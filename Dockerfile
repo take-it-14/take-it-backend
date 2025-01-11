@@ -16,4 +16,4 @@ EXPOSE ${SERVICE_PORT}
 RUN rm -rf /var/cache/apk/* /root/.gradle
 
 # JVM 최적화 옵션 추가 (메모리 효율성 향상)
-ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=75.0", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=75.0", "-XX:+UnlockExperimentalVMOptions", "-XX:+UseG1GC", "-XX:G1HeapRegionSize=16M", "-jar", "app.jar"]
