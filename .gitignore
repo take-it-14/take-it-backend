@@ -40,4 +40,8 @@ company/src/main/resources/application-secret.yml
 .idea/
 .DS_Store
 
+### Env File ###
 .env
+
+### Data ###
+*data/
