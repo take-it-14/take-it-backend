@@ -2,7 +2,7 @@ package com.takeit.order.presentation.request;
 
 import java.util.UUID;
 
-import com.takeit.order.application.dto.OrderCreateDto;
+import com.takeit.order.application.dto.order.OrderCreateDto;
 
 import jakarta.validation.constraints.NotNull;
 
