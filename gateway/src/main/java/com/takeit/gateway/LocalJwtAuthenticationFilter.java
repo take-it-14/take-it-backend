@@ -29,7 +29,7 @@ public class LocalJwtAuthenticationFilter implements GlobalFilter {
         String path = exchange.getRequest().getURI().getPath();
 
         // 검증 예외 처리
-        if (pathMatcher.match("/api/*/auths/**", path)) {
+        if (pathMatcher.match("/api/*/auths/signin", path) || pathMatcher.match("/api/*/auths/signup/*", path)) {
             return chain.filter(exchange);
         }
 

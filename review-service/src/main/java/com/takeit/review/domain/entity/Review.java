@@ -39,7 +39,7 @@ public class Review extends BaseEntity {
     @Builder.Default
     private List<ReviewPhoto> photoList = new ArrayList<>();
 
-    public static Review of(CreateReviewRequest request, String username, Long productId) {
+    public static Review of(CreateReviewRequest request, Long productId) {
         return Review.builder()
                .uuid(UUID.randomUUID())
                .productId(productId)

@@ -2,10 +2,13 @@ package com.takeit.review.application.service;
 
 import com.querydsl.core.types.Predicate;
 import com.takeit.common.exception.CustomException;
+import com.takeit.common.utils.AccessValidator;
 import com.takeit.review.application.dto.CreateReviewResponse;
 import com.takeit.review.application.dto.ReviewDetailResponse;
 import com.takeit.review.application.dto.ReviewPageResponse;
 import com.takeit.review.application.dto.UpdateReviewResponse;
+import com.takeit.review.application.dto.product.ProductDto;
+import com.takeit.review.application.dto.user.UserDto;
 import com.takeit.review.domain.repository.ReviewPhotoRepository;
 import com.takeit.review.domain.repository.ReviewRepository;
 import com.takeit.review.domain.entity.Review;
@@ -28,18 +31,24 @@ import static com.takeit.common.exception.ErrorCode.*;
 
 @Slf4j
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final ReviewPhotoRepository reviewPhotoRepository;
     private final FileUpload fileUpload;
 
+    private final UserService userService;
+    private final ProductService productService;
+    private final OrderService orderService;
+
     @Transactional
     public CreateReviewResponse createReview(CreateReviewRequest request, String username) {
-        // todo : username 으로 user 권한 체크 및 order uuid로 productId와 userid 가 일치하는지 체크, 상품 이름 가져오기
-        Long productId = 1L;
+        UserDto userDto = userService.getUser(username);
 
-        Review review = reviewRepository.save(Review.of(request, username, productId));
+        Long productId = orderService.getProductId(request.orderId(), userDto.id());
+
+        Review review = reviewRepository.save(Review.of(request, productId));
 
         if(request.files() != null && !request.files().isEmpty()) {
             if(request.files().size() > 3) {
@@ -61,10 +70,14 @@ public class ReviewService {
 
     @Transactional
     public UpdateReviewResponse updateReview(@Valid UpdateReviewRequest request, UUID reviewId, String username) {
-        // todo : username 으로 user 권한 체크 및 order uuid로 productId가 일치하는지 체크, 상품 이름 가져오기
-        Long productId = 1L;
+        UserDto userDto = userService.getUser(username);
 
         Review review = findByUuid(reviewId);
+
+        if(checkMasterAndManager(userDto.role()))
+            validateUser(review, username);
+
+        List<ProductDto> productDto = productService.getProducts(List.of(review.getProductId()));
 
         review.updateReview(request);
         review = reviewRepository.save(review);
@@ -101,12 +114,18 @@ public class ReviewService {
         review.getPhotoList().clear();
         review.addPhotos(reviewPhotoRepository.findAllByReview(review));
 
-        return UpdateReviewResponse.of(review, "상품이름");
+        return UpdateReviewResponse.of(review, productDto.isEmpty() ? null : productDto.get(0).productName());
     }
 
     public ReviewDetailResponse getReview(String username, UUID reviewId) {
-        // todo : product 정보 같이 반환
         Review review = reviewRepository.findReviewAndReviewPhotosByUuid(reviewId).orElseThrow(() -> new CustomException(REVIEW_NOT_FOUND));
+
+        List<ProductDto> productDto = productService.getProducts(List.of(review.getProductId()));
+
+        if(productDto != null && !productDto.isEmpty()) {
+            return ReviewDetailResponse.of(review, productDto.get(0));
+        }
+
         return ReviewDetailResponse.from(review);
     }
 
@@ -116,9 +135,13 @@ public class ReviewService {
 
     @Transactional
     public void deleteReview(UUID reviewId, String username) {
-        // todo : username 으로 user 권한 체크
+        UserDto userDto = userService.getUser(username);
 
         Review review = findByUuid(reviewId);
+
+        if(checkMasterAndManager(userDto.role()))
+            validateUser(review, username);
+
         review.deleted(username);
 
         review = reviewRepository.save(review);
@@ -135,6 +158,16 @@ public class ReviewService {
 
     private Review findByUuid(UUID reviewId) {
         return reviewRepository.findByUuid(reviewId).orElseThrow(() -> new CustomException(REVIEW_NOT_FOUND));
+    }
+
+    private void validateUser(Review review, String username) {
+        if(!review.getCreatedBy().equals(username)) {
+            throw new CustomException(UNAUTHORIZED);
+        }
+    }
+
+    private boolean checkMasterAndManager(String role) {
+        return !AccessValidator.isManager(role) && !AccessValidator.isMaster(role);
     }
 
 }
