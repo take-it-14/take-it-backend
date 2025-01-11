@@ -3,7 +3,7 @@ spring:
       driver-class-name: org.postgresql.Driver
       username: takeit_review
       password: takeit_review
-      url: jdbc:postgresql://localhost:15432/takeit_review
+      url: jdbc:postgresql://postgres:5432/takeit_review
     jpa:
       hibernate:
         ddl-auto: update
@@ -14,11 +14,6 @@ spring:
           highlight_sql: true
           default_batch_fetch_size: 10
       open-in-view: false
-    data:
-      redis:
-        host: localhost
-        port: 6379
-        password: systempass
 
 server:
   port: 19096
@@ -26,7 +21,7 @@ server:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:19090/eureka/
+      defaultZone: http://eureka-server:19090/
 
 cloud:
   aws:
@@ -40,5 +35,3 @@ cloud:
       auto: false
     stack:
       auto: false
-
-
