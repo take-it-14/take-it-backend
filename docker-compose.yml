@@ -1,0 +1,165 @@
+networks:
+  takeit-network:
+    driver: bridge
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    ports:
+      - "15432:5432"
+    environment:
+      POSTGRES_USER: postgres # superuser
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+      - ./init-database.sql:/docker-entrypoint-initdb.d/init-database.sql:ro
+    restart: always
+    networks:
+      - takeit-network
+
+  redis-stack:
+    image: redis/redis-stack
+    container_name: redis-stack
+    restart: always
+    environment:
+      REDIS_ARGS: "--requirepass systempass"
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+    volumes:
+      - ./redis-data:/data
+    networks:
+      - takeit-network
+
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    ports:
+      - "9411:9411"
+    restart: always
+    volumes:
+      - ./zipkin-data:/data
+    networks:
+      - takeit-network
+
+  eureka-server:
+    image: gogohaena/takeit-eureka-server:latest
+    container_name: eureka-server
+    ports:
+      - "19090:19090"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+    networks:
+      - takeit-network
+
+  gateway:
+    image: gogohaena/takeit-gateway:latest
+    container_name: gateway
+    ports:
+      - "19091:19091"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+    depends_on:
+      - eureka-server
+    networks:
+      - takeit-network
+
+  auth-service:
+    image: gogohaena/takeit-auth-service:latest
+    container_name: auth-service
+    ports:
+      - "19092:19092"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+    depends_on:
+      - eureka-server
+      - postgres
+    networks:
+      - takeit-network
+
+  order-service:
+    image: gogohaena/takeit-order-service:latest
+    container_name: order-service
+    ports:
+      - "19093:19093"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+    depends_on:
+      - eureka-server
+      - postgres
+    networks:
+      - takeit-network
+
+  product-service:
+    image: gogohaena/takeit-product-service:latest
+    container_name: product-service
+    ports:
+      - "19094:19094"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - S3_BUCKET=${S3_BUCKET}
+      - S3_ACCESS_KEY=${S3_ACCESS_KEY}
+      - S3_SECRET_KEY=${S3_SECRET_KEY}
+    depends_on:
+      - eureka-server
+      - postgres
+    networks:
+      - takeit-network
+
+  payment-service:
+    image: gogohaena/takeit-payment-service:latest
+    container_name: payment-service
+    ports:
+      - "19095:19095"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+    depends_on:
+      - eureka-server
+      - postgres
+    networks:
+      - takeit-network
+
+  review-service:
+    image: gogohaena/takeit-review-service:latest
+    container_name: review-service
+    ports:
+      - "19096:19096"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - S3_BUCKET=${S3_BUCKET}
+      - S3_ACCESS_KEY=${S3_ACCESS_KEY}
+      - S3_SECRET_KEY=${S3_SECRET_KEY}
+    depends_on:
+      - eureka-server
+      - postgres
+      - redis-stack
+    networks:
+      - takeit-network
+
+  coupon-service:
+    image: gogohaena/takeit-coupon-service:latest
+    container_name: coupon-service
+    ports:
+      - "19097:19097"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+    depends_on:
+      - eureka-server
+      - postgres
+    networks:
+      - takeit-network
+
+  favorite-service:
+    image: gogohaena/takeit-favorite-service:latest
+    container_name: favorite-service
+    ports:
+      - "19098:19098"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+    depends_on:
+      - eureka-server
+      - postgres
+    networks:
+      - takeit-network
