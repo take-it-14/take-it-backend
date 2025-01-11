@@ -1,32 +1,23 @@
 spring:
   datasource:
-    url: ${AUTH_DB_URL}
-    username: ${AUTH_DB_USERNAME}
-    password: ${AUTH_DB_PASSWORD}
+    url: ${PRODUCT_DB_URL}
+    username: ${PRODUCT_DB_USERNAME}
+    password: ${PRODUCT_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: ${AUTH_DDL_AUTO}
+      ddl-auto: ${PRODUCT_DDL_AUTO}
     show-sql: true
     properties:
       hibernate:
         format_sql: true
-        highlight_sql: true
-        use_sql_comments: true
-        hibernate.type:
-          trace: true # SQL에 바인딩된 파라미터 값을 출력
         default_batch_fetch_size: 100
     open-in-view: false
 
-logging:
-  level:
-    org.hibernate.type.descriptor.sql: trace
-    org.hibernate.SQL: trace
-
 server:
-  port: ${AUTH_SERVICE_PORT}
+  port: ${PRODUCT_SERVICE_PORT}
 
 eureka:
   client:
@@ -45,3 +36,16 @@ cloud:
       auto: false
     stack:
       auto: false
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_ENDPOINT}
+  endpoint:
+    health:
+      show-details: when_authorized
+    prometheus:
+      enabled: true
