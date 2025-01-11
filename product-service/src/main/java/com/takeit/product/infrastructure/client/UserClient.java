@@ -1,5 +1,6 @@
 package com.takeit.product.infrastructure.client;
 
+import com.takeit.product.application.dto.user.SellerDto;
 import com.takeit.product.application.dto.user.UserDto;
 import com.takeit.product.application.service.UserService;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -10,4 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface UserClient extends UserService {
     @GetMapping("/feign/v1/auths/{username}")
     UserDto getUser(@PathVariable String username);
+
+    @GetMapping("feign/v1/auths/seller/{userId}")
+    SellerDto getSeller(@PathVariable Long userId);
 }
