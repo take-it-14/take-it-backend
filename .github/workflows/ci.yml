@@ -3,12 +3,22 @@ name: CI for TakeIt Services
 on:
   push:
     branches: [ main, dev ]
+    paths:
+      - 'eureka-server/**'
+      - 'gateway/**'
+      - 'auth-service/**'
+      - 'order-service/**'
+      - 'product-service/**'
+      - 'payment-service/**'
+      - 'review-service/**'
+      - 'coupon-service/**'
+      - 'favorite-service/**'
 
-  # 👉 수동 실행을 위한 트리거 추가
+  # 수동 실행 트리거
   workflow_dispatch:
     inputs:
       service:
-        description: 'Build and deploy specific service'
+        description: 'Select a service to build and deploy'
         required: true
         default: 'all'
         type: choice
@@ -25,15 +35,44 @@ on:
           - favorite-service
 
 jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.set-changed-services.outputs.services }}
+
+    steps:
+      # 1️⃣ 레포지토리 체크아웃
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # 2️⃣ 변경된 서비스 감지 or 수동 실행
+      - name: Detect Changed Services or Use Manual Input
+        id: set-changed-services
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            if [[ "${{ github.event.inputs.service }}" == "all" ]]; then
+              echo "services=[\"eureka-server\", \"gateway\", \"auth-service\", \"order-service\", \"product-service\", \"payment-service\", \"review-service\", \"coupon-service\", \"favorite-service\"]" >> $GITHUB_OUTPUT
+            else
+              echo "services=[\"${{ github.event.inputs.service }}\"]" >> $GITHUB_OUTPUT
+            fi
+          else
+            CHANGED_SERVICES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -Eo '^(eureka-server|gateway|auth-service|order-service|product-service|payment-service|review-service|coupon-service|favorite-service)' | sort -u | jq -R -s -c 'split("\n")[:-1]')
+          
+            if [[ -z "$CHANGED_SERVICES" ]]; then
+              echo "services=[]" >> $GITHUB_OUTPUT
+            else
+              echo "services=$CHANGED_SERVICES" >> $GITHUB_OUTPUT
+            fi
+          fi
+
   build-and-push:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.services != '[]' }}
     runs-on: ubuntu-latest
 
-    # 서비스 선택 (수동 실행 시 선택 가능)
     strategy:
       matrix:
-        service: ${{ fromJson('["eureka-server", "gateway", "auth-service", "order-service", "product-service", "payment-service", "review-service", "coupon-service", "favorite-service"]') }}
-
-    if: ${{ github.event.inputs.service == 'all' || github.event.inputs.service == matrix.service }}
+        service: ${{ fromJson(needs.detect-changes.outputs.services) }}
 
     env:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -67,14 +106,18 @@ jobs:
         run: |
           ./gradlew :${{ matrix.service }}:clean :${{ matrix.service }}:build -x test --info
 
-      # 5️⃣ Docker Hub 로그인
+      # 5️⃣ Docker Buildx 설정 추가
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # 6️⃣ Docker Hub 로그인
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      # 6️⃣ Docker 이미지 빌드 및 푸시
+      # 7️⃣ Docker 이미지 빌드 및 푸시
       - name: Build and Push Docker Image
         run: |
           SERVICE_PORT=$(case ${{ matrix.service }} in
@@ -88,9 +131,9 @@ jobs:
             coupon-service) echo 19097 ;;
             favorite-service) echo 19098 ;;
           esac)
-
+          
           IMAGE_NAME="gogohaena/takeit-${{ matrix.service }}"
-
+          
           docker buildx build \
             --platform linux/amd64,linux/arm64 \
             --build-arg SERVICE_NAME=${{ matrix.service }} \
