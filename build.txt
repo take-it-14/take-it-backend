@@ -1,0 +1,115 @@
+./gradlew clean build -x test --info
+./gradlew :eureka-server:clean :eureka-server:build -x test --info
+./gradlew :gateway:clean :gateway:build -x test --info
+./gradlew :auth-service:clean :auth-service:build -x test --info
+./gradlew :order-service:clean :order-service:build -x test
+./gradlew :product-service:clean :product-service:build -x test
+./gradlew :payment-service:clean :payment-service:build -x test
+./gradlew :review-service:clean :review-service:build -x test
+./gradlew :coupon-service:clean :coupon-service:build -x test
+./gradlew :favorite-service:clean :favorite-service:build -x test
+
+docker build --build-arg SERVICE_NAME=eureka-server --build-arg SERVICE_PORT=19090 -t takeit-eureka-server .
+docker build --build-arg SERVICE_NAME=gateway --build-arg SERVICE_PORT=19091 -t takeit-gateway .
+docker build --build-arg SERVICE_NAME=auth-service --build-arg SERVICE_PORT=19092 -t takeit-auth-service .
+docker build --build-arg SERVICE_NAME=order-service --build-arg SERVICE_PORT=19093 -t takeit-order-service .
+docker build --build-arg SERVICE_NAME=product-service --build-arg SERVICE_PORT=19094 -t takeit-product-service .
+docker build --build-arg SERVICE_NAME=payment-service --build-arg SERVICE_PORT=19095 -t takeit-payment-service .
+docker build --build-arg SERVICE_NAME=review-service --build-arg SERVICE_PORT=19096 -t takeit-review-service .
+docker build --build-arg SERVICE_NAME=coupon-service --build-arg SERVICE_PORT=19097 -t takeit-coupon-service .
+docker build --build-arg SERVICE_NAME=favorite-service --build-arg SERVICE_PORT=19098 -t takeit-favorite-service .
+
+docker tag takeit-eureka-server gogohaena/takeit-eureka-server:latest
+docker tag takeit-gateway gogohaena/takeit-gateway:latest
+docker tag takeit-auth-service gogohaena/takeit-auth-service:latest
+docker tag takeit-order-service gogohaena/takeit-order-service:latest
+docker tag takeit-product-service gogohaena/takeit-product-service:latest
+docker tag takeit-payment-service gogohaena/takeit-payment-service:latest
+docker tag takeit-review-service gogohaena/takeit-review-service:latest
+docker tag takeit-coupon-service gogohaena/takeit-coupon-service:latest
+docker tag takeit-favorite-service gogohaena/takeit-favorite-service:latest
+
+docker push gogohaena/takeit-eureka-server:latest
+docker push gogohaena/takeit-gateway:latest
+docker push gogohaena/takeit-auth-service:latest
+docker push gogohaena/takeit-order-service:latest
+docker push gogohaena/takeit-product-service:latest
+docker push gogohaena/takeit-payment-service:latest
+docker push gogohaena/takeit-review-service:latest
+docker push gogohaena/takeit-coupon-service:latest
+docker push gogohaena/takeit-favorite-service:latest
+
+
+docker buildx create --use
+docker buildx build --platform linux/amd64,linux/arm64 --build-arg SERVICE_NAME=eureka-server --build-arg SERVICE_PORT=19090 -t gogohaena/takeit-eureka-server:latest --push .
+docker buildx build --platform linux/amd64,linux/arm64 --build-arg SERVICE_NAME=gateway --build-arg SERVICE_PORT=19091 -t gogohaena/takeit-gateway:latest --push .
+docker buildx build --platform linux/amd64,linux/arm64 --build-arg SERVICE_NAME=auth-service --build-arg SERVICE_PORT=19092 -t gogohaena/takeit-auth-service:latest --push .
+docker buildx build --platform linux/amd64,linux/arm64 --build-arg SERVICE_NAME=order-service --build-arg SERVICE_PORT=19093 -t gogohaena/takeit-order-service:latest --push .
+docker buildx build --platform linux/amd64,linux/arm64 --build-arg SERVICE_NAME=product-service --build-arg SERVICE_PORT=19094 -t gogohaena/takeit-product-service:latest --push .
+docker buildx build --platform linux/amd64,linux/arm64 --build-arg SERVICE_NAME=payment-service --build-arg SERVICE_PORT=19095 -t gogohaena/takeit-payment-service:latest --push .
+docker buildx build --platform linux/amd64,linux/arm64 --build-arg SERVICE_NAME=review-service --build-arg SERVICE_PORT=19096 -t gogohaena/takeit-review-service:latest --push .
+docker buildx build --platform linux/amd64,linux/arm64 --build-arg SERVICE_NAME=coupon-service --build-arg SERVICE_PORT=19097 -t gogohaena/takeit-coupon-service:latest --push .
+docker buildx build --platform linux/amd64,linux/arm64 --build-arg SERVICE_NAME=favorite-service --build-arg SERVICE_PORT=19098 -t gogohaena/takeit-favorite-service:latest --push .
+
+
+docker run -d \
+  --name eureka-server \
+  -p 19090:19090 \
+  gogohaena/takeit-eureka-server:latest
+
+docker run -d \
+  --name gateway \
+  --link eureka-server \
+  -p 19091:19091 \
+  -e JWT_SECRET_KEY=401b09eab3c013d4ca54922bb802bec8fd5318192b0a75f201d8b3727429080fb337591abd3e44453b954555b7a0812e1081c39b740293f765eae731f5a65ed1 \
+  gogohaena/takeit-gateway:latest
+
+docker run -d \
+  --name auth-service \
+  --link eureka-server \
+  -p 19092:19092 \
+  gogohaena/takeit-auth-service:latest
+
+docker run -d \
+  --name order-service \
+  --link eureka-server \
+  -p 19093:19093 \
+  gogohaena/takeit-order-service:latest
+
+docker run -d \
+  --name product-service \
+  --link eureka-server \
+  -p 19094:19094 \
+  -e S3_BUCKET=${S3_BUCKET} \
+  -e S3_ACCESS_KEY=${S3_ACCESS_KEY} \
+  -e S3_SECRET_KEY=${S3_SECRET_KEY} \
+  gogohaena/takeit-product-service:latest
+
+docker run -d \
+  --name payment-service \
+  --link eureka-server \
+  -p 19095:19095 \
+  gogohaena/takeit-payment-service:latest
+
+docker run -d \
+  --name review-service \
+  --link eureka-server \
+  -p 19096:19096 \
+  -e S3_BUCKET=${S3_BUCKET} \
+  -e S3_ACCESS_KEY=${S3_ACCESS_KEY} \
+  -e S3_SECRET_KEY=${S3_SECRET_KEY} \
+  gogohaena/takeit-review-service:latest
+
+docker run -d \
+  --name coupon-service \
+  --link eureka-server \
+  -p 19097:19097 \
+  gogohaena/takeit-coupon-service:latest
+
+docker run -d \
+  --name favorite-service \
+  --link eureka-server \
+  -p 19098:19098 \
+  gogohaena/takeit-favorite-service:latest
+
+

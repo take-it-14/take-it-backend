@@ -1,0 +1,11 @@
+server:
+  port: 19091
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:19090/eureka/
+
+service:
+  jwt:
+    secret-key: ${JWT_SECRET_KEY}

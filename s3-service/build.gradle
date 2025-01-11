@@ -1,3 +1,11 @@
+bootJar {
+	enabled = false
+}
+
+jar {
+	enabled = true
+}
+
 dependencies {
 	// 공통 모듈
 	implementation project(':common')

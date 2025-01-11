@@ -1,3 +1,5 @@
+bootJar.enabled = true
+
 dependencies {
 	// JWT
 	implementation "io.jsonwebtoken:jjwt:${jwtVersion}"

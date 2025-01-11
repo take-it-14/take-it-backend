@@ -1,3 +1,5 @@
+bootJar.enabled = true
+
 dependencies {
 	// 공통 모듈
 	implementation project(':common')
