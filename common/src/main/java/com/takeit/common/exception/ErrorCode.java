@@ -57,6 +57,7 @@ public enum ErrorCode {
 
     // product
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 상품을 찾을 수 없습니다."),
+    INVALID_STOCK(HttpStatus.BAD_REQUEST, "주문 수량보다 재고가 부족합니다."),
 
     // product daily stat
     INVALID_DATE_FORMAT(HttpStatus.BAD_REQUEST, "유효하지 않은 날짜 입력 형식입니다."),
