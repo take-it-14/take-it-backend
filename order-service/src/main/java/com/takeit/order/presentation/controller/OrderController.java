@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,7 +40,7 @@ public class OrderController {
 	@RequireRole({"MASTER", "CUSTOMER"})
 	public CommonResponse<OrderResponse> createOrder(
 		@RequestBody @Valid OrderCreateRequest request,
-		@RequestHeader(value = "X-UserId", required = true) Long userId
+		@RequestAttribute(value = "X-UserId") Long userId
 		){
 		return CommonResponse.ofSuccess("주문 등록", orderService.createOrder(request.toServiceDto(), userId));
 	}
@@ -48,7 +49,7 @@ public class OrderController {
 	@RequireRole({"MASTER", "MANAGER", "CUSTOMER", "SELLER"})
 	public CommonResponse<OrderDetailResponse> getOrderDetail(
 		@PathVariable UUID orderId,
-		@RequestHeader(value = "X-UserId", required = true) Long userId,
+		@RequestAttribute(value = "X-UserId") Long userId,
 		@RequestHeader(value = "X-Role", required = true) String role
 	){
 		return CommonResponse.ofSuccess("주문 상세 조회", orderService.getOrderDetail(orderId, userId, role));
@@ -60,7 +61,7 @@ public class OrderController {
 		Pageable pageable,
 		@RequestParam(required = false) String status,
 		@RequestParam Long searchUserId,
-		@RequestHeader(value = "X-UserId", required = true) Long userId,
+		@RequestAttribute(value = "X-UserId") Long userId,
 		@RequestHeader(value = "X-Role", required = true) String role
 	){
 		return CommonResponse.ofSuccess("주문 목록 조회", PageResponse.of(orderService.getOrders(pageable, status, searchUserId, userId, role)));
@@ -71,7 +72,7 @@ public class OrderController {
 	public CommonResponse<OrderResponse> updateOrder(
 		@PathVariable UUID orderId,
 		@RequestBody @Valid OrderUpdateRequest request,
-		@RequestHeader(value = "X-UserId", required = true) Long userId,
+		@RequestAttribute(value = "X-UserId") Long userId,
 		@RequestHeader(value = "X-Role", required = true) String role
 	){
 		return CommonResponse.ofSuccess("주문 정보 수정", orderService.updateOrder(orderId, request.toServiceDto(), userId, role));
@@ -82,7 +83,7 @@ public class OrderController {
 	public CommonResponse<OrderStatusUpdateResponse> updateOrderStatus(
 		@PathVariable UUID orderId,
 		@RequestBody @Valid OrderStatusUpdateRequest request,
-		@RequestHeader(value = "X-UserId", required = true) Long userId,
+		@RequestAttribute(value = "X-UserId") Long userId,
 		@RequestHeader(value = "X-Role", required = true) String role
 	){
 		return CommonResponse.ofSuccess("주문 상태 변경", orderService.updateOrderStatus(orderId, request.toServiceDto(), userId, role));
@@ -92,7 +93,7 @@ public class OrderController {
 	@RequireRole({"MASTER", "CUSTOMER"})
 	public CommonResponse<OrderStatusUpdateResponse> cancelOrder(
 		@PathVariable UUID orderId,
-		@RequestHeader(value = "X-UserId", required = true) Long userId,
+		@RequestAttribute(value = "X-UserId") Long userId,
 		@RequestHeader(value = "X-Role", required = true) String role
 	){
 		return CommonResponse.ofSuccess("주문 취소", orderService.cancelOrder(orderId, userId, role));
