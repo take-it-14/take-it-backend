@@ -9,7 +9,9 @@ import com.takeit.order.infrastructure.client.UserClient;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 public class UserCheckInterceptor implements HandlerInterceptor {
 	private final UserClient userClient;
@@ -29,7 +31,7 @@ public class UserCheckInterceptor implements HandlerInterceptor {
 			return false;
 		}
 
-		response.addHeader("X-UserId", userDto.id().toString());
+		request.setAttribute("X-UserId", userDto.id());
 
 		return true;
 	}

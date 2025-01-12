@@ -3,14 +3,14 @@ spring:
     name: eureka-server
 
 server:
-  port: 19090
+  port: ${EUREKA_SERVER_PORT}
 
 eureka:
   client:
     register-with-eureka: false
     fetch-registry: false
   instance:
-    hostname: localhost
+    hostname: ${EUREKA_HOSTNAME}
 
 management:
   tracing:
@@ -18,13 +18,9 @@ management:
       probability: 1.0
   zipkin:
     tracing:
-      endpoint: "http://localhost:9411/api/v2/spans"
-  endpoints:
-    web:
-      exposure:
-        include: *
+      endpoint: ${ZIPKIN_ENDPOINT}
   endpoint:
     health:
-      show-details: always
+      show-details: when_authorized
     prometheus:
       enabled: true
