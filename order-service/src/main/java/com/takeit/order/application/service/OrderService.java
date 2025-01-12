@@ -6,6 +6,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.takeit.order.application.dto.OrderDto;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.takeit.common.exception.CustomException;
 import com.takeit.common.exception.ErrorCode;
+
 import static com.takeit.common.utils.AccessValidator.*;
+
 import com.takeit.order.application.dto.order.OrderCreateDto;
 import com.takeit.order.application.dto.order.OrderResponse;
 import com.takeit.order.application.dto.order.OrderDetailResponse;
@@ -46,7 +49,8 @@ public class OrderService {
 
 		checkStock(product.stock(), request.quantity().intValue());
 
-		Long userCouponId = couponClient.validUserCouponAndGetUserCouponId(request.userCouponId(), userId);
+		Long userCouponId = request.userCouponId() != null ?
+			couponClient.validUserCouponAndGetUserCouponId(request.userCouponId(), userId) : null;
 
 		Order order = Order.create(
 			userId,
@@ -63,18 +67,22 @@ public class OrderService {
 
 		ProductDto product = findProductByProductId(order.getProductId());
 
-		if(isCustomer(role)) validateUser(userId, order.getCustomerId());
-		else if(isSeller(role)) validateUser(userId, product.sellerId());
+		if (isCustomer(role))
+			validateUser(userId, order.getCustomerId());
+		else if (isSeller(role))
+			validateUser(userId, product.sellerId());
 
 		UUID userCouponId = couponClient.getUserCouponUuid(order.getUserCouponId());
 
 		return OrderDetailResponse.of(order, product.uuid(), userCouponId);
 	}
 
-	public Page<OrderListResponse> getOrders(Pageable pageable, String status, Long searchUserId, Long userId, String role) {
+	public Page<OrderListResponse> getOrders(Pageable pageable, String status, Long searchUserId, Long userId,
+		String role) {
 		Page<Order> orderPage;
 
-		if(isCustomer(role)) validateUser(userId, searchUserId);
+		if (isCustomer(role))
+			validateUser(userId, searchUserId);
 
 		OrderStatus stat = OrderStatus.of(status);
 
@@ -93,7 +101,6 @@ public class OrderService {
 		Map<Long, UUID> productIdToUuidMap = products.stream()
 			.collect(Collectors.toMap(ProductDto::id, ProductDto::uuid));
 
-
 		return orderPage.map(
 			order -> {
 				return OrderListResponse.of(order, productIdToUuidMap.get(order.getProductId()));
@@ -109,7 +116,8 @@ public class OrderService {
 
 		checkStock(product.stock(), request.quantity().intValue());
 
-		if(isCustomer(role)) validateUser(userId, order.getCustomerId());
+		if (isCustomer(role))
+			validateUser(userId, order.getCustomerId());
 
 		checkStatus(order.getStatus());
 
@@ -121,12 +129,14 @@ public class OrderService {
 	}
 
 	@Transactional
-	public OrderStatusUpdateResponse updateOrderStatus(UUID orderId, OrderStatusUpdateDto request, Long userId, String role) {
+	public OrderStatusUpdateResponse updateOrderStatus(UUID orderId, OrderStatusUpdateDto request, Long userId,
+		String role) {
 		Order order = findOrderByUuid(orderId);
 
 		ProductDto product = findProductByProductId(order.getProductId());
 
-		if(isSeller(role)) validateUser(userId, product.sellerId());
+		if (isSeller(role))
+			validateUser(userId, product.sellerId());
 
 		OrderStatus status = OrderStatus.of(request.status());
 		order.updateStatus(status);
@@ -138,7 +148,8 @@ public class OrderService {
 	public OrderStatusUpdateResponse cancelOrder(UUID orderId, Long userId, String role) {
 		Order order = findOrderByUuid(orderId);
 
-		if(isCustomer(role)) validateUser(userId, order.getCustomerId());
+		if (isCustomer(role))
+			validateUser(userId, order.getCustomerId());
 
 		checkStatus(order.getStatus());
 
@@ -158,12 +169,12 @@ public class OrderService {
 		return orderRepository.findByUuid(uuid).orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
 	}
 
-    public OrderDto findOrderByOrderUuidAndUserId(UUID orderId, Long userId){
-        Order order = findOrderByUuid(orderId);
-        validateUser(order.getCustomerId(), userId);
+	public OrderDto findOrderByOrderUuidAndUserId(UUID orderId, Long userId) {
+		Order order = findOrderByUuid(orderId);
+		validateUser(order.getCustomerId(), userId);
 
-        return OrderDto.from(order);
-    }
+		return OrderDto.from(order);
+	}
 
 	private void checkStatus(OrderStatus status) {
 		if (status == OrderStatus.CANCELLED || status == OrderStatus.DELIVERED)
@@ -176,12 +187,14 @@ public class OrderService {
 	}
 
 	private void checkStock(Integer currentStock, Integer requiredStock) {
-		if(currentStock < requiredStock) throw new CustomException(ErrorCode.INVALID_STOCK);
+		if (currentStock < requiredStock)
+			throw new CustomException(ErrorCode.INVALID_STOCK);
 	}
 
-	private ProductDto findProductByProductId(Long productId){
+	private ProductDto findProductByProductId(Long productId) {
 		List<ProductDto> products = productClient.getAllProducts(List.of(productId));
-		if(products.isEmpty()) throw new CustomException(ErrorCode.PRODUCT_NOT_FOUND);
+		if (products.isEmpty())
+			throw new CustomException(ErrorCode.PRODUCT_NOT_FOUND);
 		return products.get(0);
 	}
 }
