@@ -10,6 +10,7 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "권한이 없습니다."),
     FORBIDDEN(HttpStatus.FORBIDDEN, "해당 작업에 대한 권한이 없습니다."),
+    JSON_PROCESSING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "JsonProcessingException"),
 
     // Payment
     WRONG_PAYMENT(HttpStatus.BAD_REQUEST, "결제 정보가 잘못되었습니다."),
@@ -37,6 +38,7 @@ public enum ErrorCode {
     // order
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 주문 정보입니다."),
     ORDER_CANNOT_BE_MODIFIED(HttpStatus.BAD_REQUEST, "현재 상태의 주문은 수정할 수 없습니다."),
+    ORDER_ALREADY_CANCELED(HttpStatus.BAD_REQUEST, "이미 취소 처리된 주문입니다."),
 
     // category
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 카테고리가 없습니다."),

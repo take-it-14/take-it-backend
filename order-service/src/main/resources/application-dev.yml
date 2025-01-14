@@ -15,6 +15,11 @@ spring:
       host: redis-stack
       port: 6379
       password: systempass
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
 
 server:
   port: 19093
@@ -40,3 +45,11 @@ management:
       show-details: always
     prometheus:
       enabled: true
+
+message:
+  exchange: "takeit"
+  queues:
+    order:
+      cancel: "takeit.order.cancel"
+    product:
+      cancel: "takeit.product.cancel"

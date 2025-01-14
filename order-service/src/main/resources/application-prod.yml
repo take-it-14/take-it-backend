@@ -20,6 +20,11 @@ spring:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
       password: ${REDIS_PASSWORD}
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
 
 server:
   port: ${ORDER_SERVICE_PORT}
@@ -41,3 +46,11 @@ management:
       show-details: when_authorized
     prometheus:
       enabled: true
+
+message:
+  exchange: ${RABBITMQ_EXCHANGE}
+  queues:
+    order:
+      cancel: ${MESSAGE_QUEUE_ORDER_CANCEL}
+    product:
+      cancel: ${MESSAGE_QUEUE_PRODUCT_CANCEL}
