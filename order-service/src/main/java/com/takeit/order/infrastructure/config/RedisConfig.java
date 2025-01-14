@@ -1,4 +1,4 @@
-package com.takeit.order.infrastructure.redis;
+package com.takeit.order.infrastructure.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

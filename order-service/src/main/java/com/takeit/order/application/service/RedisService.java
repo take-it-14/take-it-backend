@@ -21,27 +21,27 @@ public class RedisService {
 	}
 
 	public void saveOrder(OrderCacheDto orderCacheDto) {
-		String key = "order:" + orderCacheDto.uuid();
+		String key = "order:" + orderCacheDto.uuid().toString();
 		redisTemplate.opsForValue().set(key, orderCacheDto);
 	}
 
-	public Object getOrderId(UUID orderId){
+	public Object getOrderId(String orderId){
 		String key = "orderId:" + orderId;
 		return redisTemplate.opsForValue().get(key);
 	}
 
-	public Object getOrder(UUID uuid) {
-		String key = "order:" + uuid;
-		return redisTemplate.opsForValue().get(key);
+	public OrderCacheDto getOrder(String orderId) {
+		String key = "order:" + orderId;
+		return (OrderCacheDto) redisTemplate.opsForValue().get(key);
 	}
 
-	public void deleteOrderId(UUID orderId){
+	public void deleteOrderId(String orderId){
 		String key = "orderId:" + orderId;
 		redisTemplate.delete(key);
 	}
 
-	public void deleteOrder(UUID uuid) {
-		String key = "order:" + uuid;
+	public void deleteOrder(String orderId) {
+		String key = "order:" + orderId;
 		redisTemplate.delete(key);
 	}
 }
