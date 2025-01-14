@@ -10,14 +10,19 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+  data:
+    redis:
+      host: redis-stack
+      port: 6379
+      password: systempass
   rabbitmq:
-    host: localhost
+    host: rabbitMQ
     port: 5672
     username: guest
     password: guest
 
 server:
-  port: 19098
+  port: 19093
 
 eureka:
   client:

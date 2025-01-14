@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.takeit.common.presentation.dto.CommonResponse;
 import com.takeit.order.application.annotation.RequireRole;
+import com.takeit.order.application.dto.order.OrderCreateResponse;
 import com.takeit.order.application.dto.order.OrderResponse;
 import com.takeit.order.application.dto.order.OrderDetailResponse;
 import com.takeit.order.application.dto.order.OrderStatusUpdateResponse;
@@ -38,7 +39,7 @@ public class OrderController {
 
 	@PostMapping
 	@RequireRole({"MASTER", "CUSTOMER"})
-	public CommonResponse<OrderResponse> createOrder(
+	public CommonResponse<OrderCreateResponse> createOrder(
 		@RequestBody @Valid OrderCreateRequest request,
 		@RequestAttribute(value = "X-UserId") Long userId
 		){

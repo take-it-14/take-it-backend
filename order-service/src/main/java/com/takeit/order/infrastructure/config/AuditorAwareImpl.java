@@ -1,4 +1,4 @@
-package com.takeit.order.config;
+package com.takeit.order.infrastructure.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.AuditorAware;
