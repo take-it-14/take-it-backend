@@ -9,7 +9,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.takeit.order.application.dto.OrderDto;
 
+import org.springframework.beans.factory.annotation.Value;
+
 import com.takeit.order.application.dto.product.CancelProduct;
+
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -22,7 +25,9 @@ import com.takeit.common.exception.ErrorCode;
 
 import static com.takeit.common.utils.AccessValidator.*;
 
+import com.takeit.order.application.dto.order.OrderCacheDto;
 import com.takeit.order.application.dto.order.OrderCreateDto;
+import com.takeit.order.application.dto.order.OrderCreateResponse;
 import com.takeit.order.application.dto.order.OrderResponse;
 import com.takeit.order.application.dto.order.OrderDetailResponse;
 import com.takeit.order.application.dto.order.OrderStatusUpdateDto;
@@ -46,13 +51,17 @@ public class OrderService {
 	private final OrderRepository orderRepository;
 	private final ProductClient productClient;
 	private final CouponClient couponClient;
+	private final RedisService redisService;
+
+	@Value("${order.redis.ttl:300}") // 5분
+	private long orderRedisTtl;
 
 	private final RabbitTemplate rabbitTemplate;
 	@Value("${message.queues.product.cancel}")
 	private String productQueue;
 
 	@Transactional
-	public OrderResponse createOrder(OrderCreateDto request, Long userId) {
+	public OrderCreateResponse createOrder(OrderCreateDto request, Long userId) {
 
 		ProductDto product = productClient.getProductByUuid(request.productId());
 
@@ -61,14 +70,19 @@ public class OrderService {
 		Long userCouponId = request.userCouponId() != null ?
 			couponClient.validUserCouponAndGetUserCouponId(request.userCouponId(), userId) : null;
 
-		Order order = Order.create(
+		OrderCacheDto orderCacheDto = OrderCacheDto.of(
+			UUID.randomUUID(),
 			userId,
 			product.id(),
 			userCouponId,
 			request.quantity(),
 			request.amount()
 		);
-		return OrderResponse.of(orderRepository.save(order), request.productId(), request.userCouponId());
+
+		redisService.saveOrderId(orderCacheDto.uuid(), orderRedisTtl);
+		redisService.saveOrder(orderCacheDto);
+
+		return OrderCreateResponse.from(orderCacheDto.uuid());
 	}
 
 	public OrderDetailResponse getOrderDetail(UUID orderId, Long userId, String role) {
@@ -209,19 +223,22 @@ public class OrderService {
 
 	@Transactional
 	public void cancelOrder(Long orderId) {
-		Order order = orderRepository.findById(orderId).orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
+		Order order = orderRepository.findById(orderId)
+			.orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
 		checkCanCanceled(order.getStatus());
 		order.cancel();
 		try {
 			ObjectMapper objectMapper = new ObjectMapper();
-			String message = objectMapper.writeValueAsString(CancelProduct.create(order.getProductId(), order.getQuantity()));
+			String message = objectMapper.writeValueAsString(
+				CancelProduct.create(order.getProductId(), order.getQuantity()));
 			rabbitTemplate.convertAndSend(productQueue, message);
 		} catch (JsonProcessingException e) {
-            throw new CustomException(ErrorCode.JSON_PROCESSING_ERROR);
-        }
-    }
+			throw new CustomException(ErrorCode.JSON_PROCESSING_ERROR);
+		}
+	}
 
 	private void checkCanCanceled(OrderStatus status) {
-		if(status == OrderStatus.CANCELLED) throw new CustomException(ErrorCode.ORDER_ALREADY_CANCELED);
+		if (status == OrderStatus.CANCELLED)
+			throw new CustomException(ErrorCode.ORDER_ALREADY_CANCELED);
 	}
 }
