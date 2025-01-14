@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import com.takeit.order.application.dto.OrderDto;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,9 @@ import com.takeit.common.exception.ErrorCode;
 
 import static com.takeit.common.utils.AccessValidator.*;
 
+import com.takeit.order.application.dto.order.OrderCacheDto;
 import com.takeit.order.application.dto.order.OrderCreateDto;
+import com.takeit.order.application.dto.order.OrderCreateResponse;
 import com.takeit.order.application.dto.order.OrderResponse;
 import com.takeit.order.application.dto.order.OrderDetailResponse;
 import com.takeit.order.application.dto.order.OrderStatusUpdateDto;
@@ -41,9 +44,13 @@ public class OrderService {
 	private final OrderRepository orderRepository;
 	private final ProductClient productClient;
 	private final CouponClient couponClient;
+	private final RedisService redisService;
+
+	@Value("${order.redis.ttl:300}") // 5분
+	private long orderRedisTtl;
 
 	@Transactional
-	public OrderResponse createOrder(OrderCreateDto request, Long userId) {
+	public OrderCreateResponse createOrder(OrderCreateDto request, Long userId) {
 
 		ProductDto product = productClient.getProductByUuid(request.productId());
 
@@ -52,14 +59,18 @@ public class OrderService {
 		Long userCouponId = request.userCouponId() != null ?
 			couponClient.validUserCouponAndGetUserCouponId(request.userCouponId(), userId) : null;
 
-		Order order = Order.create(
+		OrderCacheDto orderCacheDto = OrderCacheDto.of(
+			UUID.randomUUID(),
 			userId,
 			product.id(),
 			userCouponId,
 			request.quantity(),
 			request.amount()
 		);
-		return OrderResponse.of(orderRepository.save(order), request.productId(), request.userCouponId());
+
+		redisService.saveOrder(orderCacheDto, orderRedisTtl);
+
+		return OrderCreateResponse.from(orderCacheDto.uuid());
 	}
 
 	public OrderDetailResponse getOrderDetail(UUID orderId, Long userId, String role) {
