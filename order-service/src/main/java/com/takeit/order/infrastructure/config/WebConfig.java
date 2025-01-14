@@ -1,4 +1,4 @@
-package com.takeit.order.config;
+package com.takeit.order.infrastructure.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
