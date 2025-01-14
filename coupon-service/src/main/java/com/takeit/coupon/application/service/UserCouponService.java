@@ -41,13 +41,13 @@ public class UserCouponService {
 
         Coupon coupon = couponRepository.findByUuidAndIsDeletedIsFalse(request.couponId()).orElseThrow(() -> new CustomException(COUPON_NOT_FOUND));
 
-        CategoryDto categoryDto = categoryService.getCategory(coupon.getCategoryId());
+        CategoryDto categoryDto = coupon.getCategoryId() != null ? categoryService.getCategory(coupon.getCategoryId()) : null;
 
         if(coupon.getEndDate().isBefore(LocalDateTime.now())) {
             throw new CustomException(COUPON_EXPIRED);
         }
 
-        return CreateUserCouponResponse.of(userCouponRepository.save(UserCoupon.create(coupon, couponUserDto.id())), coupon.getName(), categoryDto.name());
+        return CreateUserCouponResponse.of(userCouponRepository.save(UserCoupon.create(coupon, couponUserDto.id())), coupon.getName(), categoryDto == null ? null : categoryDto.name());
     }
 
     @Transactional
@@ -105,12 +105,15 @@ public class UserCouponService {
         return UpdateUserCouponResponse.of(userCouponRepository.save(coupon), couponName);
     }
 
-    public Long validUserCouponAndGetUserCouponId(UUID userCouponId, Long userId) {
+    @Transactional
+    public Long validUserCouponAndUsedAndGetUserCouponId(UUID userCouponId, Long userId) {
         UserCoupon coupon = userCouponRepository.findByUuidAndIsDeletedIsFalse(userCouponId).orElseThrow(() -> new CustomException(USER_COUPON_NOT_FOUND));
 
         validUserCouponUser(coupon, userId);
 
         validCouponIsNotUsed(coupon);
+
+        coupon.used();
 
         return coupon.getId();
     }
@@ -155,5 +158,12 @@ public class UserCouponService {
 
     private boolean checkRoleMasterOrManager(String role) {
         return !AccessValidator.isMaster(role) && !AccessValidator.isManager(role);
+    }
+
+    @Transactional
+    public void cancel(Long userCouponId) {
+        UserCoupon userCoupon = userCouponRepository.findById(userCouponId).orElseThrow(() -> new CustomException(USER_COUPON_NOT_FOUND));
+
+        userCoupon.cancel();
     }
 }
