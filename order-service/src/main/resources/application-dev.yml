@@ -53,3 +53,5 @@ message:
       cancel: "takeit.order.cancel"
     product:
       cancel: "takeit.product.cancel"
+    coupon:
+      cancel: "takeit.coupon.cancel"
