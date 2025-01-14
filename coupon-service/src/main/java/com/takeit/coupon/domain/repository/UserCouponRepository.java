@@ -23,4 +23,6 @@ public interface UserCouponRepository {
     UserCouponPageResponse findAll(Predicate predicate, Pageable pageable, UserDto userId);
 
     Optional<UserCoupon> findByIdAndIsDeletedIsFalse(Long userCouponId);
+
+    Optional<UserCoupon> findById(Long userCouponId);
 }
