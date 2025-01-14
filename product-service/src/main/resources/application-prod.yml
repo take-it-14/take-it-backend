@@ -16,6 +16,18 @@ spring:
         default_batch_fetch_size: 100
     open-in-view: false
 
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+
 server:
   port: ${PRODUCT_SERVICE_PORT}
 
@@ -49,3 +61,8 @@ management:
       show-details: when_authorized
     prometheus:
       enabled: true
+
+message:
+  queue:
+    product:
+      cancel: ${MESSAGE_QUEUE_PRODUCT_CANCEL}

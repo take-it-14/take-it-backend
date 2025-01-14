@@ -7,6 +7,8 @@ import com.takeit.payment.application.dto.payment.VerifyTossPaymentDto;
 import com.takeit.payment.domain.entity.Payment;
 import com.takeit.payment.domain.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class PaymentService {
     private final PaymentRepository paymentRepository;
+    private final RabbitTemplate rabbitTemplate;
+
+    @Value("${message.queue.order.cancel}")
+    private String queueOrder;
 
     @Transactional
     public void verifyTossPayment(VerifyTossPaymentDto request, String username) {
@@ -24,13 +30,14 @@ public class PaymentService {
         Long orderId = 1L;
 
         // TODO: pg사에 결제 확인(실제로는 try catch를 통해 진행해야함)
-        boolean isPaymentSuccess = true;
+        boolean isPaymentSuccess = false;
         String receipt = "영수증";
 
         if(isPaymentSuccess) {
             paymentRepository.save(Payment.create(orderId, userId, request.amount(), receipt));
         } else {
-            throw new CustomException(ErrorCode.WRONG_PAYMENT);
+            rabbitTemplate.convertAndSend(queueOrder, orderId);
+//            throw new CustomException(ErrorCode.WRONG_PAYMENT);
         }
 
     }
@@ -47,6 +54,7 @@ public class PaymentService {
 
         if(isPaymentCanceled) {
             payment.cancel();
+            rabbitTemplate.convertAndSend(queueOrder, request.orderId());
         } else {
             throw new CustomException(ErrorCode.PAYMENT_CANCEL_FAIL);
         }

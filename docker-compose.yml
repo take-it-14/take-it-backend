@@ -3,6 +3,17 @@ networks:
     driver: bridge
 
 services:
+  rabbitMQ:
+    image: rabbitmq:management
+    container_name: rabbitMQ
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - ./rabbitMQ-data:/data
+    networks:
+      - takeit-network
+
   postgres:
     image: postgres:latest
     container_name: postgres

@@ -12,6 +12,12 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
 server:
   port: 19095
 
@@ -36,3 +42,9 @@ management:
       show-details: always
     prometheus:
       enabled: true
+
+message:
+  exchange: "takeit"
+  queue:
+    order:
+      cancel: "takeit.order.cancel"
