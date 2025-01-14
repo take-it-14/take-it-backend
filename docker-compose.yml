@@ -23,7 +23,7 @@ services:
       POSTGRES_USER: postgres # superuser
       POSTGRES_PASSWORD: postgres
     volumes:
-      - /var/lib/postgresql/data
+      - ./postgres-data:/var/lib/postgresql/data
       - ./init-database.sql:/docker-entrypoint-initdb.d/init-database.sql:ro
     restart: always
     networks:
@@ -91,7 +91,7 @@ services:
       - takeit-network
 
   order-service:
-    image: takeit-order-service:latest
+    image: gogohaena/takeit-order-service:latest
     container_name: order-service
     ports:
       - "19093:19093"
