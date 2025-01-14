@@ -51,5 +51,6 @@ message:
   queues:
     order:
       cancel: "takeit.order.cancel"
+      complete: "takeit.order.complete"
     product:
       cancel: "takeit.product.cancel"

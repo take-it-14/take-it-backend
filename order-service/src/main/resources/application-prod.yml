@@ -52,5 +52,6 @@ message:
   queues:
     order:
       cancel: ${MESSAGE_QUEUE_ORDER_CANCEL}
+      complete: ${MESSAGE_QUEUE_ORDER_COMPLETE}
     product:
       cancel: ${MESSAGE_QUEUE_PRODUCT_CANCEL}
