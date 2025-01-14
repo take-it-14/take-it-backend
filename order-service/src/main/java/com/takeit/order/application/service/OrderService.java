@@ -77,7 +77,8 @@ public class OrderService {
 			request.amount()
 		);
 
-		redisService.saveOrder(orderCacheDto, orderRedisTtl);
+		redisService.saveOrderId(orderCacheDto.uuid(), orderRedisTtl);
+		redisService.saveOrder(orderCacheDto);
 
 		return OrderCreateResponse.from(orderCacheDto.uuid());
 	}
