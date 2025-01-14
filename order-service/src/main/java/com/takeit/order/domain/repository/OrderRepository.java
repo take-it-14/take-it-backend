@@ -16,4 +16,6 @@ public interface OrderRepository {
 	Optional<Order> findByUuid(UUID uuid);
 	Page<Order> findByCustomerId(Long customerId, Pageable pageable);
 	Page<Order> findByCustomerIdAndStatus(Long customerId, OrderStatus orderStatus, Pageable pageable);
+
+    Optional<Order> findById(Long orderId);
 }
