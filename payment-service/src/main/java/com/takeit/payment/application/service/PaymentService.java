@@ -6,6 +6,8 @@ import com.takeit.payment.application.dto.payment.CancelTossPaymentDto;
 import com.takeit.payment.application.dto.payment.VerifyTossPaymentDto;
 import com.takeit.payment.domain.entity.Payment;
 import com.takeit.payment.domain.repository.PaymentRepository;
+import com.takeit.payment.presentation.controller.PaymentMessageProducer;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,8 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final RabbitTemplate rabbitTemplate;
+    private final PaymentMessageProducer paymentMessageProducer;
 
-    @Value("${message.queue.order.cancel}")
+    @Value("${message.queues.order.cancel}")
     private String queueOrder;
 
     @Transactional
@@ -35,6 +38,7 @@ public class PaymentService {
 
         if(isPaymentSuccess) {
             paymentRepository.save(Payment.create(orderId, userId, request.amount(), receipt));
+            paymentMessageProducer.sendOrderCompleteRequest(request.orderId());
             return "결제 성공";
         } else {
             rabbitTemplate.convertAndSend(queueOrder, orderId);

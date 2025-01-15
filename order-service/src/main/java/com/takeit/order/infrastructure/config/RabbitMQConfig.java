@@ -28,6 +28,9 @@ public class RabbitMQConfig {
     @Value("${message.queues.order.cancel}")
     private String queueOrder;
 
+    @Value("${message.queues.order.complete}")
+    private String queueOrderComplete;
+
     @Bean
     public TopicExchange orderExchange() { return new TopicExchange(exchange); }
 
@@ -38,7 +41,18 @@ public class RabbitMQConfig {
     public Queue orderQueue() { return new Queue(queueOrder); }
 
     @Bean
+    public Queue orderCompleteQueue() { return new Queue(queueOrderComplete); }
+
+    @Bean
     public Binding productBinding() { return BindingBuilder.bind(productQueue()).to(orderExchange()).with(queueProduct); }
+
+    @Bean
+    public Binding orderCompleteBinding() {
+        return BindingBuilder
+            .bind(orderCompleteQueue())
+            .to(orderExchange())
+            .with(queueOrderComplete);
+    }
 
     @Bean
     public MessageConverter jsonMessageConverter() {
