@@ -50,4 +50,4 @@ logging:
 message:
   queues:
     coupon:
-      cancel: ${MESSAGE_QUEUE_COUPON_CANCEL}
+      cancel: "takeit.order.cancel"
