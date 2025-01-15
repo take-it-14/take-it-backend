@@ -14,21 +14,6 @@ services:
     networks:
       - takeit-network
 
-#  postgres:
-#    image: postgres:latest
-#    container_name: postgres
-#    ports:
-#      - "15432:5432"
-#    environment:
-#      POSTGRES_USER: postgres # superuser
-#      POSTGRES_PASSWORD: postgres
-#    volumes:
-#      - postgres-data:/var/lib/postgresql/data
-#      - ./init-database.sql:/docker-entrypoint-initdb.d/init-database.sql:ro
-#    restart: always
-#    networks:
-#      - takeit-network
-
   redis-stack:
     image: redis/redis-stack
     container_name: redis-stack
