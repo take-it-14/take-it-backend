@@ -38,6 +38,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ProductPhotoRepository productPhotoRepository;
     private final FileUpload fileUpload;
+    private final ProductRedisService productRedisService;
 
     // 상품 등록
     @Transactional
@@ -161,13 +162,13 @@ public class ProductService {
 
     // 상품 목록
     public ProductPageResponse getProducts(Predicate predicate, Pageable pageable) {
-        Page<Product> userPage = productRepository.findAll(predicate, pageable);
+        Page<Product> productPage = productRepository.findAll(predicate, pageable);
 
-        if (userPage.isEmpty()) {
-            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        if (productPage.isEmpty()) {
+            throw new CustomException(PRODUCT_NOT_FOUND);
         }
 
-        return ProductPageResponse.from(userPage);
+        return ProductPageResponse.from(productPage);
     }
 
 	public Page<ProductDailyStatResponse> getProductDailyStat(UUID productId, Date startDate, Date endDate, Pageable pageable) {
