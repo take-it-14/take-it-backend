@@ -7,8 +7,10 @@ server:
 
 eureka:
   client:
-    register-with-eureka: false
-    fetch-registry: false
+    register-with-eureka: false  # 다른 Eureka 서버에 등록하지 않음
+    fetch-registry: false        # 다른 Eureka 서버에서 레지스트리를 불러오지 않음
+    service-url:
+      defaultZone: http://localhost:19090/eureka/
   instance:
     hostname: localhost
 

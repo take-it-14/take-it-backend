@@ -160,6 +160,7 @@ services:
       - SPRING_PROFILES_ACTIVE=prod
       - EUREKA_HOSTNAME=${EUREKA_HOSTNAME}
       - EUREKA_SERVER_PORT=${EUREKA_SERVER_PORT}
+      - EUREKA_SERVER_URL=${EUREKA_SERVER_URL}
       - ZIPKIN_ENDPOINT=${ZIPKIN_ENDPOINT}
     networks:
       - takeit-network
