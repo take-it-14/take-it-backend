@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 public class ProductMessageListener {
     private final ProductRedisService productRedisService;
 
-    @RabbitListener(queues = "${message.queue.product.cancel}")
+    @RabbitListener(queues = "${message.queues.product.cancel}")
     public void receiveMessage(String message) {
         log.info("Received message");
 

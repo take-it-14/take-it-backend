@@ -45,6 +45,7 @@ management:
 
 message:
   exchange: ${RABBITMQ_EXCHANGE}
-  queue:
+  queues:
     order:
       cancel: ${MESSAGE_QUEUE_ORDER_CANCEL}
+      complete: ${MESSAGE_QUEUE_ORDER_COMPLETE}
