@@ -57,6 +57,7 @@ public class ProductService {
                 dto.closeTime(),
                 dto.isActive()
         ));
+        productRedisService.saveProduct(product);
 
         List<ProductPhoto> photos = new ArrayList<>();
         if(dto.files() != null && !dto.files().isEmpty()) {
