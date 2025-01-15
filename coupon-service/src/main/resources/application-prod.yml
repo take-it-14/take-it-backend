@@ -13,9 +13,12 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        highlight_sql: true
-        default_batch_fetch_size: 10
-    open-in-view: false
+
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
 
 server:
   port: ${COUPON_SERVICE_PORT}
@@ -43,3 +46,8 @@ logging:
     root: info
     com.takeit: info
     org.springframework: warn
+
+message:
+  queues:
+    coupon:
+      cancel: ${MESSAGE_QUEUE_COUPON_CANCEL}

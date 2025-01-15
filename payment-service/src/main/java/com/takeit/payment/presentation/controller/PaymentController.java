@@ -17,8 +17,7 @@ public class PaymentController {
     @PostMapping("/toss/verify")
     public CommonResponse<?> verifyTossPayment(@Valid @RequestBody VerifyTossPaymentRequest request,
                                                @RequestHeader(value = "X-Username") String username) {
-        paymentService.verifyTossPayment(request.toDto(), username);
-        return CommonResponse.ofSuccess("결제 성공", null);
+        return CommonResponse.ofSuccess(paymentService.verifyTossPayment(request.toDto(), username), null);
     }
 
     @PatchMapping("/toss/cancel")

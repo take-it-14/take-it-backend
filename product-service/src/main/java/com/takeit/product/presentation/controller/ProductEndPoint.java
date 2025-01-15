@@ -36,7 +36,7 @@ public class ProductEndPoint {
     }
 
     @PostMapping("/{productId}/occupy")
-    public void occupyProduct(@PathVariable Long productId,
+    public void occupyProduct(@PathVariable UUID productId,
                               @RequestParam(required = false) int quantity) {
         productRedisService.occupyProduct(productId, quantity);
     }

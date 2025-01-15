@@ -57,6 +57,7 @@ public class ProductService {
                 dto.closeTime(),
                 dto.isActive()
         ));
+        productRedisService.saveProduct(product);
 
         List<ProductPhoto> photos = new ArrayList<>();
         if(dto.files() != null && !dto.files().isEmpty()) {
@@ -96,6 +97,7 @@ public class ProductService {
         );
 
         product = productRepository.save(product);
+        productRedisService.saveProduct(product);
 
         int deleteFileSize = 0;
         if(dto.deletePhotos() != null && !dto.deletePhotos().isEmpty()) {
@@ -143,6 +145,7 @@ public class ProductService {
         );
 
         product.delete(requesterUsername);
+        productRedisService.deleteProduct(productId);
 
         List<ProductPhoto> deletePhotos = productPhotoRepository.findAllByProductAndIsDeletedIsFalse(product);
         deletePhotos.forEach(productPhoto -> productPhoto.delete(requesterUsername));
@@ -153,9 +156,14 @@ public class ProductService {
 
     // 상품 단건 조회
     public ProductDetailResponse getProduct(UUID productId) {
-        Product product = productRepository.findByUuidAndIsDeletedFalse(productId).orElseThrow(
-                () -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND)
-        );
+        Product product = productRedisService.getProduct(productId);
+        if(product == null) {
+            product = productRepository.findByUuidAndIsDeletedFalse(productId).orElseThrow(
+                    () -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND)
+            );
+
+            productRedisService.saveProduct(product);
+        }
 
         return ProductDetailResponse.from(product);
     }
@@ -183,8 +191,15 @@ public class ProductService {
 	}
 
     public ProductEntityResponse getProductEntity(UUID productId) {
-        return ProductEntityResponse.from(productRepository.findByUuidAndIsDeletedFalse(productId)
-                .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND)));
+        Product product = productRedisService.getProduct(productId);
+        if(product == null) {
+            product = productRepository.findByUuidAndIsDeletedFalse(productId).orElseThrow(
+                    () -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND)
+            );
+
+            productRedisService.saveProduct(product);
+        }
+        return ProductEntityResponse.from(product);
     }
 
     public List<ProductEntityResponse> getProductEntities(List<Long> idList, Predicate predicate) {

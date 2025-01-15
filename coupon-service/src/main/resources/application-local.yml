@@ -12,9 +12,12 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        highlight_sql: true
-        default_batch_fetch_size: 10
-    open-in-view: false
+
+  rabbitmq:
+    host: redis-stack
+    port: 5672
+    username: guest
+    password: guest
 
 server:
   port: 19097
@@ -46,3 +49,8 @@ logging:
     root: debug
     com.takeit: debug
     org.springframework: warn
+
+message:
+  queues:
+    coupon:
+      cancel: "takeit.order.cancel"

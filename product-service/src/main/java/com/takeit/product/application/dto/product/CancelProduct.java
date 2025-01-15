@@ -1,7 +1,9 @@
 package com.takeit.product.application.dto.product;
 
+import java.util.UUID;
+
 public record CancelProduct(
-        Long productId,
+        UUID productId,
         Long quantity
 )  {}
 
