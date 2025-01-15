@@ -53,7 +53,10 @@ public class OrderService {
 	private final CouponClient couponClient;
 	private final RedisService redisService;
 
-	@Value("${order.redis.ttl:300}") // 5분
+	@Value("${order.redis.ttl:300}") // 5분(ID 단독 저장용)
+	private long orderIdRedisTtl;
+
+	@Value("${order.redis.ttl:1800}") // 30분(주문 데이터 전체 저장용)
 	private long orderRedisTtl;
 
 	private final RabbitTemplate rabbitTemplate;
@@ -79,8 +82,8 @@ public class OrderService {
 			request.amount()
 		);
 
-		redisService.saveOrderId(orderCacheDto.uuid(), orderRedisTtl);
-		redisService.saveOrder(orderCacheDto);
+		redisService.saveOrderId(orderCacheDto.uuid(), orderIdRedisTtl);
+		redisService.saveOrder(orderCacheDto, orderRedisTtl);
 
 		return OrderCreateResponse.from(orderCacheDto.uuid());
 	}

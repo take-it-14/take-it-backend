@@ -20,9 +20,9 @@ public class RedisService {
 		redisTemplate.opsForValue().set(key, orderId, ttl, TimeUnit.SECONDS);
 	}
 
-	public void saveOrder(OrderCacheDto orderCacheDto) {
+	public void saveOrder(OrderCacheDto orderCacheDto, long ttl) {
 		String key = "order:" + orderCacheDto.uuid().toString();
-		redisTemplate.opsForValue().set(key, orderCacheDto);
+		redisTemplate.opsForValue().set(key, orderCacheDto, ttl, TimeUnit.SECONDS);
 	}
 
 	public Object getOrderId(String orderId){
