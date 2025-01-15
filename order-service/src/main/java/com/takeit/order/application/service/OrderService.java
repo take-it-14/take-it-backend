@@ -5,16 +5,11 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.takeit.order.application.dto.OrderDto;
 
+import com.takeit.order.presentation.controller.OrderMessageProducer;
 import org.springframework.beans.factory.annotation.Value;
 
-import com.takeit.order.application.dto.product.CancelProduct;
-
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -56,9 +51,10 @@ public class OrderService {
 	@Value("${order.redis.ttl:300}") // 5분
 	private long orderRedisTtl;
 
-	private final RabbitTemplate rabbitTemplate;
 	@Value("${message.queues.product.cancel}")
 	private String productQueue;
+
+	private final OrderMessageProducer orderMessageProducer;
 
 	@Transactional
 	public OrderCreateResponse createOrder(OrderCreateDto request, Long userId) {
@@ -227,14 +223,9 @@ public class OrderService {
 			.orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
 		checkCanCanceled(order.getStatus());
 		order.cancel();
-		try {
-			ObjectMapper objectMapper = new ObjectMapper();
-			String message = objectMapper.writeValueAsString(
-				CancelProduct.create(order.getProductId(), order.getQuantity()));
-			rabbitTemplate.convertAndSend(productQueue, message);
-		} catch (JsonProcessingException e) {
-			throw new CustomException(ErrorCode.JSON_PROCESSING_ERROR);
-		}
+		orderMessageProducer.sendProductCancelRequest(order.getProductId(), order.getQuantity());
+		if(order.getUserCouponId() != null)
+			orderMessageProducer.sendUserCouponRequest(order.getUserCouponId());
 	}
 
 	private void checkCanCanceled(OrderStatus status) {

@@ -17,7 +17,7 @@ public class UserCouponEndPoint {
             @PathVariable UUID userCouponId,
             @RequestParam(name = "userId") Long userId
     ) {
-        return userCouponService.validUserCouponAndGetUserCouponId(userCouponId, userId);
+        return userCouponService.validUserCouponAndUsedAndGetUserCouponId(userCouponId, userId);
     }
 
     @GetMapping

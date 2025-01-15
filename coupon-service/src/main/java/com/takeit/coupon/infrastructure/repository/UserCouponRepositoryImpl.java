@@ -145,4 +145,9 @@ public class UserCouponRepositoryImpl implements UserCouponRepository {
     public Optional<UserCoupon> findByIdAndIsDeletedIsFalse(Long userCouponId) {
         return jpaUserCouponRepository.findByIdAndIsDeletedIsFalse(userCouponId);
     }
+
+    @Override
+    public Optional<UserCoupon> findById(Long userCouponId) {
+        return jpaUserCouponRepository.findById(userCouponId);
+    }
 }

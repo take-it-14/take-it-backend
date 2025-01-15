@@ -26,7 +26,7 @@ public class PaymentService {
     private String queueOrder;
 
     @Transactional
-    public void verifyTossPayment(VerifyTossPaymentDto request, String username) {
+    public String verifyTossPayment(VerifyTossPaymentDto request, String username) {
         // TODO: username으로 User 조회 + 권한 체크
         Long userId = 1L;
         // TODO: orderUUID로 orderId 가져오기
@@ -39,9 +39,11 @@ public class PaymentService {
         if(isPaymentSuccess) {
             paymentRepository.save(Payment.create(orderId, userId, request.amount(), receipt));
             paymentMessageProducer.sendOrderCompleteRequest(request.orderId());
+            return "결제 성공";
         } else {
             rabbitTemplate.convertAndSend(queueOrder, orderId);
 //            throw new CustomException(ErrorCode.WRONG_PAYMENT);
+            return "결제 실패";
         }
 
     }

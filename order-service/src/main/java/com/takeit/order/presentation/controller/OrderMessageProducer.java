@@ -16,11 +16,18 @@ public class OrderMessageProducer {
 	@Value("${message.queues.product.cancel}")
 	private String productQueue;
 
+	@Value("${message.queues.coupon.cancel}")
+	private String couponQueue;
+
 	private void sendMessage(String routingKey, Object message) {
 		rabbitTemplate.convertAndSend(routingKey, message);
 	}
 
 	public void sendProductCancelRequest(Long productId, Long quantity){
 		sendMessage(productQueue, CancelProduct.create(productId, quantity));
+	}
+
+	public void sendUserCouponRequest(Long userCouponId) {
+		sendMessage(couponQueue, userCouponId);
 	}
 }
