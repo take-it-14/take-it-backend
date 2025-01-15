@@ -68,6 +68,9 @@ management:
       enabled: true
 
 message:
+  exchange: "takeit"
   queues:
     product:
       cancel: "takeit.product.cancel"
+      save:
+        db: "takeit.product.save.db"
