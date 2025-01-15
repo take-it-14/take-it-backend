@@ -57,3 +57,9 @@ management:
       show-details: always
     prometheus:
       enabled: true
+
+logging:
+  level:
+    root: debug
+    com.takeit: debug
+    org.springframework: warn

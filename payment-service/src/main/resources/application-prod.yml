@@ -43,6 +43,12 @@ management:
     prometheus:
       enabled: true
 
+logging:
+  level:
+    root: info
+    com.takeit: info
+    org.springframework: warn
+
 message:
   exchange: ${RABBITMQ_EXCHANGE}
   queues:

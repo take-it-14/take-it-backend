@@ -17,11 +17,6 @@ spring:
         default_batch_fetch_size: 100
     open-in-view: false
 
-logging:
-  level:
-    org.hibernate.type.descriptor.sql: info
-    org.hibernate.SQL: info
-
 server:
   port: ${AUTH_SERVICE_PORT}
 
@@ -47,3 +42,11 @@ management:
       show-details: when_authorized
     prometheus:
       enabled: true
+
+logging:
+  level:
+    root: info
+    com.takeit: info
+    org.springframework: warn
+    org.hibernate.type.descriptor.sql: info
+    org.hibernate.SQL: info

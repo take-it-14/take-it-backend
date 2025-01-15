@@ -22,3 +22,9 @@ management:
       show-details: when_authorized
     prometheus:
       enabled: true
+
+logging:
+  level:
+    root: info
+    com.takeit: info
+    org.springframework: warn
