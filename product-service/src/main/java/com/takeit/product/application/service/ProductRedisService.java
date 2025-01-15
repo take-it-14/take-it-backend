@@ -61,6 +61,35 @@ public class ProductRedisService {
 
     }
 
+    public Product getProduct(UUID productId) {
+        String key = "product:" + productId;
+
+        Map<Object, Object> productMap = redisTemplate.opsForHash().entries(key);
+        if (productMap.isEmpty()) {
+            return null;
+        }
+
+        return Product.of(
+                Long.valueOf(productMap.get("id").toString()),
+                productId,
+                Long.valueOf(productMap.get("sellerId").toString()),
+                Long.valueOf(productMap.get("categoryId").toString()),
+                productMap.get("productName").toString(),
+                productMap.get("description").toString(),
+                Long.valueOf(productMap.get("price").toString()),
+                Integer.valueOf(productMap.get("stock").toString()),
+                Integer.valueOf(productMap.get("limitPerUser").toString()),
+                LocalDateTime.parse(productMap.get("openTime").toString()),
+                productMap.get("closeTime") != null ? LocalDateTime.parse(productMap.get("closeTime").toString()) : null,
+                Boolean.valueOf(productMap.get("isActive").toString()),
+                productMap.get("stars") != null ? Double.valueOf(productMap.get("stars").toString()) : null
+        );
+    }
+
+    public void deleteProduct(UUID productId) {
+        String key = "product:" + productId;
+        redisTemplate.delete(key);
+    }
 
     public void cancelProduct(CancelProduct request) {
         String key = "product:" + request.productId();

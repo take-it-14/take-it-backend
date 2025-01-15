@@ -60,6 +60,38 @@ public class Product extends BaseEntity implements Serializable{
     @Builder.Default
     private List<ProductPhoto> photoList = new ArrayList<>();
 
+    public static Product of(
+            Long id,
+            UUID uuid,
+            Long sellerId,
+            Long categoryId,
+            String productName,
+            String description,
+            Long price,
+            Integer stock,
+            Integer limitPerUser,
+            LocalDateTime openTime,
+            LocalDateTime closeTime,
+            Boolean isActive,
+            Double stars) {
+
+        return Product.builder()
+                .id(id)
+                .uuid(uuid)
+                .sellerId(sellerId)
+                .categoryId(categoryId)
+                .productName(productName)
+                .description(description)
+                .price(price)
+                .stock(stock)
+                .limitPerUser(limitPerUser)
+                .openTime(openTime)
+                .closeTime(closeTime)
+                .isActive(isActive)
+                .stars(stars)
+                .build();
+    }
+
     // 상품 생성 메서드
     public static Product create(
             Long sellerId,
