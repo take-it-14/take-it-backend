@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 @RequiredArgsConstructor
 public class RabbitMQConfig {
 
-    @Value("${message.queue.product.cancel}")
+    @Value("${message.queues.product.cancel}")
     private String queueProduct;
 
     @Bean

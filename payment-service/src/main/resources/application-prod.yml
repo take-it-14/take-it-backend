@@ -50,8 +50,8 @@ logging:
     org.springframework: warn
 
 message:
-  exchange: ${RABBITMQ_EXCHANGE}
+  exchange: "takeit"
   queues:
     order:
-      cancel: ${MESSAGE_QUEUE_ORDER_CANCEL}
-      complete: ${MESSAGE_QUEUE_ORDER_COMPLETE}
+      cancel: "takeit.order.cancel"
+      complete: "takeit.order.complete"

@@ -14,20 +14,20 @@ services:
     networks:
       - takeit-network
 
-  postgres:
-    image: postgres:latest
-    container_name: postgres
-    ports:
-      - "15432:5432"
-    environment:
-      POSTGRES_USER: postgres # superuser
-      POSTGRES_PASSWORD: postgres
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-      - ./init-database.sql:/docker-entrypoint-initdb.d/init-database.sql:ro
-    restart: always
-    networks:
-      - takeit-network
+#  postgres:
+#    image: postgres:latest
+#    container_name: postgres
+#    ports:
+#      - "15432:5432"
+#    environment:
+#      POSTGRES_USER: postgres # superuser
+#      POSTGRES_PASSWORD: postgres
+#    volumes:
+#      - postgres-data:/var/lib/postgresql/data
+#      - ./init-database.sql:/docker-entrypoint-initdb.d/init-database.sql:ro
+#    restart: always
+#    networks:
+#      - takeit-network
 
   redis-stack:
     image: redis/redis-stack
@@ -170,7 +170,7 @@ services:
       - "19090:19090"
     volumes:
       - ./eureka-server/src/main/resources/application.yml:/config/application.yml
-      - ./eureka-server/src/main/resources/application-dev.yml:/config/application-dev.yml
+      - ./eureka-server/src/main/resources/application-prod.yml:/config/application-prod.yml
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - EUREKA_HOSTNAME=${EUREKA_HOSTNAME}
@@ -186,7 +186,7 @@ services:
       - "19091:19091"
     volumes:
       - ./gateway/src/main/resources/application.yml:/config/application.yml
-      - ./gateway/src/main/resources/application-dev.yml:/config/application-dev.yml
+      - ./gateway/src/main/resources/application-prod.yml:/config/application-prod.yml
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - EUREKA_SERVER_URL=${EUREKA_SERVER_URL}
@@ -205,7 +205,7 @@ services:
       - "19092:19092"
     volumes:
       - ./auth-service/src/main/resources/application.yml:/config/application.yml
-      - ./auth-service/src/main/resources/application-dev.yml:/config/application-dev.yml
+      - ./auth-service/src/main/resources/application-prod.yml:/config/application-prod.yml
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - EUREKA_SERVER_URL=${EUREKA_SERVER_URL}
@@ -218,7 +218,6 @@ services:
       - ZIPKIN_ENDPOINT=${ZIPKIN_ENDPOINT}
     depends_on:
       - eureka-server
-      - postgres
     networks:
       - takeit-network
 
@@ -229,7 +228,7 @@ services:
       - "19093:19093"
     volumes:
       - ./order-service/src/main/resources/application.yml:/config/application.yml
-      - ./order-service/src/main/resources/application-dev.yml:/config/application-dev.yml
+      - ./order-service/src/main/resources/application-prod.yml:/config/application-prod.yml
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - EUREKA_SERVER_URL=${EUREKA_SERVER_URL}
@@ -239,9 +238,15 @@ services:
       - ORDER_DDL_AUTO=${ORDER_DDL_AUTO}
       - ORDER_SERVICE_PORT=${ORDER_SERVICE_PORT}
       - ZIPKIN_ENDPOINT=${ZIPKIN_ENDPOINT}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - RABBITMQ_HOST=${RABBITMQ_HOST}
+      - RABBITMQ_PORT=${RABBITMQ_PORT}
+      - RABBITMQ_USERNAME=${RABBITMQ_USERNAME}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
     depends_on:
       - eureka-server
-      - postgres
     networks:
       - takeit-network
 
@@ -252,7 +257,7 @@ services:
       - "19094:19094"
     volumes:
       - ./product-service/src/main/resources/application.yml:/config/application.yml
-      - ./product-service/src/main/resources/application-dev.yml:/config/application-dev.yml
+      - ./product-service/src/main/resources/application-prod.yml:/config/application-prod.yml
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - EUREKA_SERVER_URL=${EUREKA_SERVER_URL}
@@ -265,9 +270,15 @@ services:
       - S3_SECRET_KEY=${S3_SECRET_KEY}
       - PRODUCT_SERVICE_PORT=${PRODUCT_SERVICE_PORT}
       - ZIPKIN_ENDPOINT=${ZIPKIN_ENDPOINT}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - RABBITMQ_HOST=${RABBITMQ_HOST}
+      - RABBITMQ_PORT=${RABBITMQ_PORT}
+      - RABBITMQ_USERNAME=${RABBITMQ_USERNAME}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
     depends_on:
       - eureka-server
-      - postgres
     networks:
       - takeit-network
 
@@ -278,7 +289,7 @@ services:
       - "19095:19095"
     volumes:
       - ./payment-service/src/main/resources/application.yml:/config/application.yml
-      - ./payment-service/src/main/resources/application-dev.yml:/config/application-dev.yml
+      - ./payment-service/src/main/resources/application-prod.yml:/config/application-prod.yml
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - EUREKA_SERVER_URL=${EUREKA_SERVER_URL}
@@ -288,9 +299,12 @@ services:
       - PAYMENT_DDL_AUTO=${PAYMENT_DDL_AUTO}
       - PAYMENT_SERVICE_PORT=${PAYMENT_SERVICE_PORT}
       - ZIPKIN_ENDPOINT=${ZIPKIN_ENDPOINT}
+      - RABBITMQ_HOST=${RABBITMQ_HOST}
+      - RABBITMQ_PORT=${RABBITMQ_PORT}
+      - RABBITMQ_USERNAME=${RABBITMQ_USERNAME}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
     depends_on:
       - eureka-server
-      - postgres
     networks:
       - takeit-network
 
@@ -301,25 +315,24 @@ services:
       - "19096:19096"
     volumes:
       - ./review-service/src/main/resources/application.yml:/config/application.yml
-      - ./review-service/src/main/resources/application-dev.yml:/config/application-dev.yml
+      - ./review-service/src/main/resources/application-prod.yml:/config/application-prod.yml
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - EUREKA_SERVER_URL=${EUREKA_SERVER_URL}
       - S3_BUCKET=${S3_BUCKET}
       - S3_ACCESS_KEY=${S3_ACCESS_KEY}
       - S3_SECRET_KEY=${S3_SECRET_KEY}
-      - REDIS_HOST=${REDIS_HOST}
-      - REDIS_PORT=${REDIS_PORT}
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
       - REVIEW_DB_URL=${REVIEW_DB_URL}
       - REVIEW_DB_USERNAME=${REVIEW_DB_USERNAME}
       - REVIEW_DB_PASSWORD=${REVIEW_DB_PASSWORD}
       - REVIEW_DDL_AUTO=${REVIEW_DDL_AUTO}
       - REVIEW_SERVICE_PORT=${REVIEW_SERVICE_PORT}
       - ZIPKIN_ENDPOINT=${ZIPKIN_ENDPOINT}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
     depends_on:
       - eureka-server
-      - postgres
       - redis-stack
     networks:
       - takeit-network
@@ -331,7 +344,7 @@ services:
       - "19097:19097"
     volumes:
       - ./coupon-service/src/main/resources/application.yml:/config/application.yml
-      - ./coupon-service/src/main/resources/application-dev.yml:/config/application-dev.yml
+      - ./coupon-service/src/main/resources/application-prod.yml:/config/application-prod.yml
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - EUREKA_SERVER_URL=${EUREKA_SERVER_URL}
@@ -343,7 +356,6 @@ services:
       - ZIPKIN_ENDPOINT=${ZIPKIN_ENDPOINT}
     depends_on:
       - eureka-server
-      - postgres
     networks:
       - takeit-network
 
@@ -354,7 +366,7 @@ services:
       - "19098:19098"
     volumes:
       - ./favorite-service/src/main/resources/application.yml:/config/application.yml
-      - ./favorite-service/src/main/resources/application-dev.yml:/config/application-dev.yml
+      - ./favorite-service/src/main/resources/application-prod.yml:/config/application-prod.yml
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - EUREKA_SERVER_URL=${EUREKA_SERVER_URL}
@@ -366,7 +378,6 @@ services:
       - ZIPKIN_ENDPOINT=${ZIPKIN_ENDPOINT}
     depends_on:
       - eureka-server
-      - postgres
     networks:
       - takeit-network
 

@@ -74,6 +74,6 @@ logging:
     org.springframework: warn
 
 message:
-  queue:
+  queues:
     product:
-     cancel: "takeit.product.cancel"
+      cancel: "takeit.product.cancel"
