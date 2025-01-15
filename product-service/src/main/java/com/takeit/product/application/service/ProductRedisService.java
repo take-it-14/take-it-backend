@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -67,7 +68,7 @@ public class ProductRedisService {
         redisTemplate.opsForValue().increment(key, request.quantity());
     }
 
-    public void occupyProduct(Long productId, int quantity) {
+    public void occupyProduct(UUID productId, int quantity) {
         String productKey = "product:" + productId;
         DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>();
         redisScript.setScriptText(OCCUPY_SCRIPT);
