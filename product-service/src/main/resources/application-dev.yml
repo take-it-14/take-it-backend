@@ -68,6 +68,6 @@ management:
       enabled: true
 
 message:
-  queue:
+  queues:
     product:
       cancel: "takeit.product.cancel"
