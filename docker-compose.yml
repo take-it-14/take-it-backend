@@ -35,6 +35,9 @@ services:
     restart: always
     environment:
       REDIS_ARGS: "--requirepass ${REDIS_PASSWORD}"
+    expose:
+      - 6379
+      - 8001
     ports:
       - "6379:6379"
       - "8001:8001"
@@ -57,6 +60,8 @@ services:
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
+    expose:
+      - 9090
     ports:
       - "9090:9090"
     volumes:
@@ -75,6 +80,8 @@ services:
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
+    expose:
+      - 3000
     ports:
       - "3000:3000"  # 호스트의 3000 포트를 컨테이너의 3000 포트로 매핑
     volumes:
@@ -120,6 +127,8 @@ services:
   loki:
     image: grafana/loki:3.2.1
     container_name: loki
+    expose:
+      - 3100
     ports:
       - "3100:3100"  # Loki API 포트
     command: -config.file=/mnt/config/loki-config.yaml
@@ -166,6 +175,8 @@ services:
   eureka-server:
     image: gogohaena/takeit-eureka-server:latest
     container_name: eureka-server
+    expose:
+      - 19090
     ports:
       - "19090:19090"
     volumes:
@@ -179,6 +190,8 @@ services:
   gateway:
     image: gogohaena/takeit-gateway:latest
     container_name: gateway
+    expose:
+      - 19091
     ports:
       - "19091:19091"
     volumes:
@@ -195,6 +208,8 @@ services:
   auth-service:
     image: gogohaena/takeit-auth-service:latest
     container_name: auth-service
+    expose:
+      - 19092
     ports:
       - "19092:19092"
     volumes:
@@ -211,6 +226,8 @@ services:
   order-service:
     image: gogohaena/takeit-order-service:latest
     container_name: order-service
+    expose:
+      - 19093
     ports:
       - "19093:19093"
     volumes:
@@ -227,6 +244,8 @@ services:
   product-service:
     image: gogohaena/takeit-product-service:latest
     container_name: product-service
+    expose:
+      - 19094
     ports:
       - "19094:19094"
     volumes:
@@ -246,6 +265,8 @@ services:
   payment-service:
     image: gogohaena/takeit-payment-service:latest
     container_name: payment-service
+    expose:
+      - 19095
     ports:
       - "19095:19095"
     volumes:
@@ -262,6 +283,8 @@ services:
   review-service:
     image: gogohaena/takeit-review-service:latest
     container_name: review-service
+    expose:
+      - 19096
     ports:
       - "19096:19096"
     volumes:
@@ -282,6 +305,8 @@ services:
   coupon-service:
     image: gogohaena/takeit-coupon-service:latest
     container_name: coupon-service
+    expose:
+      - 19097
     ports:
       - "19097:19097"
     volumes:
@@ -298,6 +323,8 @@ services:
   favorite-service:
     image: gogohaena/takeit-favorite-service:latest
     container_name: favorite-service
+    expose:
+      - 19098
     ports:
       - "19098:19098"
     volumes:
