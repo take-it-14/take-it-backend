@@ -4,10 +4,12 @@ import java.util.UUID;
 
 import com.takeit.order.application.dto.order.OrderCacheDto;
 import com.takeit.order.application.dto.order.OrderCompleteDto;
+import com.takeit.order.application.dto.product.ProductDto;
 import com.takeit.order.application.service.OrderService;
 import com.takeit.order.application.service.RedisService;
 import com.takeit.order.domain.entity.Order;
 import com.takeit.order.domain.repository.OrderRepository;
+import com.takeit.order.infrastructure.client.ProductClient;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +24,7 @@ public class OrderMessageListener {
     private final OrderService orderService;
     private final RedisService redisService;
     private final OrderRepository orderRepository;
+    private final ProductClient productClient;
 
     @RabbitListener(queues = "${message.queues.order.cancel}")
     public void receiveMessage(Long orderId) {
@@ -33,10 +36,13 @@ public class OrderMessageListener {
     @RabbitListener(queues = "${message.queues.order.complete}")
     public void handleOrderCompleteMessage(OrderCompleteDto orderCompleteDto) {
         OrderCacheDto orderCacheDto = redisService.getOrder(orderCompleteDto.orderId().toString());
+
+        ProductDto productDto = productClient.getProductByUuid(orderCacheDto.productId());
+
         Order order = Order.create(
             orderCacheDto.uuid(),
             orderCacheDto.customerId(),
-            orderCacheDto.productId(),
+            productDto.id(),
             orderCacheDto.userCouponId(),
             orderCacheDto.quantity(),
             orderCacheDto.amount()

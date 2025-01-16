@@ -1,5 +1,7 @@
 package com.takeit.order.presentation.controller;
 
+import java.util.UUID;
+
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,7 +25,7 @@ public class OrderMessageProducer {
 		rabbitTemplate.convertAndSend(routingKey, message);
 	}
 
-	public void sendProductCancelRequest(Long productId, Long quantity){
+	public void sendProductCancelRequest(UUID productId, Long quantity){
 		sendMessage(productQueue, CancelProduct.create(productId, quantity));
 	}
 

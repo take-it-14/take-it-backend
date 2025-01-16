@@ -6,12 +6,12 @@ import java.util.UUID;
 public record OrderCacheDto(
 	UUID uuid,
 	Long customerId,
-	Long productId,
+	UUID productId,
 	Long userCouponId,
 	Long quantity,
 	Long amount
 ) implements Serializable {
-	public static OrderCacheDto of(UUID uuid, Long customerId, Long productId, Long userCouponId, Long quantity, Long amount) {
+	public static OrderCacheDto of(UUID uuid, Long customerId, UUID productId, Long userCouponId, Long quantity, Long amount) {
 		return new OrderCacheDto(uuid, customerId, productId, userCouponId, quantity, amount);
 	}
 }

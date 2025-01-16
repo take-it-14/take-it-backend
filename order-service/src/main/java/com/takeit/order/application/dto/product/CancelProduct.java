@@ -1,10 +1,12 @@
 package com.takeit.order.application.dto.product;
 
+import java.util.UUID;
+
 public record CancelProduct(
-        Long productId,
+        UUID productId,
         Long quantity
 ) {
-    public static CancelProduct create(Long productId, Long quantity) {
+    public static CancelProduct create(UUID productId, Long quantity) {
         return new CancelProduct(productId, quantity);
     }
 }
