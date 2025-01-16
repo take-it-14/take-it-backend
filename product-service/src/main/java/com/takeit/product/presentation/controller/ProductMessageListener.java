@@ -1,8 +1,6 @@
 package com.takeit.product.presentation.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.takeit.product.application.dto.product.CancelProduct;
+import com.takeit.common.application.dto.CancelProduct;
 import com.takeit.product.application.service.ProductRedisService;
 import com.takeit.product.domain.entity.Product;
 import com.takeit.product.domain.repository.ProductRepository;
@@ -21,16 +19,10 @@ public class ProductMessageListener {
     private final ProductRepository productRepository;
 
     @RabbitListener(queues = "${message.queues.product.cancel}")
-    public void receiveProductCancelMessage(String message) {
+    public void receiveProductCancelMessage(CancelProduct cancelProduct) {
         log.info("Received message: product cancel");
 
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            CancelProduct cancelProduct = objectMapper.readValue(message, CancelProduct.class);
-            productRedisService.cancelProduct(cancelProduct);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        productRedisService.cancelProduct(cancelProduct);
     }
 
     @RabbitListener(queues = "${message.queues.product.save.db}")

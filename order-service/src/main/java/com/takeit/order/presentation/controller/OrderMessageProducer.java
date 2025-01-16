@@ -6,7 +6,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.takeit.order.application.dto.product.CancelProduct;
+import com.takeit.common.application.dto.CancelProduct;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,7 +29,7 @@ public class OrderMessageProducer {
 		sendMessage(productQueue, CancelProduct.create(productId, quantity));
 	}
 
-	public void sendUserCouponRequest(Long userCouponId) {
+	public void sendUserCouponCancelRequest(Long userCouponId) {
 		sendMessage(couponQueue, userCouponId);
 	}
 }
