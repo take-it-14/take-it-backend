@@ -165,6 +165,7 @@ public class OrderService {
 		return OrderStatusUpdateResponse.from(order);
 	}
 
+	// 주문 && 결제까지 완료된 건에 한하여 사용자가 요청할때 수행하는 취소 로직
 	@Transactional
 	public OrderStatusUpdateResponse cancelOrder(UUID orderId, Long userId, String role) {
 		Order order = findOrderByUuid(orderId);
@@ -174,9 +175,28 @@ public class OrderService {
 
 		checkStatus(order.getStatus());
 
+		ProductDto product = findProductByProductId(order.getProductId());
+
+		orderMessageProducer.sendProductCancelRequest(product.uuid(), order.getQuantity());
+
+		if(order.getUserCouponId() != null)
+			orderMessageProducer.sendUserCouponCancelRequest(order.getUserCouponId());
+
 		order.cancel();
 
 		return OrderStatusUpdateResponse.from(order);
+	}
+
+	// 주문 || 결제가 성공하지 못해서 메시지 큐로 보상 트랜잭션을 수행하는 취소 로직
+	@Transactional
+	public void failOrder(String orderId) {
+		OrderCacheDto orderCacheDto = redisService.getOrder(orderId);
+
+		orderMessageProducer.sendProductCancelRequest(orderCacheDto.productId(), orderCacheDto.quantity());
+		if(orderCacheDto.userCouponId() != null)
+			orderMessageProducer.sendUserCouponCancelRequest(orderCacheDto.userCouponId());
+
+		redisService.deleteOrder(orderId);
 	}
 
 	public Long findProductIdByOrderUuidAndUserId(UUID orderId, Long userId) {
@@ -198,7 +218,7 @@ public class OrderService {
 	}
 
 	private void checkStatus(OrderStatus status) {
-		if (status == OrderStatus.CANCELLED || status == OrderStatus.DELIVERED)
+		if (status != OrderStatus.COMPLETED)
 			throw new CustomException(ErrorCode.ORDER_CANNOT_BE_MODIFIED);
 	}
 
@@ -217,24 +237,5 @@ public class OrderService {
 		if (products.isEmpty())
 			throw new CustomException(ErrorCode.PRODUCT_NOT_FOUND);
 		return products.get(0);
-	}
-
-	@Transactional
-	public void cancelOrder(Long orderId) {
-		Order order = orderRepository.findById(orderId)
-			.orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
-		checkCanCanceled(order.getStatus());
-		order.cancel();
-
-		ProductDto product = findProductByProductId(order.getProductId());
-
-		orderMessageProducer.sendProductCancelRequest(product.uuid(), order.getQuantity());
-		if(order.getUserCouponId() != null)
-			orderMessageProducer.sendUserCouponCancelRequest(order.getUserCouponId());
-	}
-
-	private void checkCanCanceled(OrderStatus status) {
-		if (status == OrderStatus.CANCELLED)
-			throw new CustomException(ErrorCode.ORDER_ALREADY_CANCELED);
 	}
 }
