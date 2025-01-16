@@ -26,12 +26,12 @@ public class ProductRedisService {
     private static final String OCCUPY_SCRIPT =
             "local productKey = KEYS[1] " +
             "local decrementQuantity = tonumber(ARGV[1]) " +
-            "local currentQuantity = tonumber(redis.call('GET', productKey)) " +
-            "if not currentQuantity or currentQuantity < decrementQuantity then " +
+            "local currentStock = tonumber(redis.call('HGET', productKey, 'stock')) " +
+            "if not currentStock or currentStock < decrementQuantity then " +
             "   return -1 " +  // 재고 부족
             "end " +
-            "redis.call('DECRBY', productKey, decrementQuantity) " +
-            "return currentQuantity - decrementQuantity";
+            "redis.call('HINCRBY', productKey, 'stock', -decrementQuantity) " +
+            "return currentStock - decrementQuantity";
     public void saveProduct(Product product) {
         String key = "product:" + product.getUuid();
         Map<String, Object> productMap = new HashMap<>();
@@ -94,7 +94,7 @@ public class ProductRedisService {
     public void cancelProduct(CancelProduct request) {
         String key = "product:" + request.productId();
         log.info("[cancel product] id : {}, amount : {}", request.productId(), request.quantity());
-        redisTemplate.opsForValue().increment(key, request.quantity());
+        redisTemplate.opsForHash().increment(key, "stock",request.quantity());
     }
 
     public void occupyProduct(UUID productId, int quantity) {
