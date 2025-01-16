@@ -1,19 +1,26 @@
 package com.takeit.order.application.service;
 
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Service;
 
 import com.takeit.order.application.dto.order.OrderCacheDto;
 
 import lombok.RequiredArgsConstructor;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RedisService {
 	private final RedisTemplate<String, Object> redisTemplate;
+	private final RedisTemplate<String, String> stringRedisTemplate;
+	private static final String ACTIVE_USERS = "activeUsers";
+
 
 	public void saveOrderId(UUID orderId, long ttl){
 		String key = "orderId:" + orderId;
@@ -44,4 +51,10 @@ public class RedisService {
 		String key = "order:" + orderId;
 		redisTemplate.delete(key);
 	}
+
+	public void deleteActiveUser(String productId, String username) {
+		String activeSetKey = ACTIVE_USERS + ":productId:" + productId;
+		Long remove = stringRedisTemplate.opsForSet().remove(activeSetKey, username);
+	}
+
 }

@@ -47,6 +47,7 @@ public class OrderService {
 	private final ProductClient productClient;
 	private final CouponClient couponClient;
 	private final RedisService redisService;
+	private final QueueService queueService;
 
 	@Value("${order.redis.ttl:300}") // 5분
 	private long orderRedisTtl;
@@ -57,7 +58,7 @@ public class OrderService {
 	private final OrderMessageProducer orderMessageProducer;
 
 	@Transactional
-	public OrderCreateResponse createOrder(OrderCreateDto request, Long userId) {
+	public OrderCreateResponse createOrder(OrderCreateDto request, Long userId, String username) {
 
 		ProductDto product = productClient.getProductByUuid(request.productId());
 
@@ -77,6 +78,8 @@ public class OrderService {
 
 		redisService.saveOrderId(orderCacheDto.uuid(), orderRedisTtl);
 		redisService.saveOrder(orderCacheDto);
+
+		queueService.deleteActiveKey(product.uuid(), username);
 
 		return OrderCreateResponse.from(orderCacheDto.uuid());
 	}
