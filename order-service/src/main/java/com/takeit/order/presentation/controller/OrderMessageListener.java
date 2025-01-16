@@ -27,8 +27,8 @@ public class OrderMessageListener {
     private final ProductClient productClient;
 
     @RabbitListener(queues = "${message.queues.order.cancel}")
-    public void handleOrderCancelMessage(OrderUuidDto orderUuidDto) {
-        log.info("handleOrderCancelMessage");
+    public void handleOrderFailMessage(OrderUuidDto orderUuidDto) {
+        log.info("handleOrderFailMessage");
 
         orderService.failOrder(orderUuidDto.orderId().toString());
 

@@ -179,6 +179,8 @@ public class OrderService {
 
 		orderMessageProducer.sendProductCancelRequest(product.uuid(), order.getQuantity());
 
+		// 결제 취소 로직 필요
+
 		if(order.getUserCouponId() != null)
 			orderMessageProducer.sendUserCouponCancelRequest(order.getUserCouponId());
 
