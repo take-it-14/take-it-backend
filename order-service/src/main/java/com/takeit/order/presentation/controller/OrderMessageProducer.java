@@ -21,6 +21,9 @@ public class OrderMessageProducer {
 	@Value("${message.queues.coupon.cancel}")
 	private String couponQueue;
 
+	@Value("${message.queues.product.save.db}")
+	private String saveProductDbQueue;
+
 	private void sendMessage(String routingKey, Object message) {
 		rabbitTemplate.convertAndSend(routingKey, message);
 	}
@@ -32,4 +35,6 @@ public class OrderMessageProducer {
 	public void sendUserCouponCancelRequest(Long userCouponId) {
 		sendMessage(couponQueue, userCouponId);
 	}
+
+	public void sendProductSaveDbRequest(UUID productId){ sendMessage(saveProductDbQueue, productId); }
 }

@@ -25,6 +25,7 @@ public class OrderMessageListener {
     private final RedisService redisService;
     private final OrderRepository orderRepository;
     private final ProductClient productClient;
+    private final OrderMessageProducer orderMessageProducer;
 
     @RabbitListener(queues = "${message.queues.order.cancel}")
     public void handleOrderFailMessage(OrderUuidDto orderUuidDto) {
@@ -55,6 +56,7 @@ public class OrderMessageListener {
 
         redisService.deleteOrder(order.getUuid().toString());
         redisService.deleteOrderId(order.getUuid().toString());
-        // 재고 차감 db 반영 요청
+
+        orderMessageProducer.sendProductSaveDbRequest(productDto.uuid());
     }
 }
