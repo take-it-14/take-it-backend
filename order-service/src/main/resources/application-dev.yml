@@ -54,3 +54,5 @@ message:
       complete: "takeit.order.complete"
     product:
       cancel: "takeit.product.cancel"
+    coupon:
+      cancel: "takeit.coupon.cancel"

@@ -55,3 +55,5 @@ message:
       complete: ${MESSAGE_QUEUE_ORDER_COMPLETE}
     product:
       cancel: ${MESSAGE_QUEUE_PRODUCT_CANCEL}
+    coupon:
+      cancel: ${MESSAGE_QUEUE_COUPON_CANCEL}

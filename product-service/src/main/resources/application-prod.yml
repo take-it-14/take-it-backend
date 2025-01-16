@@ -63,6 +63,6 @@ management:
       enabled: true
 
 message:
-  queue:
+  queues:
     product:
       cancel: ${MESSAGE_QUEUE_PRODUCT_CANCEL}

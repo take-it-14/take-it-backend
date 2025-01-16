@@ -4,6 +4,7 @@ import com.takeit.common.domain.model.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.UUID;
 @Builder(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor
-public class Product extends BaseEntity {
+public class Product extends BaseEntity implements Serializable{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -58,6 +59,38 @@ public class Product extends BaseEntity {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "product")
     @Builder.Default
     private List<ProductPhoto> photoList = new ArrayList<>();
+
+    public static Product of(
+            Long id,
+            UUID uuid,
+            Long sellerId,
+            Long categoryId,
+            String productName,
+            String description,
+            Long price,
+            Integer stock,
+            Integer limitPerUser,
+            LocalDateTime openTime,
+            LocalDateTime closeTime,
+            Boolean isActive,
+            Double stars) {
+
+        return Product.builder()
+                .id(id)
+                .uuid(uuid)
+                .sellerId(sellerId)
+                .categoryId(categoryId)
+                .productName(productName)
+                .description(description)
+                .price(price)
+                .stock(stock)
+                .limitPerUser(limitPerUser)
+                .openTime(openTime)
+                .closeTime(closeTime)
+                .isActive(isActive)
+                .stars(stars)
+                .build();
+    }
 
     // 상품 생성 메서드
     public static Product create(
