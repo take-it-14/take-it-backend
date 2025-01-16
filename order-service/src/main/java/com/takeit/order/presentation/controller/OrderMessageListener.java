@@ -3,7 +3,7 @@ package com.takeit.order.presentation.controller;
 import java.util.UUID;
 
 import com.takeit.order.application.dto.order.OrderCacheDto;
-import com.takeit.order.application.dto.order.OrderCompleteDto;
+import com.takeit.common.application.dto.OrderUuidDto;
 import com.takeit.order.application.dto.product.ProductDto;
 import com.takeit.order.application.service.OrderService;
 import com.takeit.order.application.service.RedisService;
@@ -27,15 +27,18 @@ public class OrderMessageListener {
     private final ProductClient productClient;
 
     @RabbitListener(queues = "${message.queues.order.cancel}")
-    public void receiveMessage(Long orderId) {
-        log.info("Received message");
-        orderService.cancelOrder(orderId);
+    public void handleOrderCancelMessage(OrderUuidDto orderUuidDto) {
+        log.info("handleOrderCancelMessage");
+
+        orderService.failOrder(orderUuidDto.orderId().toString());
+
+        redisService.deleteOrderId(orderUuidDto.orderId().toString());
     }
 
     @Transactional
     @RabbitListener(queues = "${message.queues.order.complete}")
-    public void handleOrderCompleteMessage(OrderCompleteDto orderCompleteDto) {
-        OrderCacheDto orderCacheDto = redisService.getOrder(orderCompleteDto.orderId().toString());
+    public void handleOrderCompleteMessage(OrderUuidDto orderUuidDto) {
+        OrderCacheDto orderCacheDto = redisService.getOrder(orderUuidDto.orderId().toString());
 
         ProductDto productDto = productClient.getProductByUuid(orderCacheDto.productId());
 
