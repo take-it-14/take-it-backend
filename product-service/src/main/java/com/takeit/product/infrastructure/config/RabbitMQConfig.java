@@ -16,12 +16,38 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @RequiredArgsConstructor
 public class RabbitMQConfig {
+    @Value("${message.exchange}")
+    private String exchange;
 
-    @Value("${message.queue.product.cancel}")
-    private String queueProduct;
+    @Value("${message.queues.product.cancel}")
+    private String queueProductCancel;
+
+    @Value("${message.queues.product.save.db}")
+    private String queueProductSaveDb;
+
+    @Bean public TopicExchange exchange() {
+        return new TopicExchange(exchange);
+    }
 
     @Bean
-    public Queue productQueue() { return new Queue(queueProduct); }
+    public Queue queueProductCancel() {
+        return new Queue(queueProductCancel);
+    }
+
+    @Bean
+    public Queue queueProductSaveDb() {
+        return new Queue(queueProductSaveDb);
+    }
+
+    @Bean
+    public Binding bindingProductCancel() {
+        return BindingBuilder.bind(queueProductCancel()).to(exchange()).with(queueProductCancel);
+    }
+
+    @Bean
+    public Binding bindingProductSaveDb() {
+        return BindingBuilder.bind(queueProductSaveDb()).to(exchange()).with(queueProductSaveDb);
+    }
 
     @Bean
     public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(ConnectionFactory connectionFactory) {
