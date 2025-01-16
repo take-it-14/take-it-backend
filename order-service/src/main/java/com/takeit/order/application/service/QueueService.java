@@ -6,10 +6,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -29,16 +32,13 @@ public class QueueService {
     private static final int MAX_ACTIVE_SIZE = 100; // 최대 active token 수
     private static final long ACTIVE_TTL_SECONDS = 5; // active token TTL (5초)
 
-    @Async
-    public void joinQueue(UUID productId, String username) {
-        if(getActiveUsersSize(productId) < MAX_ACTIVE_SIZE) {
-            addActiveUser(productId, username);
-        }
-
+    public boolean joinQueue(UUID productId, String username) {
         long currentTime = System.currentTimeMillis();
         String key = WAITING_TOKENS + ":productId:" + productId;
         stringRedisTemplate.opsForZSet().add(key, username, currentTime);
         log.info("username : {}, product id : {}", username, productId);
+
+        return false;
     }
 
     public QueueDto getRankAndIsActive(UUID productId, String username) {
@@ -84,6 +84,16 @@ public class QueueService {
         String activeKey = ACTIVE_TOKENS + ":productId:" + productId.toString() + ":username:" + username;
         stringRedisTemplate.opsForSet().add(activeSetKey, username);
         stringRedisTemplate.opsForValue().set(activeKey, "active", ACTIVE_TTL_SECONDS, TimeUnit.SECONDS);
+    }
+
+    private Boolean hasWaitingToken(UUID productId) {
+        String key = WAITING_TOKENS + ":productId:" + productId;
+        return stringRedisTemplate.hasKey(key);
+    }
+
+    private Boolean hasActiveToken(UUID productId) {
+        String key = ACTIVE_USERS + ":productId:" + productId;
+        return stringRedisTemplate.hasKey(key);
     }
 
 }
