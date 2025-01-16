@@ -22,9 +22,6 @@ public class PaymentService {
     private final RabbitTemplate rabbitTemplate;
     private final PaymentMessageProducer paymentMessageProducer;
 
-    @Value("${message.queues.order.cancel}")
-    private String queueOrder;
-
     @Transactional
     public String verifyTossPayment(VerifyTossPaymentDto request, String username) {
         // TODO: username으로 User 조회 + 권한 체크
@@ -33,7 +30,7 @@ public class PaymentService {
         Long orderId = 1L;
 
         // TODO: pg사에 결제 확인(실제로는 try catch를 통해 진행해야함)
-        boolean isPaymentSuccess = false;
+        boolean isPaymentSuccess = true;
         String receipt = "영수증";
 
         if(isPaymentSuccess) {
@@ -41,8 +38,7 @@ public class PaymentService {
             paymentMessageProducer.sendOrderCompleteRequest(request.orderId());
             return "결제 성공";
         } else {
-            rabbitTemplate.convertAndSend(queueOrder, orderId);
-//            throw new CustomException(ErrorCode.WRONG_PAYMENT);
+            paymentMessageProducer.sendOrderFailRequest(request.orderId());
             return "결제 실패";
         }
 
@@ -60,7 +56,7 @@ public class PaymentService {
 
         if(isPaymentCanceled) {
             payment.cancel();
-            rabbitTemplate.convertAndSend(queueOrder, request.orderId());
+            // rabbitTemplate.convertAndSend(queueOrder, request.orderId());
         } else {
             throw new CustomException(ErrorCode.PAYMENT_CANCEL_FAIL);
         }
