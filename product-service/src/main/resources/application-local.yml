@@ -18,14 +18,14 @@ spring:
         format_sql: true
 
   rabbitmq:
-    host: localhost
+    host: rabbitMQ
     port: 5672
     username: guest
     password: guest
 
   data:
     redis:
-      host: localhost
+      host: redis-stack
       port: 6379
       password: systempass
 

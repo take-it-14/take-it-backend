@@ -55,5 +55,7 @@ message:
       complete: ${MESSAGE_QUEUE_ORDER_COMPLETE}
     product:
       cancel: ${MESSAGE_QUEUE_PRODUCT_CANCEL}
+      save:
+        db: ${MESSAGE_QUEUE_PRODUCT_SAVE_DB}
     coupon:
       cancel: ${MESSAGE_QUEUE_COUPON_CANCEL}
