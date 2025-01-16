@@ -46,6 +46,12 @@ management:
     prometheus:
       enabled: true
 
+logging:
+  level:
+    root: debug
+    com.takeit: debug
+    org.springframework: warn
+
 message:
   exchange: "takeit"
   queues:

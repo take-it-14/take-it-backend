@@ -37,15 +37,25 @@ management:
   zipkin:
     tracing:
       endpoint: ${ZIPKIN_ENDPOINT}
+  endpoints:
+    web:
+      exposure:
+        include: "*"
   endpoint:
     health:
-      show-details: when_authorized
+      show-details: always
     prometheus:
       enabled: true
 
+logging:
+  level:
+    root: info
+    com.takeit: info
+    org.springframework: warn
+
 message:
-  exchange: ${RABBITMQ_EXCHANGE}
+  exchange: "takeit"
   queues:
     order:
-      cancel: ${MESSAGE_QUEUE_ORDER_CANCEL}
-      complete: ${MESSAGE_QUEUE_ORDER_COMPLETE}
+      cancel: "takeit.order.cancel"
+      complete: "takeit.order.complete"

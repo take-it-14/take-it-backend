@@ -20,11 +20,6 @@ spring:
         default_batch_fetch_size: 100
     open-in-view: false
 
-logging:
-  level:
-    org.hibernate.type.descriptor.sql: trace
-    org.hibernate.SQL: trace
-
 server:
   port: 19092
 
@@ -54,3 +49,11 @@ management:
       show-details: always
     prometheus:
       enabled: true
+
+logging:
+  level:
+    root: debug
+    com.takeit: debug
+    org.springframework: warn
+    org.hibernate.type.descriptor.sql: trace
+    org.hibernate.SQL: trace

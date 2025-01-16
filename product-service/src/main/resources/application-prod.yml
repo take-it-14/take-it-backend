@@ -1,4 +1,7 @@
 spring:
+  application:
+    name: product-service
+
   datasource:
     url: ${PRODUCT_DB_URL}
     username: ${PRODUCT_DB_USERNAME}
@@ -13,8 +16,6 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        default_batch_fetch_size: 100
-    open-in-view: false
 
   rabbitmq:
     host: ${RABBITMQ_HOST}
@@ -56,16 +57,26 @@ management:
   zipkin:
     tracing:
       endpoint: ${ZIPKIN_ENDPOINT}
+  endpoints:
+    web:
+      exposure:
+        include: "*"
   endpoint:
     health:
-      show-details: when_authorized
+      show-details: always
     prometheus:
       enabled: true
 
+logging:
+  level:
+    root: info
+    com.takeit: info
+    org.springframework: warn
+
 message:
-  exchange: ${RABBITMQ_EXCHANGE}
+  exchange: "takeit"
   queues:
     product:
-      cancel: ${MESSAGE_QUEUE_PRODUCT_CANCEL}
+      cancel: "takeit.product.cancel"
       save:
-        db: ${MESSAGE_QUEUE_PRODUCT_SAVE_DB}
+        db: "takeit.product.save.db"
