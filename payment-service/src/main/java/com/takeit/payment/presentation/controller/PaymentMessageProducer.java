@@ -7,7 +7,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.takeit.payment.application.dto.order.OrderCompleteDto;
+import com.takeit.common.application.dto.OrderUuidDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +26,6 @@ public class PaymentMessageProducer {
 	}
 
 	public void sendOrderCompleteRequest(UUID orderId){
-		sendMessage(orderComplete, OrderCompleteDto.from(orderId));
+		sendMessage(orderComplete, OrderUuidDto.from(orderId));
 	}
 }
