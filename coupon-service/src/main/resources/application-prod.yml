@@ -13,9 +13,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        highlight_sql: true
-        default_batch_fetch_size: 10
-    open-in-view: false
+
   rabbitmq:
     host: ${RABBITMQ_HOST}
     port: ${RABBITMQ_PORT}
@@ -37,13 +35,23 @@ management:
   zipkin:
     tracing:
       endpoint: ${ZIPKIN_ENDPOINT}
+  endpoints:
+    web:
+      exposure:
+        include: "*"
   endpoint:
     health:
-      show-details: when_authorized
+      show-details: always
     prometheus:
       enabled: true
+
+logging:
+  level:
+    root: info
+    com.takeit: info
+    org.springframework: warn
 
 message:
   queues:
     coupon:
-      cancel: ${MESSAGE_QUEUE_COUPON_CANCEL}
+      cancel: "takeit.order.cancel"

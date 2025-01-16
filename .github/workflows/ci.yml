@@ -44,6 +44,8 @@ jobs:
       # 1️⃣ 레포지토리 체크아웃
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 전체 커밋 히스토리 가져오기
 
       # 2️⃣ 변경된 서비스 감지 or 수동 실행
       - name: Detect Changed Services or Use Manual Input

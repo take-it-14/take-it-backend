@@ -3,18 +3,15 @@ networks:
     driver: bridge
 
 services:
-  postgres:
-    image: postgres:latest
-    container_name: postgres
+  rabbitMQ:
+    image: rabbitmq:management
+    container_name: rabbitMQ
+
     ports:
-      - "15432:5432"
-    environment:
-      POSTGRES_USER: postgres # superuser
-      POSTGRES_PASSWORD: postgres
+      - "5672:5672"
+      - "15672:15672"
     volumes:
-      - ./postgres-data:/var/lib/postgresql/data
-      - ./init-database.sql:/docker-entrypoint-initdb.d/init-database.sql:ro
-    restart: always
+      - rabbitMQ-data:/data
     networks:
       - takeit-network
 
@@ -23,12 +20,15 @@ services:
     container_name: redis-stack
     restart: always
     environment:
-      REDIS_ARGS: "--requirepass systempass"
+      REDIS_ARGS: "--requirepass ${REDIS_PASSWORD}"
+    expose:
+      - 6379
+      - 8001
     ports:
       - "6379:6379"
       - "8001:8001"
     volumes:
-      - ./redis-data:/data
+      - redis-data:/data
     networks:
       - takeit-network
 
@@ -39,19 +39,140 @@ services:
       - "9411:9411"
     restart: always
     volumes:
-      - ./zipkin-data:/data
+      - zipkin-data:/data
+    networks:
+      - takeit-network
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    expose:
+      - 9090
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml  # 설정 파일 마운트
+      - prometheus-data:/prometheus  # Prometheus 데이터 영구 저장
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    restart: always  # 컨테이너가 중단되면 자동 재시작
+    networks:
+      - takeit-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    expose:
+      - 3000
+    ports:
+      - "3000:3000"  # 호스트의 3000 포트를 컨테이너의 3000 포트로 매핑
+    volumes:
+      - grafana-data:/var/lib/grafana  # Grafana 데이터 영구 저장
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin      # 기본 관리자 ID
+      - GF_SECURITY_ADMIN_PASSWORD=admin  # 기본 관리자 비밀번호
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+    restart: always  # 컨테이너가 중단되면 자동 재시작
+    entrypoint:
+      - sh
+      - -euc
+      - |
+        mkdir -p /etc/grafana/provisioning/datasources
+        cat <<EOF > /etc/grafana/provisioning/datasources/ds.yaml
+        apiVersion: 1
+        datasources:
+        - name: Prometheus
+          type: prometheus
+          access: proxy
+          orgId: 1
+          url: http://prometheus:9090
+          basicAuth: false
+          isDefault: true
+          version: 1
+          editable: false
+        - name: Loki
+          type: loki
+          access: proxy 
+          orgId: 1
+          url: http://loki:3100
+          basicAuth: false
+          isDefault: false
+          version: 1
+          editable: false
+        EOF
+        /run.sh
+    networks:
+      - takeit-network  # Prometheus와 연결할 네트워크
+
+  loki:
+    image: grafana/loki:3.2.1
+    container_name: loki
+    expose:
+      - 3100
+    ports:
+      - "3100:3100"  # Loki API 포트
+    command: -config.file=/mnt/config/loki-config.yaml
+    volumes:
+      - ./loki-config.yml:/mnt/config/loki-config.yaml
+      - loki-data:/tmp
+    restart: always
+    networks:
+      - takeit-network
+
+  promtail:
+    image: grafana/promtail:3.2.1
+    container_name: promtail
+    volumes:
+      - ./promtail-config.yml:/mnt/config//promtail-config.yml
+      - promtail-data:/tmp
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro  # Docker 로그 읽기
+      - /var/log:/var/log:ro                                      # 시스템 로그 읽기
+    command: -config.file=/mnt/config/promtail-config.yml
+    restart: always
+    depends_on:
+      - loki
+    networks:
+      - takeit-network
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    restart: unless-stopped
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    expose:
+      - 9100
     networks:
       - takeit-network
 
   eureka-server:
     image: gogohaena/takeit-eureka-server:latest
     container_name: eureka-server
+    expose:
+      - 19090
     ports:
       - "19090:19090"
+    volumes:
+      - ./eureka-server/src/main/resources/application.yml:/config/application.yml
+      - ./eureka-server/src/main/resources/application-prod.yml:/config/application-prod.yml
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - EUREKA_HOSTNAME=${EUREKA_HOSTNAME}
       - EUREKA_SERVER_PORT=${EUREKA_SERVER_PORT}
+      - EUREKA_SERVER_URL=${EUREKA_SERVER_URL}
       - ZIPKIN_ENDPOINT=${ZIPKIN_ENDPOINT}
     networks:
       - takeit-network
@@ -59,8 +180,13 @@ services:
   gateway:
     image: gogohaena/takeit-gateway:latest
     container_name: gateway
+    expose:
+      - 19091
     ports:
       - "19091:19091"
+    volumes:
+      - ./gateway/src/main/resources/application.yml:/config/application.yml
+      - ./gateway/src/main/resources/application-prod.yml:/config/application-prod.yml
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - EUREKA_SERVER_URL=${EUREKA_SERVER_URL}
@@ -75,8 +201,13 @@ services:
   auth-service:
     image: gogohaena/takeit-auth-service:latest
     container_name: auth-service
+    expose:
+      - 19092
     ports:
       - "19092:19092"
+    volumes:
+      - ./auth-service/src/main/resources/application.yml:/config/application.yml
+      - ./auth-service/src/main/resources/application-prod.yml:/config/application-prod.yml
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - EUREKA_SERVER_URL=${EUREKA_SERVER_URL}
@@ -89,15 +220,19 @@ services:
       - ZIPKIN_ENDPOINT=${ZIPKIN_ENDPOINT}
     depends_on:
       - eureka-server
-      - postgres
     networks:
       - takeit-network
 
   order-service:
     image: gogohaena/takeit-order-service:latest
     container_name: order-service
+    expose:
+      - 19093
     ports:
       - "19093:19093"
+    volumes:
+      - ./order-service/src/main/resources/application.yml:/config/application.yml
+      - ./order-service/src/main/resources/application-prod.yml:/config/application-prod.yml
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - EUREKA_SERVER_URL=${EUREKA_SERVER_URL}
@@ -107,17 +242,28 @@ services:
       - ORDER_DDL_AUTO=${ORDER_DDL_AUTO}
       - ORDER_SERVICE_PORT=${ORDER_SERVICE_PORT}
       - ZIPKIN_ENDPOINT=${ZIPKIN_ENDPOINT}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - RABBITMQ_HOST=${RABBITMQ_HOST}
+      - RABBITMQ_PORT=${RABBITMQ_PORT}
+      - RABBITMQ_USERNAME=${RABBITMQ_USERNAME}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
     depends_on:
       - eureka-server
-      - postgres
     networks:
       - takeit-network
 
   product-service:
     image: gogohaena/takeit-product-service:latest
     container_name: product-service
+    expose:
+      - 19094
     ports:
       - "19094:19094"
+    volumes:
+      - ./product-service/src/main/resources/application.yml:/config/application.yml
+      - ./product-service/src/main/resources/application-prod.yml:/config/application-prod.yml
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - EUREKA_SERVER_URL=${EUREKA_SERVER_URL}
@@ -130,17 +276,28 @@ services:
       - S3_SECRET_KEY=${S3_SECRET_KEY}
       - PRODUCT_SERVICE_PORT=${PRODUCT_SERVICE_PORT}
       - ZIPKIN_ENDPOINT=${ZIPKIN_ENDPOINT}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - RABBITMQ_HOST=${RABBITMQ_HOST}
+      - RABBITMQ_PORT=${RABBITMQ_PORT}
+      - RABBITMQ_USERNAME=${RABBITMQ_USERNAME}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
     depends_on:
       - eureka-server
-      - postgres
     networks:
       - takeit-network
 
   payment-service:
     image: gogohaena/takeit-payment-service:latest
     container_name: payment-service
+    expose:
+      - 19095
     ports:
       - "19095:19095"
+    volumes:
+      - ./payment-service/src/main/resources/application.yml:/config/application.yml
+      - ./payment-service/src/main/resources/application-prod.yml:/config/application-prod.yml
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - EUREKA_SERVER_URL=${EUREKA_SERVER_URL}
@@ -150,35 +307,42 @@ services:
       - PAYMENT_DDL_AUTO=${PAYMENT_DDL_AUTO}
       - PAYMENT_SERVICE_PORT=${PAYMENT_SERVICE_PORT}
       - ZIPKIN_ENDPOINT=${ZIPKIN_ENDPOINT}
+      - RABBITMQ_HOST=${RABBITMQ_HOST}
+      - RABBITMQ_PORT=${RABBITMQ_PORT}
+      - RABBITMQ_USERNAME=${RABBITMQ_USERNAME}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
     depends_on:
       - eureka-server
-      - postgres
     networks:
       - takeit-network
 
   review-service:
     image: gogohaena/takeit-review-service:latest
     container_name: review-service
+    expose:
+      - 19096
     ports:
       - "19096:19096"
+    volumes:
+      - ./review-service/src/main/resources/application.yml:/config/application.yml
+      - ./review-service/src/main/resources/application-prod.yml:/config/application-prod.yml
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - EUREKA_SERVER_URL=${EUREKA_SERVER_URL}
       - S3_BUCKET=${S3_BUCKET}
       - S3_ACCESS_KEY=${S3_ACCESS_KEY}
       - S3_SECRET_KEY=${S3_SECRET_KEY}
-      - REDIS_HOST=${REDIS_HOST}
-      - REDIS_PORT=${REDIS_PORT}
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
       - REVIEW_DB_URL=${REVIEW_DB_URL}
       - REVIEW_DB_USERNAME=${REVIEW_DB_USERNAME}
       - REVIEW_DB_PASSWORD=${REVIEW_DB_PASSWORD}
       - REVIEW_DDL_AUTO=${REVIEW_DDL_AUTO}
       - REVIEW_SERVICE_PORT=${REVIEW_SERVICE_PORT}
       - ZIPKIN_ENDPOINT=${ZIPKIN_ENDPOINT}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
     depends_on:
       - eureka-server
-      - postgres
       - redis-stack
     networks:
       - takeit-network
@@ -186,8 +350,13 @@ services:
   coupon-service:
     image: gogohaena/takeit-coupon-service:latest
     container_name: coupon-service
+    expose:
+      - 19097
     ports:
       - "19097:19097"
+    volumes:
+      - ./coupon-service/src/main/resources/application.yml:/config/application.yml
+      - ./coupon-service/src/main/resources/application-prod.yml:/config/application-prod.yml
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - EUREKA_SERVER_URL=${EUREKA_SERVER_URL}
@@ -199,15 +368,19 @@ services:
       - ZIPKIN_ENDPOINT=${ZIPKIN_ENDPOINT}
     depends_on:
       - eureka-server
-      - postgres
     networks:
       - takeit-network
 
   favorite-service:
     image: gogohaena/takeit-favorite-service:latest
     container_name: favorite-service
+    expose:
+      - 19098
     ports:
       - "19098:19098"
+    volumes:
+      - ./favorite-service/src/main/resources/application.yml:/config/application.yml
+      - ./favorite-service/src/main/resources/application-prod.yml:/config/application-prod.yml
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - EUREKA_SERVER_URL=${EUREKA_SERVER_URL}
@@ -219,6 +392,15 @@ services:
       - ZIPKIN_ENDPOINT=${ZIPKIN_ENDPOINT}
     depends_on:
       - eureka-server
-      - postgres
     networks:
       - takeit-network
+
+volumes:
+  rabbitMQ-data:
+  postgres-data:
+  redis-data:
+  zipkin-data:
+  prometheus-data:
+  grafana-data:
+  loki-data:
+  promtail-data:

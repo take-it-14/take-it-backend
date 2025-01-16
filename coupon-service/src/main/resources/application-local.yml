@@ -12,9 +12,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        highlight_sql: true
-        default_batch_fetch_size: 10
-    open-in-view: false
+
   rabbitmq:
     host: redis-stack
     port: 5672
@@ -45,6 +43,12 @@ management:
       show-details: always
     prometheus:
       enabled: true
+
+logging:
+  level:
+    root: debug
+    com.takeit: debug
+    org.springframework: warn
 
 message:
   queues:
