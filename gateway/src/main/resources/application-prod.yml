@@ -17,8 +17,18 @@ management:
   zipkin:
     tracing:
       endpoint: ${ZIPKIN_ENDPOINT}
+  endpoints:
+    web:
+      exposure:
+        include: "*"
   endpoint:
     health:
-      show-details: when_authorized
+      show-details: always
     prometheus:
       enabled: true
+
+logging:
+  level:
+    root: info
+    com.takeit: info
+    org.springframework: warn

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+  <springProperty scope="context" name="spring.profiles.active" source="spring.profiles.active"/>
+
+  <!-- 색상 적용을 위한 패턴 -->
+  <property name="CONSOLE_LOG_PATTERN"
+    value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %highlight(%-5level) %cyan(%logger{36}) - %msg%n"/>
+
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+      <charset>UTF-8</charset>
+    </encoder>
+  </appender>
+
+  <!-- 패키지별 로그 레벨 설정 -->
+  <logger name="com.takeit" level="DEBUG"/>
+  <logger name="org.springframework" level="WARN"/>
+
+  <!-- 전체 로그 레벨 -->
+  <root level="INFO">
+    <appender-ref ref="CONSOLE"/>
+  </root>
+
+
+  <!-- local 프로파일 -->
+  <springProfile name="local">
+    <appender name="LOKI-LOCAL" class="com.github.loki4j.logback.Loki4jAppender">
+      <http>
+        <!-- local 환경에서 loki가 로컬에 있으면 localhost:3100 등으로 설정 -->
+        <url>http://localhost:3100/loki/api/v1/push</url>
+      </http>
+      <format>
+        <label>
+          <!-- local 환경 태그를 표시 -->
+          <pattern>app=favorite-service,host=localhost,env=local</pattern>
+        </label>
+        <message class="com.github.loki4j.logback.JsonLayout" />
+      </format>
+    </appender>
+
+    <root level="DEBUG">
+      <appender-ref ref="LOKI-LOCAL" />
+      <appender-ref ref="CONSOLE"/>
+    </root>
+  </springProfile>
+
+  <!-- dev 프로파일 -->
+  <springProfile name="dev">
+    <appender name="LOKI-DEV" class="com.github.loki4j.logback.Loki4jAppender">
+      <http>
+        <url>http://loki:3100/loki/api/v1/push</url>
+      </http>
+      <format>
+        <label>
+          <!-- dev 환경 태그를 표시 -->
+          <pattern>app=favorite-service,host=${HOSTNAME},env=dev</pattern>
+        </label>
+        <message class="com.github.loki4j.logback.JsonLayout" />
+      </format>
+    </appender>
+
+    <root level="DEBUG">
+      <appender-ref ref="LOKI-DEV" />
+      <appender-ref ref="CONSOLE"/>
+    </root>
+  </springProfile>
+
+  <!-- prod 프로파일 -->
+  <springProfile name="prod">
+    <appender name="LOKI-PROD" class="com.github.loki4j.logback.Loki4jAppender">
+      <http>
+        <url>http://loki:3100/loki/api/v1/push</url>
+      </http>
+      <format>
+        <label>
+          <!-- prod 환경 태그를 표시 -->
+          <pattern>app=favorite-service,host=${HOSTNAME},env=prod</pattern>
+        </label>
+        <message class="com.github.loki4j.logback.JsonLayout" />
+      </format>
+    </appender>
+
+    <!-- prod 에서는 로그 레벨을 INFO 이상으로 -->
+    <root level="INFO">
+      <appender-ref ref="LOKI-PROD" />
+      <appender-ref ref="CONSOLE"/>
+    </root>
+  </springProfile>
+
+</configuration>

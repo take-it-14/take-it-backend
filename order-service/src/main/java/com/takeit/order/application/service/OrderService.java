@@ -49,35 +49,37 @@ public class OrderService {
 	private final RedisService redisService;
 	private final QueueService queueService;
 
-	@Value("${order.redis.ttl:300}") // 5분
-	private long orderRedisTtl;
+	@Value("${order.redis.ttl:300}") // 5분(ID 단독 저장용)
+	private long orderIdRedisTtl;
 
-	@Value("${message.queues.product.cancel}")
-	private String productQueue;
+	@Value("${order.redis.ttl:1800}") // 30분(주문 데이터 전체 저장용)
+	private long orderRedisTtl;
 
 	private final OrderMessageProducer orderMessageProducer;
 
 	@Transactional
 	public OrderCreateResponse createOrder(OrderCreateDto request, Long userId, String username) {
 
-		ProductDto product = productClient.getProductByUuid(request.productId());
+		// 재고 확인 + 재고 차감
+		productClient.occupyProduct(request.productId(), request.quantity().intValue());
 
-		checkStock(product.stock(), request.quantity().intValue());
-
+		// 쿠폰 사용 가능 여부 확인 + 사용 처리
 		Long userCouponId = request.userCouponId() != null ?
 			couponClient.validUserCouponAndGetUserCouponId(request.userCouponId(), userId) : null;
 
+		// redis에 캐싱할 정보 생성
 		OrderCacheDto orderCacheDto = OrderCacheDto.of(
 			UUID.randomUUID(),
 			userId,
-			product.id(),
+			request.productId(),
 			userCouponId,
 			request.quantity(),
 			request.amount()
 		);
 
-		redisService.saveOrderId(orderCacheDto.uuid(), orderRedisTtl);
-		redisService.saveOrder(orderCacheDto);
+		// TTL 안에 결제 완료되는지 확인하기 위함
+		redisService.saveOrderId(orderCacheDto.uuid(), orderIdRedisTtl);
+		redisService.saveOrder(orderCacheDto, orderRedisTtl);
 
 		queueService.deleteActiveKey(product.uuid(), username);
 
@@ -166,6 +168,7 @@ public class OrderService {
 		return OrderStatusUpdateResponse.from(order);
 	}
 
+	// 주문 && 결제까지 완료된 건에 한하여 사용자가 요청할때 수행하는 취소 로직
 	@Transactional
 	public OrderStatusUpdateResponse cancelOrder(UUID orderId, Long userId, String role) {
 		Order order = findOrderByUuid(orderId);
@@ -175,9 +178,30 @@ public class OrderService {
 
 		checkStatus(order.getStatus());
 
+		ProductDto product = findProductByProductId(order.getProductId());
+
+		orderMessageProducer.sendProductCancelRequest(product.uuid(), order.getQuantity());
+
+		// 결제 취소 로직 필요
+
+		if(order.getUserCouponId() != null)
+			orderMessageProducer.sendUserCouponCancelRequest(order.getUserCouponId());
+
 		order.cancel();
 
 		return OrderStatusUpdateResponse.from(order);
+	}
+
+	// 주문 || 결제가 성공하지 못해서 메시지 큐로 보상 트랜잭션을 수행하는 취소 로직
+	@Transactional
+	public void failOrder(String orderId) {
+		OrderCacheDto orderCacheDto = redisService.getOrder(orderId);
+
+		orderMessageProducer.sendProductCancelRequest(orderCacheDto.productId(), orderCacheDto.quantity());
+		if(orderCacheDto.userCouponId() != null)
+			orderMessageProducer.sendUserCouponCancelRequest(orderCacheDto.userCouponId());
+
+		redisService.deleteOrder(orderId);
 	}
 
 	public Long findProductIdByOrderUuidAndUserId(UUID orderId, Long userId) {
@@ -199,7 +223,7 @@ public class OrderService {
 	}
 
 	private void checkStatus(OrderStatus status) {
-		if (status == OrderStatus.CANCELLED || status == OrderStatus.DELIVERED)
+		if (status != OrderStatus.COMPLETED)
 			throw new CustomException(ErrorCode.ORDER_CANNOT_BE_MODIFIED);
 	}
 
@@ -218,21 +242,5 @@ public class OrderService {
 		if (products.isEmpty())
 			throw new CustomException(ErrorCode.PRODUCT_NOT_FOUND);
 		return products.get(0);
-	}
-
-	@Transactional
-	public void cancelOrder(Long orderId) {
-		Order order = orderRepository.findById(orderId)
-			.orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
-		checkCanCanceled(order.getStatus());
-		order.cancel();
-		orderMessageProducer.sendProductCancelRequest(order.getProductId(), order.getQuantity());
-		if(order.getUserCouponId() != null)
-			orderMessageProducer.sendUserCouponRequest(order.getUserCouponId());
-	}
-
-	private void checkCanCanceled(OrderStatus status) {
-		if (status == OrderStatus.CANCELLED)
-			throw new CustomException(ErrorCode.ORDER_ALREADY_CANCELED);
 	}
 }

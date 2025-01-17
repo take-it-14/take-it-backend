@@ -18,14 +18,14 @@ spring:
         format_sql: true
 
   rabbitmq:
-    host: localhost
+    host: rabbitMQ
     port: 5672
     username: guest
     password: guest
 
   data:
     redis:
-      host: localhost
+      host: redis-stack
       port: 6379
       password: systempass
 
@@ -66,6 +66,12 @@ management:
       show-details: always
     prometheus:
       enabled: true
+
+logging:
+  level:
+    root: debug
+    com.takeit: debug
+    org.springframework: warn
 
 message:
   exchange: "takeit"

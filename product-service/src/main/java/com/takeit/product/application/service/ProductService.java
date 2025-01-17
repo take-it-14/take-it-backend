@@ -213,6 +213,7 @@ public class ProductService {
         Product product = productRepository.findById(productId).orElseThrow(() -> new CustomException(PRODUCT_NOT_FOUND));
 
         product.updateStars(stars);
+        productRedisService.saveProduct(product);
     }
 
     private void checkRequesterIsAdminOrApprovedSeller(String requesterUsername) {
