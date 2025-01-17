@@ -32,6 +32,15 @@ public class QueueService {
     private static final int MAX_ACTIVE_SIZE = 100; // 최대 active token 수
     private static final long ACTIVE_TTL_SECONDS = 5; // active token TTL (5초)
 
+    public boolean joinOneQueue(UUID productId, String username) {
+        long currentTime = System.currentTimeMillis();
+        String value = "productId:" + productId + ":username:" + username;
+        stringRedisTemplate.opsForZSet().add(WAITING_TOKENS, value, currentTime);
+        log.info("username : {}, product id : {}", username, productId);
+
+        return false;
+    }
+
     public boolean joinQueue(UUID productId, String username) {
         long currentTime = System.currentTimeMillis();
         String key = WAITING_TOKENS + ":productId:" + productId;
@@ -62,14 +71,15 @@ public class QueueService {
 
     // 주문이 처리된 경우 활성화된 키를 삭제하는 메소드
     public void deleteActiveKey(UUID productId, String username) {
-        String activeKey = "activeTokens:productId:" + productId.toString() + ":username:" + username;
+        String activeKey = "activeTokens:productId:" + productId + ":username:" + username;
 
         // TTL에 의한 자동 삭제 이전에 주문이 처리되면 해당 키를 즉시 삭제
         stringRedisTemplate.delete(activeKey);
 
         // 활성 사용자 목록에서 해당 사용자 삭제
-        String activeSetKey = ACTIVE_USERS + ":productId:" + productId.toString();
+        String activeSetKey = ACTIVE_USERS + ":productId:" + productId;
         stringRedisTemplate.opsForSet().remove(activeSetKey, username);
+        stringRedisTemplate.delete(activeKey);
     }
 
     private long getActiveUsersSize(UUID productId) {
@@ -96,4 +106,22 @@ public class QueueService {
         return stringRedisTemplate.hasKey(key);
     }
 
+    public QueueDto getOneQueueInRankAndIsActive(UUID productId, String username) {
+        String value = "productId:" + productId + ":username:" + username;
+
+        Long rank = stringRedisTemplate.opsForZSet().rank(WAITING_TOKENS, value);
+
+        if(rank != null) {
+            return QueueDto.of(rank, false);
+        }
+
+        String activeToken = ACTIVE_TOKENS + ":productId:" + productId.toString() + ":username:" + username;
+        Boolean exists = stringRedisTemplate.hasKey(activeToken);
+
+        if(exists != null)
+            return QueueDto.of(0L, exists);
+
+        throw new CustomException(QUEUE_NOT_FOUND);
+
+    }
 }

@@ -21,19 +21,44 @@ public class ActiveTokenScheduler {
     private static final String WAITING_TOKENS = "waitingTokens";
     private static final String ACTIVE_TOKENS = "activeTokens";
     private static final String ACTIVE_USERS = "activeUsers";
-    private static final int MAX_ACTIVE_SIZE = 100; // 최대 active token 수
+    private static final int MAX_ACTIVE_SIZE = 200; // 최대 active token 수
     private static final long ACTIVE_TTL_SECONDS = 5; // active token TTL (5초)
 
     private final RedisTemplate<String, String> redisTemplate;
 
-    @Scheduled(fixedRate = 2000)
-    public void manageActiveTokens() {
-        Set<UUID> productIds = getAllProductIds();
-        for (UUID productId : productIds) {
-            processProductQueue(productId);
+//    @Scheduled(fixedRate = 2000)
+//    public void manageActiveTokens() {
+//        Set<UUID> productIds = getAllProductIds();
+//        for (UUID productId : productIds) {
+//            processProductQueue(productId);
+//        }
+//        log.info("Scheduler end");
+//    }
+
+    @Scheduled(fixedRate = 10000)
+    public void manageActiveTokensInOneQueue() {
+        Set<String> keys = getAllActiveTokens();
+        int activeUserSize = keys == null ? 0 : keys.size();
+
+        if(activeUserSize >= MAX_ACTIVE_SIZE) {
+            log.info("active token full... Scheduler end");
+            return;
         }
-        log.info("Scheduler end");
+
+        Set<String> keyForMove = redisTemplate.opsForZSet().range(WAITING_TOKENS, 0, MAX_ACTIVE_SIZE - activeUserSize - 1);
+
+        if(keyForMove == null) {
+            log.info("keyForMove is null");
+            return;
+        }
+
+        for (String key : keyForMove) {
+            String activeKey = ACTIVE_TOKENS + ":" + key;
+            redisTemplate.opsForValue().set(activeKey, "active", ACTIVE_TTL_SECONDS, TimeUnit.SECONDS);
+            redisTemplate.opsForZSet().remove(WAITING_TOKENS, key);
+        }
     }
+
 
     @Async
     public void processProductQueue(UUID productId) {
@@ -50,7 +75,7 @@ public class ActiveTokenScheduler {
         String waitingKey = WAITING_TOKENS + ":productId:" + productId;
         String activeSetKey = ACTIVE_USERS + ":productId:" + productId;
 
-        Set<String> keysToMove = redisTemplate.opsForZSet().range(waitingKey, 0, MAX_ACTIVE_SIZE - 1);
+        Set<String> keysToMove = redisTemplate.opsForZSet().range(waitingKey, 0, tokensToAdd - 1);
         if (keysToMove == null || keysToMove.isEmpty()) {
             return;
         }
@@ -84,4 +109,27 @@ public class ActiveTokenScheduler {
         log.info("getAllProductIds size : {}", productIds.size());
         return productIds;
     }
+
+    public Set<String> getAllActiveTokens() {
+        Set<String> activeTokens = new HashSet<>();
+        String pattern = ACTIVE_TOKENS + ":*"; // 상품별 대기 큐 키 패턴
+
+        // SCAN을 사용하여 효율적으로 키 스캔
+        Cursor<byte[]> cursor = redisTemplate.execute((RedisCallback<Cursor<byte[]>>) connection -> {
+            return connection.scan(ScanOptions.scanOptions().match(pattern).count(100).build());
+        });
+
+        while (cursor.hasNext()) {
+            byte[] keyBytes = cursor.next();
+            // byte[]를 String으로 변환
+            String key = new String(keyBytes, StandardCharsets.UTF_8);
+            // 상품 ID 추출 (예: "waitingTokens:1" -> 1)
+            activeTokens.add(key);
+        }
+
+        log.info("get all active key : {}", activeTokens.size());
+        return activeTokens;
+    }
+
+
 }

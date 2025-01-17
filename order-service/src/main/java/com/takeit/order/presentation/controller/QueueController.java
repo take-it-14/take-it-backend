@@ -16,18 +16,33 @@ import java.util.UUID;
 public class QueueController {
     private final QueueService queueService;
 
+//    @PostMapping("/products/{productId}")
+//    public CommonResponse<?> joinQueue(
+//            @PathVariable("productId") UUID productId,
+//            @RequestHeader("X-Username") String username) {
+//        boolean result = queueService.joinQueue(productId, username);
+//        return CommonResponse.ofSuccess("대기열에 정상적으로 등록되었습니다.", result ? "즉시 주문 생성 api 호출 가능" : "대기열 페이지로 이동");
+//    }
+
     @PostMapping("/products/{productId}")
-    public CommonResponse<?> joinQueue(
+    public CommonResponse<?> joinOneQueue(
             @PathVariable("productId") UUID productId,
-            @RequestHeader("X-Username") String username) {
-        boolean result = queueService.joinQueue(productId, username);
+            @RequestHeader("X-Username") String username
+    ) {
+        boolean result = queueService.joinOneQueue(productId, username);
         return CommonResponse.ofSuccess("대기열에 정상적으로 등록되었습니다.", result ? "즉시 주문 생성 api 호출 가능" : "대기열 페이지로 이동");
     }
 
+//    @GetMapping("/products/{productId}")
+//    public CommonResponse<QueueDto> getRankAndIsActive(@PathVariable("productId") UUID productId,
+//                                                       @RequestHeader("X-Username") String username) {
+//        return CommonResponse.ofSuccess("현재 대기 순위가 조회되었습니다.", queueService.getRankAndIsActive(productId, username));
+//    }
+
     @GetMapping("/products/{productId}")
-    public CommonResponse<QueueDto> getRankAndIsActive(@PathVariable("productId") UUID productId,
+    public CommonResponse<QueueDto> getOneQueueInRankAndIsActive(@PathVariable("productId") UUID productId,
                                                        @RequestHeader("X-Username") String username) {
-        return CommonResponse.ofSuccess("현재 대기 순위가 조회되었습니다.", queueService.getRankAndIsActive(productId, username));
+        return CommonResponse.ofSuccess("현재 대기 순위가 조회되었습니다.", queueService.getOneQueueInRankAndIsActive(productId, username));
     }
 
 }

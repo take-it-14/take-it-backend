@@ -81,7 +81,7 @@ public class OrderService {
 		redisService.saveOrderId(orderCacheDto.uuid(), orderIdRedisTtl);
 		redisService.saveOrder(orderCacheDto, orderRedisTtl);
 
-		queueService.deleteActiveKey(product.uuid(), username);
+		queueService.deleteActiveKey(request.productId(), username);
 
 		return OrderCreateResponse.from(orderCacheDto.uuid());
 	}
