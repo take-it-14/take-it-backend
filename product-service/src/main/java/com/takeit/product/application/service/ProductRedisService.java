@@ -1,8 +1,8 @@
 package com.takeit.product.application.service;
 
+import com.takeit.common.application.dto.CancelProduct;
 import com.takeit.common.exception.CustomException;
 import com.takeit.common.exception.ErrorCode;
-import com.takeit.product.application.dto.product.CancelProduct;
 import com.takeit.product.domain.entity.Product;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ public class ProductRedisService {
     private final RedisTemplate<String, Object> redisTemplate;
 
     private static final String OCCUPY_SCRIPT =
-            "local productKey = KEYS[1] " +
+        "local productKey = KEYS[1] " +
             "local decrementQuantity = tonumber(ARGV[1]) " +
             "local currentStock = tonumber(redis.call('HGET', productKey, 'stock')) " +
             "if not currentStock or currentStock < decrementQuantity then " +

@@ -7,7 +7,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.takeit.payment.application.dto.order.OrderCompleteDto;
+import com.takeit.common.application.dto.OrderUuidDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,11 +21,18 @@ public class PaymentMessageProducer {
 	@Value("${message.queues.order.complete}")
 	private String orderComplete;
 
+	@Value("${message.queues.order.cancel}")
+	private String orderCancel;
+
 	private void sendMessage(String routingKey, Object message) {
 		rabbitTemplate.convertAndSend(paymentExchange.getName(), routingKey, message);
 	}
 
 	public void sendOrderCompleteRequest(UUID orderId){
-		sendMessage(orderComplete, OrderCompleteDto.from(orderId));
+		sendMessage(orderComplete, OrderUuidDto.from(orderId));
+	}
+
+	public void sendOrderFailRequest(UUID orderId){
+		sendMessage(orderCancel, OrderUuidDto.from(orderId));
 	}
 }
