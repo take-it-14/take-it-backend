@@ -32,7 +32,7 @@ public enum ErrorCode {
     FILE_UPLOAD_ERROR(HttpStatus.BAD_REQUEST , "파일 업로드에 실패했습니다"),
     TOO_MANY_PHOTOS(HttpStatus.BAD_REQUEST, "너무 많은 사진을 업로드했습니다."),
     REVIEW_NOT_FOUND(HttpStatus.BAD_REQUEST, "리뷰를 찾을 수 없습니다."),
-
+    ORDER_NOT_DELIVERED(HttpStatus.BAD_REQUEST, "리뷰를 남길 수 없는 주문 상태입니다."),
     FILE_DELETE_ERROR(HttpStatus.BAD_REQUEST, "파일 삭제에 실패했습니다."),
 
     // order
@@ -58,6 +58,7 @@ public enum ErrorCode {
     USER_COUPON_NOT_USED(HttpStatus.BAD_REQUEST, "아직 사용하지 않은 쿠폰입니다."),
     USER_COUPON_EXPIRED(HttpStatus.BAD_REQUEST, "사용 기한이 지난 쿠폰입니다."),
     REVIEW_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 작성된 리뷰가 존재합니다."),
+    CANNOT_USE_USER_COUPON(HttpStatus.BAD_REQUEST, "해당 주문에서 쿠폰을 사용할 수 없습니다."),
 
     // product
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 상품을 찾을 수 없습니다."),

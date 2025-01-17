@@ -1,6 +1,8 @@
 package com.takeit.coupon.application.service;
 
 import com.querydsl.core.types.Predicate;
+import com.takeit.common.application.dto.coupon.UseCouponDto;
+import com.takeit.common.application.dto.coupon.UseCouponRequestDto;
 import com.takeit.common.exception.CustomException;
 import com.takeit.common.utils.AccessValidator;
 import com.takeit.coupon.application.dto.CreateUserCouponResponse;
@@ -106,24 +108,35 @@ public class UserCouponService {
     }
 
     @Transactional
-    public Long validUserCouponAndUsedAndGetUserCouponId(UUID userCouponId, Long userId) {
-        UserCoupon coupon = userCouponRepository.findByUuidAndIsDeletedIsFalse(userCouponId).orElseThrow(() -> new CustomException(USER_COUPON_NOT_FOUND));
+    public UseCouponDto validUserCouponAndUsedAndGetUserCouponId(UseCouponRequestDto request, Long userId) {
+        UserCoupon userCoupon = userCouponRepository.findByUuidAndIsDeletedIsFalse(request.userCouponId()).orElseThrow(() -> new CustomException(USER_COUPON_NOT_FOUND));
 
-        validUserCouponUser(coupon, userId);
+        if(!validUserCouponUser(userCoupon, userId) || validCouponIsNotUsed(userCoupon))
+            return null;
 
-        validCouponIsNotUsed(coupon);
+        userCoupon.used();
 
-        coupon.used();
+        Coupon coupon = userCoupon.getCoupon();
 
-        return coupon.getId();
+        if(coupon.getMinAmount() > request.amount())
+            return null;
+
+        return UseCouponDto.of(userCoupon.getId(), getDisCountAmount(coupon, request.amount()));
     }
 
-    private void validUserCouponUser(UserCoupon coupon, Long userId) {
-        if(!coupon.getUserId().equals(userId))  throw new CustomException(UNAUTHORIZED);
+    private Long getDisCountAmount(Coupon coupon, Long amount) {
+        return switch (coupon.getType()) {
+            case AMOUNT -> amount >= coupon.getDiscountValue() ? amount - coupon.getDiscountValue() : 0;
+            case PERCENTAGE -> amount * (100 - coupon.getDiscountValue()) / 100;
+        };
     }
 
-    private void validCouponIsNotUsed(UserCoupon coupon) {
-        if(coupon.getIsUsed()) throw new CustomException(USER_COUPON_ALREADY_USED);
+    private boolean validUserCouponUser(UserCoupon coupon, Long userId) {
+        return coupon.getUserId().equals(userId);
+    }
+
+    private boolean validCouponIsNotUsed(UserCoupon coupon) {
+        return coupon.getIsUsed();
     }
 
     public UUID getUserCouponUuid(Long userCouponId) {

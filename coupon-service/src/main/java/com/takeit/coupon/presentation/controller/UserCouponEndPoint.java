@@ -1,5 +1,7 @@
 package com.takeit.coupon.presentation.controller;
 
+import com.takeit.common.application.dto.coupon.UseCouponDto;
+import com.takeit.common.application.dto.coupon.UseCouponRequestDto;
 import com.takeit.coupon.application.service.UserCouponService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -12,12 +14,12 @@ import java.util.UUID;
 public class UserCouponEndPoint {
     private final UserCouponService userCouponService;
 
-    @GetMapping("/{userCouponId}")
-    public Long validUserCouponAndGetUserCouponId(
-            @PathVariable UUID userCouponId,
+    @PostMapping("/used")
+    public UseCouponDto validUserCouponAndGetUserCouponId(
+            @RequestBody UseCouponRequestDto request,
             @RequestParam(name = "userId") Long userId
     ) {
-        return userCouponService.validUserCouponAndUsedAndGetUserCouponId(userCouponId, userId);
+        return userCouponService.validUserCouponAndUsedAndGetUserCouponId(request, userId);
     }
 
     @GetMapping
