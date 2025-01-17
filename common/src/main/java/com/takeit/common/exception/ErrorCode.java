@@ -39,6 +39,7 @@ public enum ErrorCode {
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 주문 정보입니다."),
     ORDER_CANNOT_BE_MODIFIED(HttpStatus.BAD_REQUEST, "현재 상태의 주문은 수정할 수 없습니다."),
     ORDER_ALREADY_CANCELED(HttpStatus.BAD_REQUEST, "이미 취소 처리된 주문입니다."),
+    QUEUE_NOT_FOUND(HttpStatus.BAD_REQUEST, "존재하지 않는 대기열 번호이거나 이미 삭제된 대기열 번호입니다."),
 
     // category
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 카테고리가 없습니다."),

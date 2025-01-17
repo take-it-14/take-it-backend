@@ -47,6 +47,7 @@ public class OrderService {
 	private final ProductClient productClient;
 	private final CouponClient couponClient;
 	private final RedisService redisService;
+	private final QueueService queueService;
 
 	@Value("${order.redis.ttl:300}") // 5분(ID 단독 저장용)
 	private long orderIdRedisTtl;
@@ -57,7 +58,7 @@ public class OrderService {
 	private final OrderMessageProducer orderMessageProducer;
 
 	@Transactional
-	public OrderCreateResponse createOrder(OrderCreateDto request, Long userId) {
+	public OrderCreateResponse createOrder(OrderCreateDto request, Long userId, String username) {
 
 		// 재고 확인 + 재고 차감
 		productClient.occupyProduct(request.productId(), request.quantity().intValue());
@@ -79,6 +80,8 @@ public class OrderService {
 		// TTL 안에 결제 완료되는지 확인하기 위함
 		redisService.saveOrderId(orderCacheDto.uuid(), orderIdRedisTtl);
 		redisService.saveOrder(orderCacheDto, orderRedisTtl);
+
+		queueService.deleteActiveKey(request.productId(), username);
 
 		return OrderCreateResponse.from(orderCacheDto.uuid());
 	}
