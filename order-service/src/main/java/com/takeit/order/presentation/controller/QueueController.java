@@ -24,12 +24,11 @@ public class QueueController {
 //        return CommonResponse.ofSuccess("대기열에 정상적으로 등록되었습니다.", result ? "즉시 주문 생성 api 호출 가능" : "대기열 페이지로 이동");
 //    }
 
-    @PostMapping("/products/{productId}")
+    @PostMapping
     public CommonResponse<?> joinOneQueue(
-            @PathVariable("productId") UUID productId,
             @RequestHeader("X-Username") String username
     ) {
-        boolean result = queueService.joinOneQueue(productId, username);
+        boolean result = queueService.joinOneQueue(username);
         return CommonResponse.ofSuccess("대기열에 정상적으로 등록되었습니다.", result ? "즉시 주문 생성 api 호출 가능" : "대기열 페이지로 이동");
     }
 
@@ -39,10 +38,10 @@ public class QueueController {
 //        return CommonResponse.ofSuccess("현재 대기 순위가 조회되었습니다.", queueService.getRankAndIsActive(productId, username));
 //    }
 
-    @GetMapping("/products/{productId}")
-    public CommonResponse<QueueDto> getOneQueueInRankAndIsActive(@PathVariable("productId") UUID productId,
-                                                       @RequestHeader("X-Username") String username) {
-        return CommonResponse.ofSuccess("현재 대기 순위가 조회되었습니다.", queueService.getOneQueueInRankAndIsActive(productId, username));
+    @GetMapping
+    public CommonResponse<QueueDto> getOneQueueInRankAndIsActive(
+           @RequestHeader("X-Username") String username) {
+        return CommonResponse.ofSuccess("현재 대기 순위가 조회되었습니다.", queueService.getOneQueueInRankAndIsActive(username));
     }
 
 }

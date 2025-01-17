@@ -69,3 +69,6 @@ message:
         db: "takeit.product.save.db"
     coupon:
       cancel: "takeit.coupon.cancel"
+
+queue:
+  max-active-size: ${MAX_ACTIVE_SIZE}

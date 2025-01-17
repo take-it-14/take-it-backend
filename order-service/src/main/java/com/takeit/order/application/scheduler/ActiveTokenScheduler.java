@@ -2,6 +2,7 @@ package com.takeit.order.application.scheduler;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.*;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,7 +22,8 @@ public class ActiveTokenScheduler {
     private static final String WAITING_TOKENS = "waitingTokens";
     private static final String ACTIVE_TOKENS = "activeTokens";
     private static final String ACTIVE_USERS = "activeUsers";
-    private static final int MAX_ACTIVE_SIZE = 500; // 최대 active token 수
+    @Value("${queue.max-active-size}")
+    private int MAX_ACTIVE_SIZE; // 최대 active token 수
     private static final long ACTIVE_TTL_SECONDS = 5; // active token TTL (5초)
 
     private final RedisTemplate<String, String> redisTemplate;
@@ -52,11 +54,18 @@ public class ActiveTokenScheduler {
             return;
         }
 
+        log.info("current waiting token size : {}", redisTemplate.opsForZSet().size(WAITING_TOKENS));
+
         for (String key : keyForMove) {
-            String activeKey = ACTIVE_TOKENS + ":" + key;
+            String activeKey = ACTIVE_TOKENS + ":username:" + key;
             redisTemplate.opsForValue().set(activeKey, "active", ACTIVE_TTL_SECONDS, TimeUnit.SECONDS);
+            log.info("create active token : {}", activeKey);
             redisTemplate.opsForZSet().remove(WAITING_TOKENS, key);
+            log.info("remove waiting token : {}", key);
         }
+
+        log.info("finish key move");
+        log.info("current waiting token size : {}", redisTemplate.opsForZSet().size(WAITING_TOKENS));
     }
 
 

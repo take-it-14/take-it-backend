@@ -32,11 +32,10 @@ public class QueueService {
     private static final int MAX_ACTIVE_SIZE = 100; // 최대 active token 수
     private static final long ACTIVE_TTL_SECONDS = 5; // active token TTL (5초)
 
-    public boolean joinOneQueue(UUID productId, String username) {
+    public boolean joinOneQueue(String username) {
         long currentTime = System.currentTimeMillis();
-        String value = "productId:" + productId + ":username:" + username;
-        stringRedisTemplate.opsForZSet().add(WAITING_TOKENS, value, currentTime);
-        log.info("username : {}, product id : {}", username, productId);
+        stringRedisTemplate.opsForZSet().add(WAITING_TOKENS, username, currentTime);
+        log.info("username : {}", username);
 
         return false;
     }
@@ -106,16 +105,14 @@ public class QueueService {
         return stringRedisTemplate.hasKey(key);
     }
 
-    public QueueDto getOneQueueInRankAndIsActive(UUID productId, String username) {
-        String value = "productId:" + productId + ":username:" + username;
-
-        Long rank = stringRedisTemplate.opsForZSet().rank(WAITING_TOKENS, value);
+    public QueueDto getOneQueueInRankAndIsActive(String username) {
+        Long rank = stringRedisTemplate.opsForZSet().rank(WAITING_TOKENS, username);
 
         if(rank != null) {
             return QueueDto.of(rank, false);
         }
 
-        String activeToken = ACTIVE_TOKENS + ":productId:" + productId.toString() + ":username:" + username;
+        String activeToken = ACTIVE_TOKENS + "username:" + username;
         Boolean exists = stringRedisTemplate.hasKey(activeToken);
 
         if(exists != null)
