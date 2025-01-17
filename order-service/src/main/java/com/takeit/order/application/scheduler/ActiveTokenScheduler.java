@@ -21,7 +21,7 @@ public class ActiveTokenScheduler {
     private static final String WAITING_TOKENS = "waitingTokens";
     private static final String ACTIVE_TOKENS = "activeTokens";
     private static final String ACTIVE_USERS = "activeUsers";
-    private static final int MAX_ACTIVE_SIZE = 200; // 최대 active token 수
+    private static final int MAX_ACTIVE_SIZE = 500; // 최대 active token 수
     private static final long ACTIVE_TTL_SECONDS = 5; // active token TTL (5초)
 
     private final RedisTemplate<String, String> redisTemplate;
@@ -35,7 +35,7 @@ public class ActiveTokenScheduler {
 //        log.info("Scheduler end");
 //    }
 
-    @Scheduled(fixedRate = 10000)
+    @Scheduled(fixedRate = 2000)
     public void manageActiveTokensInOneQueue() {
         Set<String> keys = getAllActiveTokens();
         int activeUserSize = keys == null ? 0 : keys.size();
