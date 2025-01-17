@@ -34,6 +34,8 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final AuthService authService;
 
+    private final CouponService couponService;
+
     // 사용자 등록
     @Transactional
     public UserResponse createUser(CreateUserDto request) {
@@ -51,7 +53,9 @@ public class UserService {
                 request.role()
         );
 
-        userRepository.save(user);
+        user = userRepository.save(user);
+
+        couponService.createSignupUserCoupon(user.getId());
 
         return UserResponse.from(user);
     }

@@ -166,4 +166,15 @@ public class UserCouponService {
 
         userCoupon.cancel();
     }
+
+    @Transactional
+    public boolean createSignupUserCoupon(Long userId) {
+        Coupon coupon = couponRepository.findByNameAndIsDeletedIsFalse("FIRST SIGN UP").orElse(null);
+
+        if(coupon == null) return false;
+
+        userCouponRepository.save(UserCoupon.create(coupon, userId));
+
+        return true;
+    }
 }

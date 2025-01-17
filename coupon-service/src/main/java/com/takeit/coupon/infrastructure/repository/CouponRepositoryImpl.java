@@ -80,6 +80,11 @@ public class CouponRepositoryImpl implements CouponRepository {
 
     }
 
+    @Override
+    public Optional<Coupon> findByNameAndIsDeletedIsFalse(String couponName) {
+        return jpaCouponRepository.findByNameAndIsDeletedIsFalse(couponName);
+    }
+
     private OrderSpecifier<?>[] buildOrderBy(Sort sort) {
         List<OrderSpecifier<?>> orderSpecifiers = new ArrayList<>();
 

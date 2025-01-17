@@ -26,4 +26,12 @@ public class UserCouponEndPoint {
     ) {
         return userCouponService.getUserCouponUuid(userCouponId);
     }
+
+    @PostMapping("/signup")
+    public boolean signupUserCoupon(
+            @RequestBody Long userId
+    ) {
+        return userCouponService.createSignupUserCoupon(userId);
+    }
+
 }
