@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,7 +28,7 @@ public class UserRedisService {
 
 
         redisTemplate.opsForHash().putAll(key, userMap);
-
+        redisTemplate.expire(key, Duration.ofDays(1));
     }
 
     public User getUser(String username) {
