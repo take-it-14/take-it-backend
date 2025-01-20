@@ -12,12 +12,11 @@ on:
   workflow_dispatch:
     inputs:
       service:
-        description: 'Select a service to build and deploy'
+        description: 'Select a service to deploy'
         required: true
-        default: 'all'
+        default: 'eureka-server'
         type: choice
         options:
-          - all
           - eureka-server
           - gateway
           - auth-service
