@@ -2,17 +2,17 @@ package com.takeit.order.infrastructure.client;
 
 import java.util.UUID;
 
+import com.takeit.common.application.dto.coupon.UseCouponDto;
+import com.takeit.common.application.dto.coupon.UseCouponRequestDto;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 @FeignClient(name = "coupon-service")
 public interface CouponClient {
-	@GetMapping("/feign/v1/coupons/{userCouponId}")
-	Long validUserCouponAndGetUserCouponId(
-		@PathVariable UUID userCouponId,
-		@RequestParam(name = "userId") Long userId
+	@PostMapping("/feign/v1/coupons/used")
+	UseCouponDto validUserCouponAndGetUserCouponId(
+			@RequestBody UseCouponRequestDto request,
+			@RequestParam(name = "userId") Long userId
 	);
 	@GetMapping("/feign/v1/coupons")
 	UUID getUserCouponUuid(

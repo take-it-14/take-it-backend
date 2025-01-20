@@ -15,4 +15,6 @@ public interface CouponRepository {
     Optional<Coupon> findByUuidAndIsDeletedIsFalse(UUID couponId);
 
     CouponPageResponse findAll(Predicate predicate, Pageable pageable);
+
+    Optional<Coupon> findByNameAndIsDeletedIsFalse(String couponName);
 }

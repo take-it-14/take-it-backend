@@ -33,6 +33,9 @@ public class UserService {
     private final SellerInfoRepository sellerInfoRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthService authService;
+    private final UserRedisService userRedisService;
+
+    private final CouponService couponService;
 
     // 사용자 등록
     @Transactional
@@ -51,7 +54,9 @@ public class UserService {
                 request.role()
         );
 
-        userRepository.save(user);
+        user = userRepository.save(user);
+
+        couponService.createSignupUserCoupon(user.getId());
 
         return UserResponse.from(user);
     }
@@ -100,9 +105,12 @@ public class UserService {
         }
 
         // 사용자 확인
-        User user = userRepository.findByUsernameAndIsDeletedFalse(username).orElseThrow(
-                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
-        );
+        User user = userRedisService.getUser(username);
+        if(user == null) {
+            user = userRepository.findByUsernameAndIsDeletedFalse(username).orElseThrow(
+                    () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+            );
+        }
 
         return UserResponse.from(user);
     }

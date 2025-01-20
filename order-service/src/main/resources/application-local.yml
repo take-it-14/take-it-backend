@@ -16,7 +16,7 @@ spring:
       port: 6379
       password: systempass
   rabbitmq:
-    host: rabbitMQ
+    host: rabbitmq
     port: 5672
     username: guest
     password: guest
@@ -64,3 +64,6 @@ message:
         db: "takeit.product.save.db"
     coupon:
       cancel: "takeit.coupon.cancel"
+
+queue:
+  max-active-size: 100
