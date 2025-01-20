@@ -36,9 +36,7 @@ jobs:
 
     strategy:
       matrix:
-        service: ${{ fromJson(github.event_name == 'workflow_dispatch'
-                   ? '["' + github.event.inputs.service + '"]'
-          : github.event.workflow_run.outputs.services || '["none"]') }}
+        service: ${{ fromJson(github.event.inputs.service || github.event.workflow_run.outputs.services || '["none"]') }}
 
     steps:
       - name: Checkout repository
