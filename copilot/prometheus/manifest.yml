@@ -1,0 +1,55 @@
+# The manifest for the "prometheus" service.
+# Read the full specification for the "Backend Service" type at:
+#  https://aws.github.io/copilot-cli/docs/manifest/backend-service/
+
+# Your service name will be used in naming your resources like log groups, ECS services, etc.
+name: prometheus
+type: Backend Service
+
+# Your service is reachable at "http://prometheus.${COPILOT_SERVICE_DISCOVERY_ENDPOINT}:9090" but is not public.
+
+# Configuration for your containers and service.
+image:
+  location: prom/prometheus:latest
+  # Port exposed through your container to route traffic to it.
+  port: 9090
+
+cpu: 256       # Number of CPU units for the task.
+memory: 512    # Amount of memory in MiB used by the task.
+count: 1       # Number of tasks that should be running in your service.
+exec: true     # Enable running commands in your container.
+network:
+  connect: true # Enable Service Connect for intra-environment traffic between services.
+
+storage:
+  volumes:
+    config:
+      path: "/etc/prometheus" # 컨테이너 내 경로
+      read_only: false
+      efs:
+        id: fs-0a5dadfb97eaaf819
+        root_dir: "/prometheus/config"
+    data:
+      path: "/prometheus" # 컨테이너 내 경로
+      read_only: false
+      efs:
+        id: fs-0a5dadfb97eaaf819
+        root_dir: "/prometheus/data"
+
+# 명령어 및 추가 설정
+entrypoint: []
+command: ["--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.path=/prometheus", "--web.console.libraries=/etc/prometheus/console_libraries", "--web.console.templates=/etc/prometheus/consoles", "--web.enable-lifecycle"]
+# Optional fields for more advanced use-cases.
+#
+#variables:                    # Pass environment variables as key value pairs.
+#  LOG_LEVEL: info
+
+#secrets:                      # Pass secrets from AWS Systems Manager (SSM) Parameter Store.
+#  GITHUB_TOKEN: GITHUB_TOKEN  # The key is the name of the environment variable, the value is the name of the SSM parameter.
+
+# You can override any of the values defined above by environment.
+#environments:
+#  test:
+#    count: 2               # Number of tasks to run for the "test" environment.
+#    deployment:            # The deployment strategy for the "test" environment.
+#       rolling: 'recreate' # Stops existing tasks before new ones are started for faster deployments.

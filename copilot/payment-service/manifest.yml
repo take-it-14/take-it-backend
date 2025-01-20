@@ -1,0 +1,54 @@
+# The manifest for the "payment-service" service.
+# Read the full specification for the "Backend Service" type at:
+#  https://aws.github.io/copilot-cli/docs/manifest/backend-service/
+
+# Your service name will be used in naming your resources like log groups, ECS services, etc.
+name: payment-service
+type: Backend Service
+
+# Your service is reachable at "http://payment-service.${COPILOT_SERVICE_DISCOVERY_ENDPOINT}:19095" but is not public.
+
+# Configuration for your containers and service.
+image:
+  location: gogohaena/takeit-payment-service:latest
+  # Port exposed through your container to route traffic to it.
+  port: 19095
+
+cpu: 1024       # Number of CPU units for the task.
+memory: 2048    # Amount of memory in MiB used by the task.
+count: 1       # Number of tasks that should be running in your service.
+exec: true     # Enable running commands in your container.
+network:
+  connect: true # Enable Service Connect for intra-environment traffic between services.
+
+storage:
+  volumes:
+    config:
+      path: "/config" # 컨테이너 내 경로
+      read_only: false
+      efs:
+        id: fs-0a5dadfb97eaaf819
+        root_dir: "/payment-service/config"
+
+variables:
+  SPRING_PROFILES_ACTIVE: prod
+
+secrets:
+  EUREKA_SERVER_URL: /copilot/takeit/prod/secrets/EUREKA_SERVER_URL
+  PAYMENT_DB_URL: /copilot/takeit/prod/secrets/PAYMENT_DB_URL
+  PAYMENT_DB_USERNAME: /copilot/takeit/prod/secrets/PAYMENT_DB_USERNAME
+  PAYMENT_DB_PASSWORD: /copilot/takeit/prod/secrets/PAYMENT_DB_PASSWORD
+  PAYMENT_DDL_AUTO: /copilot/takeit/prod/secrets/PAYMENT_DDL_AUTO
+  PAYMENT_SERVICE_PORT: /copilot/takeit/prod/secrets/PAYMENT_SERVICE_PORT
+  ZIPKIN_ENDPOINT: /copilot/takeit/prod/secrets/ZIPKIN_ENDPOINT
+  RABBITMQ_HOST: /copilot/takeit/prod/secrets/RABBITMQ_HOST
+  RABBITMQ_PORT: /copilot/takeit/prod/secrets/RABBITMQ_PORT
+  RABBITMQ_USERNAME: /copilot/takeit/prod/secrets/RABBITMQ_USERNAME
+  RABBITMQ_PASSWORD: /copilot/takeit/prod/secrets/RABBITMQ_PASSWORD
+
+# You can override any of the values defined above by environment.
+#environments:
+#  test:
+#    count: 2               # Number of tasks to run for the "test" environment.
+#    deployment:            # The deployment strategy for the "test" environment.
+#       rolling: 'recreate' # Stops existing tasks before new ones are started for faster deployments.

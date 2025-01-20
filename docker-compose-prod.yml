@@ -6,7 +6,6 @@ services:
   rabbitMQ:
     image: rabbitmq:management
     container_name: rabbitMQ
-
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -117,9 +116,9 @@ services:
       - 3100
     ports:
       - "3100:3100"  # Loki API 포트
-    command: -config.file=/mnt/config/loki-config.yaml
+    command: -config.file=/mnt/config/loki-config.yml
     volumes:
-      - ./loki-config.yml:/mnt/config/loki-config.yaml
+      - ./loki-config.yml:/mnt/config/loki-config.yml
       - loki-data:/tmp
     restart: always
     networks:

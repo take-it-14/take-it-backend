@@ -45,3 +45,5 @@ company/src/main/resources/application-secret.yml
 
 ### Data ###
 *data/
+
+/copilot/secrets.yml

@@ -1,0 +1,49 @@
+name: Deploy to Private EC2 via Bastion
+
+# 트리거 설정
+on:
+  workflow_run:  # 다른 워크플로우가 완료된 후 실행
+    workflows:
+      - CI for TakeIt Services
+    types:
+      - completed  # 완료된 후 트리거
+  workflow_dispatch:  # 수동 실행 추가
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup SSH for Bastion
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: |
+            ${{ secrets.BASTION_SSH_KEY }}
+
+      - name: Deploy via Bastion
+        run: |
+          # 1. 배스천 서버 접속
+          ssh -o StrictHostKeyChecking=no -A ${{ secrets.BASTION_USER }}@${{ secrets.BASTION_HOST }} << 'EOF'
+          
+            # 2. 배스천 서버에서 배포 서버 접속
+            ssh -i ~/test-server-keypair.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.DEPLOY_HOST }} << 'INNER_EOF'
+          
+              # 3. 배포 서버 홈 디렉토리에서 앱 디렉토리로 이동
+              cd take-it-backend/
+          
+              # 4. git pull (dev 브랜치 기준)
+              git checkout dev
+              git pull origin dev
+          
+              # 5. 변경된 도커 이미지 pull
+              docker compose -f docker-compose-prod.yml pull
+          
+              # 6. 변경된 컨테이너 재시작
+              docker compose -f docker-compose-prod.yml up -d
+          
+            INNER_EOF
+          
+          EOF
