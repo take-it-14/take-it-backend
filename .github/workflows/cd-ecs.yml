@@ -1,20 +1,18 @@
 name: Deploy to ECS
 
-# 트리거 설정
 on:
-  workflow_run:  # 다른 워크플로우가 완료된 후 실행
+  workflow_run:
     workflows:
       - CI for TakeIt Services
     types:
-      - completed  # 완료된 후 트리거
+      - completed
 
-  # 수동 실행 트리거
   workflow_dispatch:
     inputs:
       service:
         description: 'Select a service to deploy'
-        required: true
-        default: 'eureka-server'
+        required: false
+        default: ''
         type: choice
         options:
           - eureka-server
@@ -28,15 +26,37 @@ on:
           - favorite-service
 
 jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.determine-services.outputs.services }}
+
+    steps:
+      - name: Determine services to deploy
+        id: determine-services
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            if [[ "${{ github.event.inputs.service }}" == "" ]]; then
+              echo "services=[]" >> $GITHUB_OUTPUT
+            else
+              echo "services=[\"${{ github.event.inputs.service }}\"]" >> $GITHUB_OUTPUT
+            fi
+          else
+            if [[ "${{ github.event.workflow_run.outputs.services }}" == "" ]]; then
+              echo "services=[\"none\"]" >> $GITHUB_OUTPUT
+            else
+              echo "services=${{ github.event.workflow_run.outputs.services }}" >> $GITHUB_OUTPUT
+            fi
+          fi
+
   deploy:
-    if: >
-      github.event_name == 'workflow_dispatch' ||
-      github.event.workflow_run.conclusion == 'success'
+    needs: prepare
+    if: ${{ needs.prepare.outputs.services != '["none"]' }}
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        service: ${{ github.event.inputs.service || github.event.workflow_run.outputs.services || '["none"]' }}
+        service: ${{ fromJson(needs.prepare.outputs.services) }}
 
     steps:
       - name: Checkout repository
@@ -49,22 +69,12 @@ jobs:
             ${{ secrets.NEW_BASTION_SSH_KEY }}
 
       - name: Deploy via Bastion
-        if: ${{ matrix.service != 'none' }}
         run: |
-          # 1. 배스천 서버 접속
-          ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=60 -A ${{ secrets.NEW_BASTION_USER }}@${{ secrets.NEW_BASTION_HOST }} << 'EOF'
-          
+          ssh -o StrictHostKeyChecking=no -A ${{ secrets.NEW_BASTION_USER }}@${{ secrets.NEW_BASTION_HOST }} << 'EOF'
             set -e
-
-            # 2. 앱 디렉토리로 이동
             cd /efs/take-it-backend
-          
-            # 3. Git 상태 확인 및 업데이트
             git fetch origin dev
             git reset --hard origin/dev
-          
-            # 4. Copilot 서비스 배포
             echo "Deploying ${{ matrix.service }}..."
             copilot svc deploy --name ${{ matrix.service }} --env prod --force --verbose
-          
           EOF
