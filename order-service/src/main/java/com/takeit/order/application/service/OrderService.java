@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.takeit.common.application.dto.coupon.UseCouponDto;
+import com.takeit.common.application.dto.coupon.UseCouponRequestDto;
 import com.takeit.order.application.dto.OrderDto;
 
 import com.takeit.order.presentation.controller.OrderMessageProducer;
@@ -64,17 +66,21 @@ public class OrderService {
 		productClient.occupyProduct(request.productId(), request.quantity().intValue());
 
 		// 쿠폰 사용 가능 여부 확인 + 사용 처리
-		Long userCouponId = request.userCouponId() != null ?
-			couponClient.validUserCouponAndGetUserCouponId(request.userCouponId(), userId) : null;
+		UseCouponDto userCoupon = request.userCouponId() != null ?
+			couponClient.validUserCouponAndGetUserCouponId(UseCouponRequestDto.of(request.userCouponId(), request.amount()), userId) : null;
+
+		if(validateUserCouponAndDiscountAmount(request.userCouponId(), userCoupon)) {
+			throw new CustomException(ErrorCode.CANNOT_USE_USER_COUPON);
+		}
 
 		// redis에 캐싱할 정보 생성
 		OrderCacheDto orderCacheDto = OrderCacheDto.of(
 			UUID.randomUUID(),
 			userId,
 			request.productId(),
-			userCouponId,
+			request.userCouponId() == null ? null : userCoupon.userCouponId(),
 			request.quantity(),
-			request.amount()
+			request.userCouponId() == null ? request.amount() : userCoupon.discountAmount()
 		);
 
 		// TTL 안에 결제 완료되는지 확인하기 위함
@@ -84,6 +90,10 @@ public class OrderService {
 		queueService.deleteActiveKey(request.productId(), username);
 
 		return OrderCreateResponse.from(orderCacheDto.uuid());
+	}
+
+	private boolean validateUserCouponAndDiscountAmount(UUID userCouponId, UseCouponDto userCoupon) {
+		return userCouponId != null && (userCoupon == null || userCoupon.userCouponId() == null || userCoupon.discountAmount() == null);
 	}
 
 	public OrderDetailResponse getOrderDetail(UUID orderId, Long userId, String role) {

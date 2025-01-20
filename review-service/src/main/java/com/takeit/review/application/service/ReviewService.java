@@ -52,6 +52,11 @@ public class ReviewService {
 
         OrderDto orderDto = orderService.getOrder(request.orderId(), userDto.id());
 
+        if(orderDto == null)
+            throw new CustomException(ORDER_NOT_FOUND);
+        if(!orderDto.status().equals("DELIVERED"))
+            throw new CustomException(ORDER_NOT_DELIVERED);
+
         if(reviewRepository.existsByOrderIdAndIsDeletedIsFalse(orderDto.orderId())) {
             throw new CustomException(REVIEW_ALREADY_EXISTS);
         }

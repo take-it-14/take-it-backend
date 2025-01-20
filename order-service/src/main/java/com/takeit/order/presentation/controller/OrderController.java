@@ -42,7 +42,7 @@ public class OrderController {
 	public CommonResponse<OrderCreateResponse> createOrder(
 		@RequestBody @Valid OrderCreateRequest request,
 		@RequestAttribute(value = "X-UserId") Long userId,
-		@RequestAttribute(value = "X-Username") String username
+		@RequestHeader(value = "X-Username") String username
 		){
 		return CommonResponse.ofSuccess("주문 등록", orderService.createOrder(request.toServiceDto(), userId, username));
 	}
