@@ -72,7 +72,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -A ${{ secrets.NEW_BASTION_USER }}@${{ secrets.NEW_BASTION_HOST }} << 'EOF'
             set -e
-            sudo cd /efs/take-it-backend
+            cd /efs/take-it-backend
             sudo git fetch origin dev
             sudo git reset --hard origin/dev
             echo "Deploying ${{ matrix.service }}..."
