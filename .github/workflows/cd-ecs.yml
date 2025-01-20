@@ -7,15 +7,39 @@ on:
       - CI for TakeIt Services
     types:
       - completed  # 완료된 후 트리거
-  workflow_dispatch:  # 수동 실행 추가
+
+  # 수동 실행 트리거
+  workflow_dispatch:
+    inputs:
+      service:
+        description: 'Select a service to build and deploy'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - eureka-server
+          - gateway
+          - auth-service
+          - order-service
+          - product-service
+          - payment-service
+          - review-service
+          - coupon-service
+          - favorite-service
 
 jobs:
   deploy:
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        service: ${{ fromJson(github.event.workflow_run.outputs.services) }}
+        service: ${{ fromJson(github.event_name == 'workflow_dispatch' && github.event.inputs.service != 'all'
+                   ? '["' + github.event.inputs.service + '"]'
+          : github.event.workflow_run.outputs.services || '["none"]') }}
 
     steps:
       - name: Checkout repository
@@ -28,6 +52,7 @@ jobs:
             ${{ secrets.NEW_BASTION_SSH_KEY }}
 
       - name: Deploy via Bastion
+        if: ${{ matrix.service != 'none' }}
         run: |
           # 1. 배스천 서버 접속
           ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=60 -A ${{ secrets.NEW_BASTION_USER }}@${{ secrets.NEW_BASTION_HOST }} << 'EOF'
@@ -41,10 +66,7 @@ jobs:
             git fetch origin dev
             git reset --hard origin/dev
           
-            # 4. Copilot 서비스 확인
-            copilot svc ls
-          
-            # 5. Copilot 서비스 배포
+            # 4. Copilot 서비스 배포
             echo "Deploying ${{ matrix.service }}..."
             copilot svc deploy --name ${{ matrix.service }} --env prod --force --verbose
           
