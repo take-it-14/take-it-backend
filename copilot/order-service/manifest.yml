@@ -48,6 +48,7 @@ secrets:
   RABBITMQ_PORT: /copilot/takeit/prod/secrets/RABBITMQ_PORT
   RABBITMQ_USERNAME: /copilot/takeit/prod/secrets/RABBITMQ_USERNAME
   RABBITMQ_PASSWORD: /copilot/takeit/prod/secrets/RABBITMQ_PASSWORD
+  MAX_ACTIVE_SIZE: /copilot/takeit/prod/secrets/MAX_ACTIVE_SIZE
   
 # You can override any of the values defined above by environment.
 #environments:

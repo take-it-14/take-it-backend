@@ -13,6 +13,7 @@ eureka:
       defaultZone: ${EUREKA_SERVER_URL}
   instance:
     hostname: ${EUREKA_HOSTNAME}
+    prefer-ip-address: false # IP 주소 대신 호스트 이름 사용
 
 management:
   tracing:

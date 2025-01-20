@@ -1,0 +1,51 @@
+name: Deploy to ECS
+
+# 트리거 설정
+on:
+  workflow_run:  # 다른 워크플로우가 완료된 후 실행
+    workflows:
+      - CI for TakeIt Services
+    types:
+      - completed  # 완료된 후 트리거
+  workflow_dispatch:  # 수동 실행 추가
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        service: ${{ fromJson(github.event.workflow_run.outputs.services) }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup SSH for Bastion
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: |
+            ${{ secrets.NEW_BASTION_SSH_KEY }}
+
+      - name: Deploy via Bastion
+        run: |
+          # 1. 배스천 서버 접속
+          ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=60 -A ${{ secrets.NEW_BASTION_USER }}@${{ secrets.NEW_BASTION_HOST }} << 'EOF'
+          
+            set -e
+
+            # 2. 앱 디렉토리로 이동
+            cd /efs/take-it-backend
+          
+            # 3. Git 상태 확인 및 업데이트
+            git fetch origin dev
+            git reset --hard origin/dev
+          
+            # 4. Copilot 서비스 확인
+            copilot svc ls
+          
+            # 5. Copilot 서비스 배포
+            echo "Deploying ${{ matrix.service }}..."
+            copilot svc deploy --name ${{ matrix.service }} --env prod --force --verbose
+          
+          EOF

@@ -30,6 +30,10 @@ eureka:
   client:
     service-url:
       defaultZone: ${EUREKA_SERVER_URL}
+  instance:
+    hostname: auth-service
+    prefer-ip-address: false # IP 대신 호스트 이름 사용
+    non-secure-port-enabled: true # HTTP를 사용하는 경우
 
 service:
   jwt:
