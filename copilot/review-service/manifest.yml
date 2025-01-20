@@ -1,0 +1,56 @@
+# The manifest for the "review-service" service.
+# Read the full specification for the "Backend Service" type at:
+#  https://aws.github.io/copilot-cli/docs/manifest/backend-service/
+
+# Your service name will be used in naming your resources like log groups, ECS services, etc.
+name: review-service
+type: Backend Service
+
+# Your service is reachable at "http://review-service.${COPILOT_SERVICE_DISCOVERY_ENDPOINT}:19096" but is not public.
+
+# Configuration for your containers and service.
+image:
+  location: gogohaena/takeit-review-service:latest
+  # Port exposed through your container to route traffic to it.
+  port: 19096
+
+cpu: 1024       # Number of CPU units for the task.
+memory: 2048    # Amount of memory in MiB used by the task.
+count: 1       # Number of tasks that should be running in your service.
+exec: true     # Enable running commands in your container.
+network:
+  connect: true # Enable Service Connect for intra-environment traffic between services.
+
+storage:
+  volumes:
+    config:
+      path: "/config" # 컨테이너 내 경로
+      read_only: false
+      efs:
+        id: fs-0a5dadfb97eaaf819
+        root_dir: "/review-service/config"
+
+variables:
+  SPRING_PROFILES_ACTIVE: prod
+
+secrets:
+  EUREKA_SERVER_URL: /copilot/takeit/prod/secrets/EUREKA_SERVER_URL
+  REVIEW_DB_URL: /copilot/takeit/prod/secrets/REVIEW_DB_URL
+  REVIEW_DB_USERNAME: /copilot/takeit/prod/secrets/REVIEW_DB_USERNAME
+  REVIEW_DB_PASSWORD: /copilot/takeit/prod/secrets/REVIEW_DB_PASSWORD
+  REVIEW_DDL_AUTO: /copilot/takeit/prod/secrets/REVIEW_DDL_AUTO
+  REVIEW_SERVICE_PORT: /copilot/takeit/prod/secrets/REVIEW_SERVICE_PORT
+  S3_BUCKET: /copilot/takeit/prod/secrets/S3_BUCKET
+  S3_ACCESS_KEY: /copilot/takeit/prod/secrets/S3_ACCESS_KEY
+  S3_SECRET_KEY: /copilot/takeit/prod/secrets/S3_SECRET_KEY
+  ZIPKIN_ENDPOINT: /copilot/takeit/prod/secrets/ZIPKIN_ENDPOINT
+  REDIS_HOST: /copilot/takeit/prod/secrets/REDIS_HOST
+  REDIS_PORT: /copilot/takeit/prod/secrets/REDIS_PORT
+  REDIS_PASSWORD: /copilot/takeit/prod/secrets/REDIS_PASSWORD
+
+# You can override any of the values defined above by environment.
+#environments:
+#  test:
+#    count: 2               # Number of tasks to run for the "test" environment.
+#    deployment:            # The deployment strategy for the "test" environment.
+#       rolling: 'recreate' # Stops existing tasks before new ones are started for faster deployments.

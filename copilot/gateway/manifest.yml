@@ -1,0 +1,65 @@
+# The manifest for the "gateway" service.
+# Read the full specification for the "Load Balanced Web Service" type at:
+#  https://aws.github.io/copilot-cli/docs/manifest/lb-web-service/
+
+# Your service name will be used in naming your resources like log groups, ECS services, etc.
+name: gateway
+type: Load Balanced Web Service
+
+# Configuration for your containers and service.
+image:
+  location: gogohaena/takeit-gateway:latest
+  # Port exposed through your container to route traffic to it.
+  port: 19091
+
+# Distribute traffic to your service.
+http:
+  # Requests to this path will be forwarded to your service.
+  # To match all requests you can use the "/" path.
+  path: '/'
+  # You can specify a custom health check path. The default is "/".
+  healthcheck:
+    path: '/'
+    success_codes: '200-499'
+    healthy_threshold: 3
+    interval: 15s
+    timeout: 10s
+    grace_period: 30s
+  deregistration_delay: 50s
+
+cpu: 512       # Number of CPU units for the task.
+memory: 1024    # Amount of memory in MiB used by the task.
+
+count:
+  range: 1-3
+  cpu_percentage: 80
+
+network:
+  connect: true # Enable Service Connect for intra-environment traffic between services.
+  vpc:
+    placement: 'public'
+
+storage:
+  volumes:
+    config:
+      path: "/config" # 컨테이너 내 경로
+      read_only: false
+      efs:
+        id: fs-0a5dadfb97eaaf819
+        root_dir: "/gateway/config"
+
+variables:
+  SPRING_PROFILES_ACTIVE: prod
+
+secrets:
+  EUREKA_SERVER_URL: /copilot/takeit/prod/secrets/EUREKA_SERVER_URL
+  JWT_SECRET_KEY: /copilot/takeit/prod/secrets/JWT_SECRET_KEY
+  GATEWAY_PORT: /copilot/takeit/prod/secrets/GATEWAY_PORT
+  ZIPKIN_ENDPOINT: /copilot/takeit/prod/secrets/ZIPKIN_ENDPOINT
+
+# You can override any of the values defined above by environment.
+#environments:
+#  test:
+#    count: 2               # Number of tasks to run for the "test" environment.
+#    deployment:            # The deployment strategy for the "test" environment.
+#       rolling: 'recreate' # Stops existing tasks before new ones are started for faster deployments.
