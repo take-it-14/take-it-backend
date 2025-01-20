@@ -65,4 +65,9 @@ public class FavoriteRepositoryImpl implements FavoriteRepository {
 
         return new PageImpl<>(results, pageable, total);
     }
+
+    @Override
+    public List<Favorite> findByProductId(Long productId) {
+        return jpaRepository.findAllByProductId(productId);
+    }
 }
