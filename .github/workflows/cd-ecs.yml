@@ -76,5 +76,5 @@ jobs:
             sudo git fetch origin dev
             sudo git reset --hard origin/dev
             echo "Deploying ${{ matrix.service }}..."
-            copilot svc deploy --name ${{ matrix.service }} --env prod --force --verbose
+            copilot svc deploy --name ${{ matrix.service }} --env prod --force
           EOF
