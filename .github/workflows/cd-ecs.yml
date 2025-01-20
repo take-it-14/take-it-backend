@@ -72,9 +72,9 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -A ${{ secrets.NEW_BASTION_USER }}@${{ secrets.NEW_BASTION_HOST }} << 'EOF'
             set -e
-            cd /efs/take-it-backend
-            git fetch origin dev
-            git reset --hard origin/dev
+            sudo cd /efs/take-it-backend
+            sudo git fetch origin dev
+            sudo git reset --hard origin/dev
             echo "Deploying ${{ matrix.service }}..."
             copilot svc deploy --name ${{ matrix.service }} --env prod --force --verbose
           EOF
