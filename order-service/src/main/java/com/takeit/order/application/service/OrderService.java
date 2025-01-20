@@ -69,7 +69,7 @@ public class OrderService {
 		UseCouponDto userCoupon = request.userCouponId() != null ?
 			couponClient.validUserCouponAndGetUserCouponId(UseCouponRequestDto.of(request.userCouponId(), request.amount()), userId) : null;
 
-		if(request.userCouponId() != null && (userCoupon == null || userCoupon.userCouponId() == null || userCoupon.discountAmount() == null)) {
+		if(validateUserCouponAndDiscountAmount(request.userCouponId(), userCoupon)) {
 			throw new CustomException(ErrorCode.CANNOT_USE_USER_COUPON);
 		}
 
@@ -90,6 +90,10 @@ public class OrderService {
 		queueService.deleteActiveKey(request.productId(), username);
 
 		return OrderCreateResponse.from(orderCacheDto.uuid());
+	}
+
+	private boolean validateUserCouponAndDiscountAmount(UUID userCouponId, UseCouponDto userCoupon) {
+		return userCouponId != null && (userCoupon == null || userCoupon.userCouponId() == null || userCoupon.discountAmount() == null);
 	}
 
 	public OrderDetailResponse getOrderDetail(UUID orderId, Long userId, String role) {
