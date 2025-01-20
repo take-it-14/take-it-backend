@@ -80,4 +80,14 @@ public class User extends BaseEntity {
         this.deletedBy = deletedBy;
         this.isDeleted = true;
     }
+
+    public static User of(Long id, String username, String nickname, String email, UserRole role) {
+        return User.builder()
+                .id(id)
+                .username(username)
+                .nickname(nickname)
+                .email(email)
+                .role(role)
+                .build();
+    }
 }
