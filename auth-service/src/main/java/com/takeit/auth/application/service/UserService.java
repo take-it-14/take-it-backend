@@ -5,11 +5,7 @@ import static com.takeit.common.utils.AccessValidator.isMaster;
 import static com.takeit.common.utils.AccessValidator.isRequesterAuthorized;
 
 import com.querydsl.core.types.Predicate;
-import com.takeit.auth.application.dto.CreateSellerDto;
-import com.takeit.auth.application.dto.CreateUserDto;
-import com.takeit.auth.application.dto.SellerResponse;
-import com.takeit.auth.application.dto.UserPageResponse;
-import com.takeit.auth.application.dto.UserResponse;
+import com.takeit.auth.application.dto.*;
 import com.takeit.auth.domain.entity.SellerInfo;
 import com.takeit.auth.domain.entity.SellerInfoStatus;
 import com.takeit.auth.domain.entity.User;
@@ -23,6 +19,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -159,4 +157,9 @@ public class UserService {
         return userRepository.findByEmailAndIsDeletedFalse(email).isPresent();
     }
 
+    public List<UserAuthResponse> getUsers(List<Long> idList) {
+        return userRepository.findAllById(idList).stream()
+                .map(UserAuthResponse::from)
+                .toList();
+    }
 }
