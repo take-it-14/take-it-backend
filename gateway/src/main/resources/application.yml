@@ -11,28 +11,28 @@ spring:
         - id: auth-service
           uri: lb://auth-service
           predicates:
-            - Path=/api/v1/auths/**,/api/v1/users/**,/api/v1/admins/**,/feign/v1/auths/**
+            - Path=/api/v1/auths/**,/api/v1/users/**,/api/v1/admins/**
         - id: order-service
           uri: lb://order-service
           predicates:
-            - Path=/api/v1/orders/**,/feign/v1/orders/**
+            - Path=/api/v1/orders/**
         - id: product-service
           uri: lb://product-service
           predicates:
-            - Path=/api/v1/products/**,/feign/v1/products/**, /api/v1/categories/**, /feign/v1/categories/**
+            - Path=/api/v1/products/**,/api/v1/categories/**
         - id: payment-service
           uri: lb://payment-service
           predicates:
-            - Path=/api/v1/payments/**,/feign/v1/payments/**
+            - Path=/api/v1/payments/**
         - id: review-service
           uri: lb://review-service
           predicates:
-            - Path=/api/v1/reviews/**,/feign/v1/reviews/**
+            - Path=/api/v1/reviews/**
         - id: coupon-service
           uri: lb://coupon-service
           predicates:
-            - Path=/api/v1/coupons/**,/feign/v1/coupons/**,/api/v1/user-coupons/**,/feign/v1/user-coupons/**
+            - Path=/api/v1/coupons/**,/api/v1/user-coupons/**
         - id: favorite-service
           uri: lb://favorite-service
           predicates:
-            - Path=/api/v1/favorites/**,/feign/v1/favorites/**
+            - Path=/api/v1/favorites/**
