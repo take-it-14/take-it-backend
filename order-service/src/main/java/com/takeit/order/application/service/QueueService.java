@@ -29,12 +29,15 @@ public class QueueService {
     private static final String WAITING_TOKENS = "waitingTokens";
     private static final String ACTIVE_TOKENS = "activeTokens";
     private static final String ACTIVE_USERS = "activeUsers";
+    private static final String WAITING_USERS = "waitingUsers";
+    private static final long WAITING_TTL_SECONDS = 60; // waiting TTL (60초)
     private static final int MAX_ACTIVE_SIZE = 100; // 최대 active token 수
     private static final long ACTIVE_TTL_SECONDS = 5; // active token TTL (5초)
 
     public boolean joinOneQueue(String username) {
         long currentTime = System.currentTimeMillis();
         stringRedisTemplate.opsForZSet().add(WAITING_TOKENS, username, currentTime);
+        setWaitingUserTtl(username);
         log.info("username : {}", username);
 
         return false;
@@ -109,6 +112,7 @@ public class QueueService {
         Long rank = stringRedisTemplate.opsForZSet().rank(WAITING_TOKENS, username);
 
         if(rank != null) {
+            setWaitingUserTtl(username);
             return QueueDto.of(rank, false);
         }
 
@@ -120,5 +124,10 @@ public class QueueService {
 
         throw new CustomException(QUEUE_NOT_FOUND);
 
+    }
+
+    private void setWaitingUserTtl(String username) {
+        String key = WAITING_USERS + ":username:" + username;
+        stringRedisTemplate.opsForValue().set(key, "active", WAITING_TTL_SECONDS, TimeUnit.SECONDS);
     }
 }

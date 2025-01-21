@@ -25,6 +25,7 @@ public class RedisKeyExpirationListener implements MessageListener {
 
 		if(expiredKey.startsWith("orderId:")) handleOrderExpiration(expiredKey.substring(8));
 //		if(expiredKey.startsWith("activeTokens:")) handleActiveUserExpiration(expiredKey);
+		if(expiredKey.startsWith("waitingUsers:")) handleWaitingUserExpiration(expiredKey.substring(22));
 	}
 
 	private void handleOrderExpiration(String key){
@@ -37,5 +38,10 @@ public class RedisKeyExpirationListener implements MessageListener {
 		String productId = parts[2];
 		String username = parts[4];
 		redisService.deleteActiveUser(productId, username);
+	}
+
+	private void handleWaitingUserExpiration(String key){
+		log.info("key : {}", key);
+		redisService.deleteWaitingToken(key);
 	}
 }

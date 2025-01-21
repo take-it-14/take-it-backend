@@ -54,7 +54,7 @@ public class ReviewService {
 
         if(orderDto == null)
             throw new CustomException(ORDER_NOT_FOUND);
-        if(!orderDto.status().equals("DELIVERED"))
+        if(!orderDto.status().equals("COMPLETED"))
             throw new CustomException(ORDER_NOT_DELIVERED);
 
         if(reviewRepository.existsByOrderIdAndIsDeletedIsFalse(orderDto.orderId())) {

@@ -31,7 +31,7 @@ public class UserCouponEndPoint {
 
     @PostMapping("/signup")
     public boolean signupUserCoupon(
-            @RequestBody Long userId
+            @RequestParam Long userId
     ) {
         return userCouponService.createSignupUserCoupon(userId);
     }
