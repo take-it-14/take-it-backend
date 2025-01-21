@@ -20,6 +20,8 @@ public class RedisService {
 	private final RedisTemplate<String, Object> redisTemplate;
 	private final RedisTemplate<String, String> stringRedisTemplate;
 	private static final String ACTIVE_USERS = "activeUsers";
+	private static final String WAITING_TOKENS = "waitingTokens";
+	private static final String WAITING_USERS = "waitingUsers";
 
 
 	public void saveOrderId(UUID orderId, long ttl){
@@ -57,4 +59,11 @@ public class RedisService {
 		Long remove = stringRedisTemplate.opsForSet().remove(activeSetKey, username);
 	}
 
+	public void deleteWaitingToken(String username) {
+		stringRedisTemplate.opsForZSet().remove(WAITING_TOKENS, username);
+	}
+
+	public void deleteWaitingUserTtl(String username) {
+		stringRedisTemplate.delete(WAITING_USERS + ":username:" + username);
+	}
 }
