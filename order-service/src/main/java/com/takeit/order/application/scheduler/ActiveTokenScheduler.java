@@ -38,7 +38,7 @@ public class ActiveTokenScheduler {
 //        log.info("Scheduler end");
 //    }
 
-//    @Scheduled(fixedRate = 2000)
+    @Scheduled(fixedRate = 2000)
     public void manageActiveTokensInOneQueue() {
         Set<String> keys = getAllActiveTokens();
         int activeUserSize = keys == null ? 0 : keys.size();
