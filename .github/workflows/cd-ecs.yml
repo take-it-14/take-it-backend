@@ -75,6 +75,7 @@ jobs:
             cd /efs/take-it-backend
             sudo git fetch origin dev
             sudo git reset --hard origin/dev
+            ../cp_config.sh
             echo "Deploying ${{ matrix.service }}..."
             copilot svc deploy --name ${{ matrix.service }} --env prod --force
           EOF
