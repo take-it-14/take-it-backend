@@ -44,6 +44,6 @@ jobs:
               # 6. 변경된 컨테이너 재시작
               docker compose -f docker-compose-prod.yml up -d
           
+              echo "Deployment completed successfully."
             INNER_EOF
-          
           EOF
