@@ -64,21 +64,8 @@ TODO: 해나님 추가 할 사항있으면 넣어주시거나 말씀해주세여
 
 ## 인프라 설계
 
-## 기술적 의사결정
-[보상 트랜잭션 방법](https://www.notion.so/teamsparta/053499af47b54dfaaf022d937ca5fbd9?pvs=4)
-
-[재고관리 동시성 해결 방법](https://www.notion.so/teamsparta/8af6d0b437ae43dc800f3b77d7108e4d?pvs=4)
-
-[외부용 API와 내부용 API 분리](https://www.notion.so/teamsparta/API-Feign-API-c929feaef71840edadf8221549c5ea68?pvs=4)
-
-[대기열 구현 방식](https://www.notion.so/teamsparta/3ed142171d6c47d5a27f4865e3d63ffd?pvs=4)
-
-## 트러블 슈팅
-[멀티 모듈 build 문제](https://www.notion.so/teamsparta/build-254821a3d50747f381ea56f6702c2ab3?pvs=4)
-
-[PostgreSQL Reserved Connections 이슈](https://www.notion.so/teamsparta/PostgreSQL-Reserved-Connections-112a11339ded4b49ae22ee6a780cadde?pvs=4)
-
-[Interceptor 순환 의존성 문제](https://www.notion.so/teamsparta/Interceptor-bb9d9159323d44f1b96b8ce83248bc32?pvs=4)
+## 기술적 의사결정 / 트러블 슈팅
+[Take It Wiki](https://github.com/take-it-14/take-it-backend/wiki)
 
 ## 팀 소개
 
@@ -86,5 +73,5 @@ TODO: 해나님 추가 할 사항있으면 넣어주시거나 말씀해주세여
 |--------|----------|-----------------------------------------------------------------------------------------------------------------------------|-----------------------------------|
 | 김원겸 | 리더     | ▶ 게이트웨이 환경 구축 <br>▶ 찜, 결제, 카테고리 도메인 개발<br>▶ 상품, 유저 도메인에 레디스 캐싱<br>▶ Redis Lua Script를 통한 재고 관리 동시성 제어<br>▶ 찜한 상품 오픈날 사용자에게 이메일 전송 기능 개발  | [🍁 깃헙링크](https://github.com/rua0704) |
 | 김해나 | 팀원     | ▶ **쿠폰**: Redis Lua Script를 통한 동시성 제어 및 대규모 트래픽 제어<br>▶ **타임세일**: Kafka 비동기 발급 처리, 분산락을 통한 동시성 제어                          | [🍁 깃헙링크]    |
-| 이민정 | 팀원     | ▶ **주문**: MSA 기반 주문 로직 구현, RabbitMQ 기반 보상 트랜잭션 적용                                              | [🍁 깃헙링크]     |
+| 이민정 | 팀원     | ▶ **주문**: MSA 기반 주문 로직 구현, RabbitMQ 기반 보상 트랜잭션 적용                                              | [🍁 깃헙링크](https://github.com/M1ngD0ng)     |
 | 최영근 | 팀원     | ▶ 리뷰, 쿠폰 도메인 개발<br>▶ Redis Sorted Set 기반 대기열 기능 개발<br>▶ RabbitMQ 기반 보상 트랜잭션 적용<br>▶ S3에 상품, 리뷰 이미지 업로드 기능 개발  | [🍁 깃헙링크](https://github.com/ykchoi1203)    |
