@@ -91,4 +91,10 @@ public class FavoriteService {
                         favoritePage.getTotalElements())
         );
     }
+
+    public List<Long> favoritedUserIdsByProductId(Long productId) {
+        return favoriteRepository.findByProductId(productId).stream()
+                .map(Favorite::getUserId)
+                .toList();
+    }
 }

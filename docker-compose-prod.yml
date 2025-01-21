@@ -397,6 +397,8 @@ services:
       - FAVORITE_DDL_AUTO=${FAVORITE_DDL_AUTO}
       - FAVORITE_SERVICE_PORT=${FAVORITE_SERVICE_PORT}
       - ZIPKIN_ENDPOINT=${ZIPKIN_ENDPOINT}
+      - GMAIL_USERNAME=${GMAIL_USERNAME}
+      - GMAIL_PASSWORD=${GMAIL_PASSWORD}
     depends_on:
       - eureka-server
     networks:

@@ -5,10 +5,9 @@ import com.takeit.auth.application.service.AuthService;
 import com.takeit.auth.application.service.UserService;
 import com.takeit.auth.domain.entity.SellerInfo;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,6 +20,11 @@ public class AuthEndPoint {
     @GetMapping("/{username}")
     public UserAuthResponse getUser(@PathVariable String username) {
         return authService.getUserByUsername(username);
+    }
+
+    @GetMapping
+    public List<UserAuthResponse> getUsers(@RequestParam(required = false) List<Long> idList) {
+        return userService.getUsers(idList);
     }
 
     @GetMapping("/seller/{userId}")
