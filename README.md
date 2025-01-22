@@ -61,6 +61,7 @@ MSA 기반 **이커머스 프로젝트**입니다.
 ![image](https://github.com/user-attachments/assets/eda73c4e-c2d5-4c23-9617-1cbec793476b)
 
 ## 인프라 설계
+![14조 인프라설계도_20250122 drawio](https://github.com/user-attachments/assets/84b2e952-51ef-4e61-b313-cf3d438e801a)
 
 ## 기술적 의사결정 / 트러블 슈팅
 [Take It Wiki](https://github.com/take-it-14/take-it-backend/wiki)
