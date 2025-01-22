@@ -14,20 +14,17 @@ MSA 기반 **이커머스 프로젝트**입니다.
     - Redis 캐싱을 활용하여 DB부하를 줄이고 응답 속도 확보
     - Redis 분산락을 활용한 동시성 처리로 안정성 있는 서비스 구축
 - **운영 및 배포 효율화**
-    - `TODO: 해나님 작성`
-    - ex) Docker와 Github Actions를 이용한 CI/CD 파이프라인 구축으로 배포 자동화
-    - ex) Prometheus와 Grafana를 활용한 실시간 모니터링으로 시스템 안정성 확보.
+    - Docker, Github Actions, AWS Copilot을 이용한 CI/CD 파이프라인 구축으로 배포 자동화
+    - Prometheus, Grafana, Loki를 활용한 실시간 메트릭 및 로그 모니터링으로 시스템 안정성 확보
 
 ## **기술 스택**
 
 ### **Backend**
 <img src="https://img.shields.io/badge/JAVA-007396?style=for-the-badge&logo=java&logoColor=white"><img src="https://img.shields.io/badge/Spring-6DB33F?style=for-the-badge&logo=Spring&logoColor=white"><img src="https://img.shields.io/badge/POSTGRESQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white"><img src="https://img.shields.io/badge/REDIS-FF4438?style=for-the-badge&logo=redis&logoColor=white"><img src="https://img.shields.io/badge/Gradle-02303A?style=for-the-badge&logo=gradle&logoColor=white"><img src="https://img.shields.io/badge/springsecurity-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white"><img src="https://img.shields.io/badge/jsonwebtokens-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white"><img src="https://img.shields.io/badge/springDataJPA-90E59A?style=for-the-badge&logo=springboot&logoColor=white"><img src="https://img.shields.io/badge/JUnit5-FB4F14?style=for-the-badge&logo=JUnit5&logoColor=white"><img src="https://img.shields.io/badge/RabbitMQ-FF6600?style=for-the-badge&logo=RabbitMQ&logoColor=white">
 
-
 ### **DevOps**
-<img src="https://img.shields.io/badge/amazonec2-FF9900?style=for-the-badge&logo=amazonec2&logoColor=white"><img src="https://img.shields.io/badge/amazonrds-527FFF?style=for-the-badge&logo=amazonrds&logoColor=white"><img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"><img src="https://img.shields.io/badge/githubactions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white"><img src="https://img.shields.io/badge/apachejmeter-D22128?style=for-the-badge&logo=apachejmeter&logoColor=white"><img src="https://img.shields.io/badge/prometheus-E6522C?style=for-the-badge&logo=prometheus&logoColor=white"><img src="https://img.shields.io/badge/grafana-F46800?style=for-the-badge&logo=grafana&logoColor=white">
+<img src="https://img.shields.io/badge/amazonec2-FF9900?style=for-the-badge&logo=amazonec2&logoColor=white"><img src="https://img.shields.io/badge/amazonecs-FF9900?style=for-the-badge&logo=amazonecs&logoColor=white"><img src="https://img.shields.io/badge/amazonrds-527FFF?style=for-the-badge&logo=amazonrds&logoColor=white"><img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"><img src="https://img.shields.io/badge/dockerhub-2496ED?style=for-the-badge&logo=docker&logoColor=white"><img src="https://img.shields.io/badge/githubactions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white"><img src="https://img.shields.io/badge/apachejmeter-D22128?style=for-the-badge&logo=apachejmeter&logoColor=white"><img src="https://img.shields.io/badge/prometheus-E6522C?style=for-the-badge&logo=prometheus&logoColor=white"><img src="https://img.shields.io/badge/grafana-F46800?style=for-the-badge&logo=grafana&logoColor=white"><img src="https://img.shields.io/badge/loki-FFC61C?style=for-the-badge&logo=&logoColor=white"><img src="https://img.shields.io/badge/promtail-FFC61C?style=for-the-badge&logo=&logoColor=white"><img src="https://img.shields.io/badge/zipkin-F46800?style=for-the-badge&logo=&logoColor=white"><img src="https://img.shields.io/badge/amazons3-569A31?style=for-the-badge&logo=amazons3&logoColor=white"><img src="https://img.shields.io/badge/aws fargate-FF9900?style=for-the-badge&logo=awsfargate&logoColor=white"><img src="https://img.shields.io/badge/aws copilot-000000?style=for-the-badge&logo=&logoColor=white">
 
-TODO: 해나님 추가 할 사항있으면 넣어주시거나 말씀해주세여
 ### **Tools**
 <img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white"><img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white"><img src="https://img.shields.io/badge/postman-FF6C37?style=for-the-badge&logo=postman&logoColor=white"><img src="https://img.shields.io/badge/intellijidea-000000?style=for-the-badge&logo=intellijidea&logoColor=white"><img src="https://img.shields.io/badge/slack-4A154B?style=for-the-badge&logo=slack&logoColor=white"><img src="https://img.shields.io/badge/notion-000000?style=for-the-badge&logo=notion&logoColor=white">
 
@@ -55,9 +52,10 @@ TODO: 해나님 추가 할 사항있으면 넣어주시거나 말씀해주세여
 
 ### 배포 자동화와 모니터링 시스템 구축
 
-- `TODO: 해나님 확인부탁드려요. 위에 예시 그대로 가져온거고, 프로젝트 목표랑은 좀 구분되게 작성해주세요!`
-- Docker와 Github Actions를 이용한 CI/CD 파이프라인 구축으로 배포 자동화
-- Prometheus와 Grafana를 활용한 실시간 모니터링으로 시스템 안정성 확보
+- Gradle Multi Module, Docker를 이용하여 Jar 및 컨테이너 빌드 환경 구성
+- Github Actions를 이용하여 CI/CD 파이프라인 구축으로 빌드 및 배포 자동화
+- AWS Copilot을 이용하여 ECS Fargate에 배포함으로써 인프라 구성 자동화 및 유연한 컨테이너 실행 환경 구성 
+- Prometheus, Grafana, Loki, Promtail을 활용한 실시간 메트릭 및 로그 모니터링으로 시스템 안정성 확보
 
 ## ERD
 ![image](https://github.com/user-attachments/assets/eda73c4e-c2d5-4c23-9617-1cbec793476b)
@@ -69,9 +67,9 @@ TODO: 해나님 추가 할 사항있으면 넣어주시거나 말씀해주세여
 
 ## 팀 소개
 
-| 이름   | 포지션   | 담당(개인별 기여점)                                                                                                            | Github 링크                       |
-|--------|----------|-----------------------------------------------------------------------------------------------------------------------------|-----------------------------------|
-| 김원겸 | 리더     | ▶ 게이트웨이 환경 구축 <br>▶ 찜, 결제, 카테고리 도메인 개발<br>▶ 상품, 유저 도메인에 레디스 캐싱<br>▶ Redis Lua Script를 통한 재고 관리 동시성 제어<br>▶ 찜한 상품 오픈날 사용자에게 이메일 전송 기능 개발  | [🍁 깃헙링크](https://github.com/rua0704) |
-| 김해나 | 팀원     | ▶ **쿠폰**: Redis Lua Script를 통한 동시성 제어 및 대규모 트래픽 제어<br>▶ **타임세일**: Kafka 비동기 발급 처리, 분산락을 통한 동시성 제어                          | [🍁 깃헙링크]    |
-| 이민정 | 팀원     | ▶ **주문**: MSA 기반 주문 로직 구현, RabbitMQ 기반 보상 트랜잭션 적용                                              | [🍁 깃헙링크](https://github.com/M1ngD0ng)     |
-| 최영근 | 팀원     | ▶ 리뷰, 쿠폰 도메인 개발<br>▶ Redis Sorted Set 기반 대기열 기능 개발<br>▶ RabbitMQ 기반 보상 트랜잭션 적용<br>▶ S3에 상품, 리뷰 이미지 업로드 기능 개발  | [🍁 깃헙링크](https://github.com/ykchoi1203)    |
+| 이름   | 포지션   | 담당(개인별 기여점)                                                                                                                             | Github 링크                                |
+|--------|----------|-----------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------|
+| 김원겸 | 리더     | ▶ 게이트웨이 환경 구축 <br>▶ 찜, 결제, 카테고리 도메인 개발<br>▶ 상품, 유저 도메인에 레디스 캐싱<br>▶ Redis Lua Script를 통한 재고 관리 동시성 제어<br>▶ 찜한 상품 오픈날 사용자에게 이메일 전송 기능 개발 | [🍁 깃헙링크](https://github.com/rua0704)    |
+| 김해나 | 팀원     | ▶ 인증, 사용자 도메인 개발<br>▶ **인프라**: AWS 환경 구축<br/>▶ **CI/CD**: Github Actions, AWS Copilot을 활용한 파이프라인 구성<br/>                                | [🍁 깃헙링크](https://github.com/gogohaena)                              |
+| 이민정 | 팀원     | ▶ **주문**: MSA 기반 주문 로직 구현, RabbitMQ 기반 보상 트랜잭션 적용                                                                                       | [🍁 깃헙링크](https://github.com/M1ngD0ng)   |
+| 최영근 | 팀원     | ▶ 리뷰, 쿠폰 도메인 개발<br>▶ Redis Sorted Set 기반 대기열 기능 개발<br>▶ RabbitMQ 기반 보상 트랜잭션 적용<br>▶ S3에 상품, 리뷰 이미지 업로드 기능 개발                            | [🍁 깃헙링크](https://github.com/ykchoi1203) |
