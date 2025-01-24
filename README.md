@@ -12,7 +12,7 @@ MSA 기반 **이커머스 프로젝트**입니다.
 - **대규모 트래픽 대응**
     - Redis Sorted Set을 활용한 대기열을 통해  부하 분산 및 사용자 경험 증진
     - Redis 캐싱을 활용하여 DB부하를 줄이고 응답 속도 확보
-    - Redis 분산락을 활용한 동시성 처리로 안정성 있는 서비스 구축
+    - Redis + Lua Script을 활용한 동시성 처리로 안정성 있는 서비스 구축
 - **운영 및 배포 효율화**
     - Docker, Github Actions, AWS Copilot을 이용한 CI/CD 파이프라인 구축으로 배포 자동화
     - Prometheus, Grafana, Loki를 활용한 실시간 메트릭 및 로그 모니터링으로 시스템 안정성 확보
@@ -38,7 +38,7 @@ MSA 기반 **이커머스 프로젝트**입니다.
 ### Redis 를 통한 캐싱 및  동시성 제어
 
 - 자주 호출되는 데이터에 대해 캐싱하여 DB부하를 줄이고 응답속도 증가
-- Redis 분산락을 통한 재고관리로 동시성 제어
+- Redis + Lua Script을 통한 재고관리로 동시성 제어
 
 ### Redis Sorted Set 기반 대기열 구현
 
